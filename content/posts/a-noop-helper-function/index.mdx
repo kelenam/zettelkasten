@@ -1,0 +1,151 @@
+---
+title: "A noop helper function (noopify)"
+date: 2020-02-12
+slug: "/a-noop-helper-function"
+tags:
+  - JS
+  - BCA
+  - Youtube
+---
+## noop
+- It's essentially a function that does nothing and returns nothing.
+- Pronounced: NO-OP
+> In computer science, a NOP, no-op, or NOOP (pronounced "no op"; short for no operation) is an assembly language instruction, programming language statement, or computer protocol command that does nothing.  
+> Source: https://en.wikipedia.org/wiki/NOP_(code)
+
+## So why use NoOp?
+- It can serve as a wrapper around potentially expected values without erroring out and blocking other code.
+- In our example below we will be using it to verify whether or not something is a function.
+- lodash and other js libraries ship with 
+
+## Code Example
+```javascript
+const noop = () => {};
+
+const noopify = possibleFunction() => {
+  return typeof  possibleFunction == "function" ? possibleFunction : noop;
+}
+
+const maybeAFunction1 = () => console.log('Hi!');
+const maybeAFunction2 = [1,2,3,4,5];
+const maybeAFunction3 = null;
+
+// If we tried calling maybeAFunction2 or 3 we would get a syntax error
+// maybeAFunction2();
+// --> Error
+
+// But by wrapping this function in noopify we are making sure it's
+// a useable function otherwise we are getting undefined
+// it's essentially like a functional typeChecker
+const wrap1 = noopify(maybeAFunction1);
+wrap1();
+
+const wrap1 = noopify(maybeAFunction2);
+wrap2();
+
+const wrap1 = noopify(maybeAFunction3);
+wrap3();
+
+```
+
+## Real-life Example
+- Useful, but particularly in React when we have some components 
+
+```jsx:title=src/noopify.js
+const noop = () => {};
+
+const noopify = possibleFunction => {
+  typeof possibleFunction === "function" ? possibleFunction : noop;
+}
+
+export default noopify;
+```
+
+```jsx:title=src/index.jsx {10}
+import React from "react";
+import ReactDOM from 'react-dom';
+
+import Button from "./Button";
+import "./styles.css";
+
+function App() {
+  return (
+    <div className="App">
+      <Button />
+    </div>
+  );
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);
+```
+- In the above we just have an app that just shows a button element that when clicked is supposed to run the onclick function passed to it as a prop
+
+```jsx:title=src/Button.jsx {8}
+import React from "react";
+
+const Button = ({ onClick }) => {
+  return (
+    <button
+      onClick={() => {
+        alert("Clicked!");
+        onClick();
+        alert("Second alert!");
+      }}
+    >
+      Click me 
+    </button>
+  );
+};
+```
+If we went ahead an ran this we would get the first alert but we wouldn't get the second alerty and thats bc we are erroring out (if we check console: `_onClick is not a function`)
+
+In order to fix this problem we can simply 
+1. import noopify
+2. Then wrap onClick with `noopify`
+
+
+```jsx:title=src/Button.jsx {3,6,12}
+import React from "react";
+
+import noopify from "./noopify";
+
+const Button = ({ onClick }) => {
+  const wrappedOnClick = noopify(onClick); 
+
+  return (
+    <button
+      onClick={() => {
+        alert("Clicked!");
+        wrappedOnClick();
+        alert("Second alert!");
+      }}
+    >
+      Click me 
+    </button>
+  );
+};
+```
+
+## Review Questions
+<details>
+    <summary>
+      What is noop? Why might you use a noop function?
+    </summary>
+      <code>noop</code> is a function that does nothing and returns nothing.
+</details>
+
+<details>
+    <summary>
+    When might you use a noop helper function?
+    </summary>
+    You might use one to validate a type, to check to see if something is a function, but more frequently you might use it to avoid erroring-out or blocking other code if an expected value is undefined or null. For example, in React you might be expecting a function to be passed down as a prop to a child component that depends on it, but say the function somehow isn't passed down/isn't written or for whatever reason is passed down as <code>undefined</code> or <code>null</code>, <code>noop</code> provides a way to handle that possibility without blocking ensuing code.
+
+</details>
+
+## Source
+Bite Sized JavaScript: https://www.youtube.com/watch?v=YKuDhEDDzfE
+
+## Backlinks
+- [HPB](../harry-potter-and-the-half-blood-prince)
+- [[]]

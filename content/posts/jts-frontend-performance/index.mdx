@@ -1,0 +1,243 @@
+---
+title: Front-end Performance - Part 1
+date: 2020-02-15
+slug: /front-end-performance-pt1
+tags:
+  - JS
+  - JTS
+  - Andrei Neagoie
+---
+
+# Performance Part 1
+
+## Introduction to Performance Part 1
+- Good performance is pretty important, seconds matter.
+- Client --> Server
+    get request to server
+    server returns file
+    - makes further requests based on needs, styles, images, js files, etc,
+    - all requests made by client ping server with requests as they emerge
+- Your page should load in less than 2 seconds otherwise you will lose a lot of visitors
+
+## 3 Keys to Performance
+
+3 ways to improve performance, can work on all 3. But you need to know what/where bottlenecks are, you need benchmarks to be efficient with your focus.
+
+1) Front-end
+    - Critical render path
+    - optimzed code
+    - Progressive web app
+2) Middle / Transfer
+    - Minimize Files
+    - Minimize Delivery
+3) Backend
+    - CDNS
+    - Caching
+    - Load Balance
+    - DB Scaling
+    - GZip
+
+## Network Performance
+
+### Honey I shrunk the files
+- bigger files = longer load
+- Minimize text (uglifyJS --> minimizes JS,CSS,HTML; part of a build process, included in webpack)
+- Minimze Images (optimize, often easiest to improve speed, but often mis-performed)
+- https://evilmartians.com/chronicles/images-done-right-web-graphics-good-to-the-last-byte-optimization-techniques
+
+### Image File Formats
+- easier: change file format to easier, JPG, GIF, PNG, SVG,
+- each has specific use case
+- JPG: Complex Photos images, thigns with lots of color, no transparency allowed, tend to be big
+- GIF: limit colors, grainy, small animations, 
+- PNGS: limit colors, smaller than JPGS because of that, used for logos, have transparency
+- SVG: vector graphics, expand size without loss of resolution, really small, and customizeable with css
+- Make sure format matches needs, then compress/optimize
+
+### Image Optimizations
+- If you want transparency: use a PNG
+- If you want animations: gif
+- colorful images: jpg
+- simple icons, logos, illustrations: SVGs
+
+### Minimize
+- Reduce PNG with : TinyPNG
+- Reduce JPG with: JPEG-optimizer
+- Try to choose simple ullustrations over highly detailed photographs
+- Always lower JPEG image quality (30-60%)
+- Resize image based on size it will be displayed
+- Display different sized iamges for different backgrounds.
+- Use CDNs like imgix
+- Remove image metadata
+
+### Media Queries
+- media queries useful for resizing appropriate image sizes for device
+- must save different file sizes, and just use css and media queries to serve smaller versions based on device size. 
+- browswer smart enough to know to download only assets it needs at a given time
+
+ ### CDNS
+- CDNS, take unoptimized images, and optimizes, caches it and gives you a url, 
+- verefix.com removes saved metadata of photos.
+
+### The Traveling DeliveryMan
+
+- reducing the amount of trips the deliveryman takes
+- sending only what we need down the wire.
+- lightweight libraries. 
+- Minimize number of files and number of requests
+
+### Critical Render Path 
+
+- HTML file arrives in browser from server
+    - Browser than starts reading or parsing HTML it generates the tree model known as the DOM.
+    - when rendering DOM it encounter CSS and requests
+    - Once DOM generated, starts working on COM (CSS Object Model) trees nodes for content style nodes
+    - Then sees JS file and sees any changes to the DOM it must make, then it rerenders DOM with combined render tree
+    - Render tree determines layout.
+    - Images are actually not part of this process and requested at need basis.
+
+### Render Tree 
+
+
+
+```
+              DOMContentLoaded                  Load
+                 |                               |
+                 V                               V              
+DOM --> CSSOM --> Render Tree --> Layout --> Paint
+HTML
+    CSS          JS                             JS
+    JS
+```
+- Parses HTML, creates DOM, as it sees external resources and DLs them as need be.
+- CSS and JS take higher priority than images.
+- Get CSS to browser as soon as possible.
+- JS at bottom of file because scripts will be blocking rest of render.
+    - exceptions might be GA (or tracking inclusions)
+
+- Script tags at bottom, bottom of body tag
+- style tags higher, bottom of head.
+
+### Critical Render Path 2 (CSS)
+- CSS is considered render blocking 
+    - CSSOM must finish before Render Tree generated
+    - Therefore keep CSS:
+        - Only load whatever is needed
+        - Above the fold loading
+            - Can write a function that pulls in style file only when needed.
+        - Media Attributes
+        - Less specificity
+            - More work with deeper specificity
+    
+### Critical Render Path 3 (JS)
+- JS files problem worse because they can both modify HTML and CSS, the DOM and the CSSOM after everything is loaded. Has to go back and modify before Render Tree produced
+- Remember JS is parser blocking.
+
+- A few things we can do:
+    - Load scripts asynchronously
+    - Defer Loading of scripts
+    - Minimze DOM Manipulating
+    - Avoid long running JS
+
+<img src="https://user-images.githubusercontent.com/5563119/65925028-ee60b380-e3a3-11e9-84cc-f97ebb62a038.png" width="600" />
+
+- `<script>`: **Use for critical scripts and app scripts**
+
+- `<script async>`: **Use for third-party scripts that don't effect DOM**
+    - might produce errors if we are modifiying the DOM and in this file and the DOM has finished loading.
+    - Rule for use is: Add them to anything that doesn't affect the DOM or CSSOM
+    - Use for all eternal scripts that require no knowledge of our code, stuff non-essnetially to our UI (tracking, GA scripts,)
+
+- `<script defer>`: **Any third-party scripts not that important for above fold**
+    - Defers loading of scripts, will not block loading, but will load only after HTML has completely finished loading.
+    - Good for things that will act on DOM/Render Tree, but for stuff not-important with above the fold content
+
+** Different browsers handle these script attributes differently.
+- the location of the script tags when you put async  or defer  attributes on them is important: https://stackoverflow.com/questions/10808109/script-tag-async-defer
+
+### Critical Render Path 4 
+- JS Events at the end of load will cause redraw of the render-tree
+- Limit the under-performant DOM manipulating events
+
+### Review
+- HTML
+    - Load style tag in the `<head>`
+    - Load the script tag before `</body>`
+
+- CSS 
+    - Only load whatever is needed
+    - Above the fold loading
+    - Media Attributes
+    - Less Specificity
+
+- JS 
+    - Load Scripts asyncrhonously
+    - Defer loading of scripts
+    - Minimze DOM Manipulating
+    - Avoid long running JS
+
+
+### Resources: Performance Tools
+#### Resources: Performance Tools
+
+Here are some extra resources and guides if you want a little more practice:
+
+#### Exercise: Dev Tools: 
+
+- [View main thread activities in a table](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#activities) to sort activities based on which ones took up the most time.
+- [Analyze frames per second (FPS)](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#fps) to measure whether your animations truly run smoothly.  
+- [Monitor CPU usage, JS heap size, DOM nodes, layouts per second, and more](https://developers.google.com/web/updates/2017/11/devtools-release-notes#perf-monitor) in real-time with the Performance Monitor.  
+- [Capture screenshots while recording](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#screenshots) to play back exactly how the page looked while the page loaded, or an animation fired, and so on.  
+- [View interactions](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#interactions) to quickly identify what happened on a page after a user interacted with it.
+- [Find scroll performance issues in real-time](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#paint-flashing) by highlighting the page whenever a potentially problematic listener fires.  
+- [View paint events in real-time](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#main) to identify costly paint events that may be harming the performance of your animations.  
+- [View main thread activity](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#main) to view every event that occurred on the main thread while you were recording.
+
+
+#### Other Resources:
+
+- http://optimizilla.com/
+- https://tools.pingdom.com/
+- https://www.thinkwithgoogle.com/feature/mobile/
+- https://developers.google.com/web/tools/lighthouse/
+- http://websitespeedranker.com/
+- https://pageweight.imgix.com/
+- https://developers.google.com/speed/pagespeed/insights/
+- https://passmarked.com/
+- https://images.guide/
+- https://www.crazyegg.com/blog/image-editing-tools/
+
+Additional image manipulation tools:
+
+- [XNConvert](https://www.xnview.com/en/xnconvert/): This free, cross-platform tool can handle batched images, and performs resizing, optimization, and other transforms.
+- [ImageOptim](https://imageoptim.com/mac): This free tool is available for Mac and as an online service, and is specifically aimed at optimizing images for speed, including metadata removal (discussed above).
+- [ResizeIt](https://itunes.apple.com/us/app/resizeit/id416280139?mt=12): A Mac-only desktop product that lets you change the size of multiple images simultaneously, and can convert file formats at the same time.
+- [PicResize](http://www.picresize.com/): One of several good browser-based tools that gives you lots of options for cropping, rotating, resizing, adding effects to, and converting images.
+
+### HTTP/2
+- May change how you decide on combining resources
+- multiplexing might make bundling files as efficient
+- one connection for parallelism, and concurrent file processing.
+- also has something called server push
+
+You can actually specify in node with http2 module to create a program using the HTTP/2 Protocol...
+resource: https://developers.google.com/web/fundamentals/performance/http2/
+
+```js
+const http2 = require('http2');
+const fs = require('fs');
+
+const options = {
+    key: fs.readFileSync('./selfsigned.key');
+    cert: fs.readFileSync('./selfseigned.crt');
+    allowHTTP1: true
+}
+
+const server = http2.createSecureServer(options, (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.end('ok');
+});
+```
+### Section Summary
+- "Preoptimization is the root of all evil"
+- Everything a trade-off, keep big picture in mind.

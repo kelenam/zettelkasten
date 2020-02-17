@@ -1,0 +1,53 @@
+---
+title: all - JavaScript helper function (30 seconds of code)
+date: 2029-11-01
+tags:
+  - 30soc
+  - JS
+  - Array
+  - Function
+---
+
+### all
+
+The `all` function Returns `true` if the provided predicate function returns `true` for all elements in a collection, `false` otherwise.
+
+Use `Array.prototype.every()` to test if all elements in the collection return `true` based on fn. Omit the second argument, fn, to use Boolean as a default.
+
+```js
+const all = (arr, fn = Boolean) => arr.every(fn);
+```
+
+Examples
+```js
+all([4, 2, 3], x => x > 1); // true
+all([1, 2, 3]); // true
+```
+
+### Notes
+**predicate:** filter criteria (in our case a function that evaluates to a Boolean value)
+> In mathematics, a predicate is either a relation or the boolean-valued function that amounts to the characteristic function or the > indicator function of such a relation.
+> A function P: X→ {true, false} is called a predicate on X. When P is a predicate on X, we sometimes say P is a property of X.
+
+### Confusions
+##### I'm not too certain what `fn = Boolean` is doing.
+- I know it's making Boolean the default function in the absence of the optional predicate.
+- `Boolean` is actually just a function, that seems to evaluate the value passed in as an arg to be its corresponding truthy/falsy value.
+    - `Boolean("")` would evaluate to `false`, as would an empty array. Any truthy evaluated value will return `true`.
+- Okay I get it now.
+##### I'm not too sure how `.every()` is working...
+**Syntax** : `arr.every(callback(element[, index[, array]])[, thisArg])`
+- Takes a callback as an argument. 
+- That callback can take up to 3 parameters: element, index, array.
+- The return value of every is `true` if the callback function returns a truthy value for every array element. Otherwise, `false`.
+- Okay, that makes sense.
+
+##### Why might I use or write this `all` function over simply using `Array.protoytype.every()`?
+- I think from first glance, it can be useful if you're evaluting if something exists or is empty.
+    - By adding the default `Boolean` we can check to see whether or not an array/string is empty.
+- It can be be a cleaner syntax? Maybe.
+
+##### When might we use `all`?
+- So I was thinking why this over using something like `.filter`? and I think it might be useful where you are trying to analyze a set or a group to see if there are any disqualifying features of that set. For example, if there is there are an array of ages or something, and the array represents a group or party. Maybe we are trying to recommend activities and you want to make sure everyone can participate, if one of your possible recommendations is a bar or some night-life activity you'd want to make sure everyone in the party is above 21 or something.
+
+### Links
