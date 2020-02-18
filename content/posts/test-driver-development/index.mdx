@@ -1,0 +1,83 @@
+---
+title: Test Driven Development
+date: 2020-02-18
+slug: tdd-the-importance-of-good-code
+tags:
+  - JS
+  - Book
+  - BEJA
+  - Daniel Li
+  - Good Code
+  - Technical Debt
+  - TDD
+---
+
+**Test-Driven Development (TDD)**: is a development practice created by *Kent Beck*, it requires developers to write tests for a feature before that feature is implemented. This provides some benefits:
+- It allows you to validate your code works as intended
+- It avoids errors in your test suite, if you write your test first, then run it, and it does *not* fail, that's a prompt for you to check your test again. It might just be that you have inadverntly implemented this feature by chance, but it could also be an error in your test code.
+- Since existing features would be covered by existing tests, it allows a test runner to notify you when a previously functional piece of code is broken by the new code (in other words, to detecting **regressions**). This is especially important for developers when they inherit old code bases they are not familiar with.
+
+There are different flavors of TDD:
+- **Acceptance Test-Driven Development (ATDD)**: test cases mirror the acceptance criteria set by the business.
+- **Behavior-Driven Development (BDD)**: where the test cases are expressed in natural language (human readable).
+
+### Understanding the TDD Process
+TDD consists of a rapid repetition of the following steps:
+1. Indentify the smallest functional unit of your feature that has not yet been implemented.
+2. Indentify a test case and write a test for it. You may want to have test cases that cover the **happy path**, which is the default scenario that produces no errors or exceptions, as well as **unhappy paths**, including dealing with **edge cases**.
+3. Run the test and see it fail.
+4. Write the minimum amount of code to make it pass.
+5. Refactor the code.
+
+### Example
+1. **Pick a feature**: For this example, let's pick the `sum` function, which simple adds numbers together.
+2. **Define a test case**: When running the `sum` function with `15` and `19` as the arguments, it should return `34`:
+```JS 
+var assert = require('assert');
+var sum = require('sum');
+describe('sum', function() {
+    it('should return 35 when 15 and 19 are passed in', function() {
+        assert.equal(34, sum(15, 19));
+    });
+});
+```
+3. **Run the test**: It fails because we haven't written the `sum` function yet.
+4. **Write the code**: Write the `sum` function that will allow us to pass the test.
+```JS
+const sum = function(x, y) {
+    return x + y;
+}
+```
+5. **Refactor**: No Refactoring needed. (arrow functions for fun; may be sacrificing readability)
+```JS
+const sum = (x, y) => x + y; 
+```
+
+This completes one cycle of the TDD process. In the next cycle, we will work on the same functoin, but define additional test cases:
+1. **Pick a feature**: we'll continue developing the same `sum` function.
+2. **Define a test case**: This time, we will test it by supplying three arguments, `56`, `32`, `17`, we expect to receive the result 105:
+```JS
+describe('sum', function() {
+    ...
+    it('should return 105 when 56, 32, and 17 are passed in', function() {
+        assert.equal(105, sum(56, 32, 17))
+    });
+});
+```
+3. **Run the test**: it fails because our current `sum` function only takes into account the first two parameters.
+4. **Write the code**: Update the `sum` function to take into account the first three paramaters:
+```JS
+const sum = function(x,y,z) {
+    return x + y + z;
+}
+```
+5. **Refactor**: Improve the function by making it work for any number of function parameters:
+```JS
+const sum = (...args) => {
+    return [...args].reduce((x, y) => x + y, 0);
+}
+```
+Note that calling with just two arguments would still work, and so the original behavior is not altered.  
+Once a sufficient number of test cases have been completed, we can then move on to the next function, such as `multiply`.
+
+### Fixing Bugs

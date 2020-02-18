@@ -5,15 +5,12 @@ slug: /building-enterprise-javascript-applications
 tags:
   - JS
   - Book
-  - Enterprise
+  - BEJA
   - Daniel Li
 ---
-
-### About
-
 #### Section 1 - Theory and Practice
 
-`Chapter 1`, *The Importance of Good Code*, is going to talk about the negative consequences of **technical debt**, and how implementing TDD can mitigate this effect.
+`Chapter 1`, *The Importance of Good Code*, is going to talk about the negative consequences of **technical debt**, and how implementing **TDD** can mitigate this effect.
 
 `Chapter 2`, *The State of JavaScript* will look at the evolution of the web application, following a **client-server model** to **single-page-applications**
 
@@ -22,6 +19,45 @@ tags:
 #### Section 2 - Developing our backend API
 
 `Chapter 4`, *Setting up Development Tools*, explains the different **module formats** in JavaScript, including **CommonJS** and **ES6 Modules**. We'll also be setting up local env with tools like: nvm, yarn, babel, nodemon, and ESLint.
+
+`Chapter 5`, *Writing End-to-End Tests*, hlps you practice TDD by teaching you how to write **end-to-end (E2E)** tests using **Cucumber** and **Gherkin**. We'll also migrate our API to Express as part of the refactoring step.  
+
+`Chapter 6`, *Storing Data in Elasticsearch*, continues our TDD journey as we persist our application data onto **Elasticsearch** a *NoSQL document store and search engine*. Also writing some **Bash** scripts to help with automation.
+
+`Chapter 7`, *Modularizing Our Code*, breaking our app into smaller modules. We will integrate a **JSON Schema** and **Ajv** inour implementation of the validation module.
+
+`Chapter 8`, *Writing Unit/Integration Tests*, how to use **Mocha** to write unit and integration tests. We will follow a **Dependency Injection** (DI) pattern, and use **Sinon** and **spies/stubs** to mock those dependencies.
+
+`Chapter 9` *Desiging our API*, discuss **REST** what it is and what it is not. We will also look at types of consistency: **Common**, **Local**, **Traversal**, **Domain** and **Perrennial**.
+
+`Chapter 10`, *Deploying Your Application on a VPS*. We will use a **VPS**, configure a DNS, and use a reverse proxy and keep our Node.js process alive with **PM2**.
+
+`Chapter 11`, *Continuous Integration*, we will implement a CI pipeline into our dev process. Also make use of Travis and Jenkins.
+
+`Chapter 12`, *Security: Authentication and Authorization*, we will look at passwords, sessions, token-based authentication. These include cryptographic hashing, salts, and JSON Web Tokens (JWTs).
+
+`Chapter 13`, *Documenting our API*, completes the development of our API by documenting it using Swagger. Learn to write OpenAPI-compliant specs in YAML, and visuzalize them using Swagger UI.
+
+#### Section 3 - Developing our frontend UI
+
+`Chapter 14`, *Creating UI with React*, going over React, VDom, pure components, and JSX. Also look at module bundlers, like Webpack, Rollup, and SystemJS.
+
+`Chapter 15`, *E2E Testing in React*, implement a TDD workflow involving Cucumber, and Selenium and using headless browers. We will also implement client-side routing in our app.
+
+`Chapter 16`, *Managing States with Redux*, using Redux to manage state in our application.
+
+#### Section 4 - Infrastructure and automation
+
+`Chapter 17`, *Migrating to Docker*, migrates our application to run Docker containers. Control groups, namespaces, Dockerfiles, and docker images.
+
+`Chapter 18`, *Robust Infrastructure with Kubernetes*, deploys our app into a cluster using Kubernetes, a **cluster management tool**, and combines discovery services, global config stores, schedulers and load balancers.
+
+#### Section 5 - Important JavaScript concepts and Syntax
+
+`Chapter 19`, *Important Concepts in JavaScript*, primer on fundamental principles of JS, things like data types, prototypes, the prototype inheritance chain, classes, context, and the execution context.
+
+`Chapter 20`, *Writing in ECMAScript2015+*, newer features of JS, defaults, destructuring, assignment, rest and spread operators, template literals, and promises.
+
 
 
 ### Table of Contents

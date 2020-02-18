@@ -1,0 +1,114 @@
+---
+title: The Importance of Good Code
+date: 2020-02-18
+slug: the-importance-of-good-code
+tags:
+  - JS
+  - Book
+  - BEJA
+  - Daniel Li
+  - Good Code
+  - Technical Debt
+---
+
+### Technical Debt
+**Technical debt**: Compounding lack of best practices, poor code quality and clarity that likely priortizes speed/bare-functionality over long-term use and readability. Plays on the analogy of financial debt, where you incur compound interest on your existing debts. The idea here is that 
+- Likely emerges when the MVP becomes the production codebase.
+
+> "Most software today is very much like an Egyptian pyramid with millions of bricks piled on top of each other, with no structural integrity, but just done by brute force and thousands of slaves."  
+> - Alan Kay, creator of Smalltalk
+
+- For development, repayment of Technical debt comes in the form of **refactoring**; trading a moderate increase in development speed now for a significant decrease later.
+
+#### Causes of technical debt
+- Lack of talent: inexeprienced devs
+- Lack of time: Setting unreasonable deadlines
+- Lack of Morale: constant changes and unclear path to success
+
+The real problem lies in the reluctance to tackle technical debt, since the biggest cause of technical debt is the *existing technical debt*. Any new code that depends on the bad code will very soon become part of the technical debt and incur further debt down the line.
+
+
+#### The Debt Spiral
+Where the financial analogy fails is the true cost. If you're thinking of a 3% APR it's more akin to something like a 1500% API from a payday loan. This is because we don't know the interest rate or repayment period beforehand.
+- Often the consequences of technical debt are close to immediate; therefore, by rushing, it may actually slow you down within the same development cycle. 
+- Very hard to predict and quantify the short-term benefits of incurring technical debt.
+
+#### Consequences of Technical Debt
+- slower development speed
+- more manpower (and thus money) to implement same amount of features
+- More bugs, meaning poorer user experience and more personnel required for customer service.
+
+#### Human Consequences
+##### Technical debt leads to low Morale
+- Most debs want to work on **greenfield** projects where they can develop new features rather than inherit **brownfield** projects riddled with bugs and technical debt.
+- Can lead to resentment of those stuck fixing things instead of creating new thing since colleagues can gain valueable experience on more modern frameworks and stay market-relevant.
+> Aside: Interesting to hear about Goog's dev process seems to reinforce this idea at least from that one blogger: https://mtlynch.io/solo-developer-year-2/
+
+##### Consequences of low Morale
+- lower productivity: work slower, longer breaks, less engaged in business.
+- lower code quality: development is a creative process, unhappy devs will be less inspired/creative.
+- highter turnover: unhappy devs will leave
+
+##### Repaying technical debt through refactoring
+How do we actually repay the technical debt?
+
+We do this through **refactoring**, or making our code *cleaner without changing the existing behavior*.
+
+Whilst no formal definition of "clean", here's an approximation:
+- **Well-structured**: code should consist of modules, separated by domain
+- **Well-documented**: For example, include unit tests, inline comments, automatically generated documentation, and `README` files.
+- **Succinct**:L Be concise, but not to the point of obfuscation.
+- **Well-formatted and readable**: Other developers must be able to review and work on the same code base, so it sould be easy to understand adn not deviate too far from well-established conventions.
+
+Deviations from these best pratices are referred to as **code smells**. They are weaknesses within the code that violate well-established design patterns.
+
+Therefore, refactoring is simply a process that moves the current code base from having a lot of code smells to one that is cleaner and less smelly.  
+
+The important point here is that developers should be given time to refator, in fact it should be at the core part of any development process and be included in the time estimates that the developers provide.
+
+#### Preventing Technical Debt
+- Prevent is better than cure. Preventative care and maintenance is key. So what does that look like?
+
+##### Informing the decision makers
+- It's important for professional developets to understand the situation that they must work within. That is the **triple constraint** model.
+
+##### The triple constraint
+- The classical project management triangle (aka the triple constraint or iron triangle).
+- Coined the popular saying: Time, Quality, Cost: Pick Two.
+- Premise: Optimzing the project for one area would cause another area to suffer.
+    - Time and Quality: You can design and build a high-quality platform quickly but you'll need to hire a lot of experienced debs which will be expensive.
+    - Time and Cost: You can build quickly with inexperienced devs but the quality will suffer.
+    - Quality and Cost: You can tell a few inexperienced debs to design and plan a platform propertly that can be of good quality but it its going to be slow.
+
+- Other companies might stay be more competitive and capture FMA (first-mover advantage) which will manifest itself in the business decisions in the company the devs are working for. 
+- To make things worse: managers and business owners are focused on more tangible, immediate results, reinforcing the desire for all 3.
+
+##### The Fallcy of the triple constraint
+- The fallacy here is that by neglecting quality and incurring debt, they'll eventualy be increasing both the time and cost requirements many times over.
+- Therefore, it is the duty of the develop to inform the product manager and business owner of the unpredictable effects of incurring technical debt.
+- DO this to prevent the worst-case scenario where the effort required to fix the code is greater than rewriting everything from scratch (aside: I think this is another something potential danger, making that judgment call, I feel like a lot of devs would prefer to rewrite the whole thing than to actaully try fixing it as an instinct which may or may not bias their path forward.) 
+
+##### Refuse to develop
+- If something is FUBAR it may be best to take the drastic approach of refusing to develop until refactoring is done.
+- most business owners do not know what is best for them technically, which is why they hired you to make teh best possible technical deicions for thier business.
+
+##### Don't be a hero
+- It's not always the business owners fault, especially if you're not pushing back on unreaonable deadlines.
+- You may think the business would appreciate you for going the extra mile but here are 4 things wrong with that way of thinking:
+1. You may not actually complete the feature on time that ensuing business strategy may depend on having done.
+2. You're establishing an unsustainable threshold: "You did it last time..."
+3. Rushing through code will likely incur technical debt.
+4. Resentment from other developers, increasing load/rush for everyone involved.
+
+- There's a time to stick your head out to save a business, but by doing it too often you are actually hurting the team.
+- Business owners would rather hear *it's not possible* a month in advance than a promise of *everything will be done that was not delivered.*
+
+#### Defining Processes
+Good code starts with good planning, design, and management and is maintained by good processes.
+Problems can be mitigated with clear guidelines:
+- Situations where incurring technical debt is appropriate, for example to meet a legal requirement such as GDPR compliance.
+- Occasions when developers can expect to receieve time to repay these debts, e.g. before the next feature is started, or two weeks at the end of each quarter.
+- The distribution of work on greenfield/brownfield projects within the team, e.g. with a rotation system.
+- The **Definition of Done** - a list of criteria which must be met before a feature is considered "done", e.g. code passes all tests and is peer-reviewed and documentation is updated.
+
+Software development paradigms such as Agile, and Waterfall, as well as implementations like Scrum and Kanban, provide different ways to enforce these processes.
