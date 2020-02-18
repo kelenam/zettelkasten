@@ -32,7 +32,7 @@ TDD consists of a rapid repetition of the following steps:
 ### Example
 1. **Pick a feature**: For this example, let's pick the `sum` function, which simple adds numbers together.
 2. **Define a test case**: When running the `sum` function with `15` and `19` as the arguments, it should return `34`:
-```JS 
+```js 
 var assert = require('assert');
 var sum = require('sum');
 describe('sum', function() {
@@ -49,14 +49,14 @@ const sum = function(x, y) {
 }
 ```
 5. **Refactor**: No Refactoring needed. (arrow functions for fun; may be sacrificing readability)
-```JS
+```js
 const sum = (x, y) => x + y; 
 ```
 
 This completes one cycle of the TDD process. In the next cycle, we will work on the same functoin, but define additional test cases:
 1. **Pick a feature**: we'll continue developing the same `sum` function.
 2. **Define a test case**: This time, we will test it by supplying three arguments, `56`, `32`, `17`, we expect to receive the result 105:
-```JS
+```js
 describe('sum', function() {
     ...
     it('should return 105 when 56, 32, and 17 are passed in', function() {
@@ -66,13 +66,13 @@ describe('sum', function() {
 ```
 3. **Run the test**: it fails because our current `sum` function only takes into account the first two parameters.
 4. **Write the code**: Update the `sum` function to take into account the first three paramaters:
-```JS
+```js
 const sum = function(x,y,z) {
     return x + y + z;
 }
 ```
 5. **Refactor**: Improve the function by making it work for any number of function parameters:
-```JS
+```js
 const sum = (...args) => {
     return [...args].reduce((x, y) => x + y, 0);
 }

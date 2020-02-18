@@ -16,7 +16,7 @@ tags:
 - Likely emerges when the MVP becomes the production codebase.
 
 > "Most software today is very much like an Egyptian pyramid with millions of bricks piled on top of each other, with no structural integrity, but just done by brute force and thousands of slaves."  
-> - Alan Kay, creator of Smalltalk
+> Alan Kay, creator of Smalltalk
 
 - For development, repayment of Technical debt comes in the form of **refactoring**; trading a moderate increase in development speed now for a significant decrease later.
 
@@ -112,3 +112,54 @@ Problems can be mitigated with clear guidelines:
 - The **Definition of Done** - a list of criteria which must be met before a feature is considered "done", e.g. code passes all tests and is peer-reviewed and documentation is updated.
 
 Software development paradigms such as Agile, and Waterfall, as well as implementations like Scrum and Kanban, provide different ways to enforce these processes.
+
+### Fixing bugs
+- TDD reduces prevalance of bugs, but there will still be edge cases we have overlooked. We can still apply TDD principles to bug fixing.
+- In TDD when a bug is encountered is a treated the same way as a new feature. You'd first write a failing test to reproduce the bug , then update the code until the test passes.
+- Having the bug documented as a test care ensures the bug stays fixed in the future, preventing regression.
+
+### Benefits of TDD
+- For most new devs, having tests in the code is an afterthought-- a luxury if time permits. But that they don't realize is: *everyone tests their code, consciously or otherwise.*
+- After you've written a function you may use the console to check if it works, but what you are doing is simply **manually testing** a function that has already been implemented.
+- The advantage of manually testing is that it requires no upfront costs--you just run the function and see if it works. However, the downside is that it cannot be automated, eating up more time in the long run.
+
+#### Avoid manual tests
+Instead, you should formallyu define these manual tests as code, in the form of **unit**, **integration**, and **end-to-end (E2E)** tests, among others.
+- Formally defining tests has a highter upfront cost, however, we can use scripts/automation to automatically run the same test every time the code changes, making the cost to run it in the future essentially zero and thus eliminating the likelhood of regression.
+
+- You will always need to test, so a little time now or a lot of time later?
+- Testing pyramid, developed by Mike Cohn, shows you should have lots of unit tests (fast and cheap to run), fewer integration tests, and even fewer UI tests (more time consuming and more expensive to define and run.)
+
+### Tests as Specification
+What are the other benefits of writing tests before implementation (besides avoiding manual testing)?
+- :star: It forces you to think about your requirements and break them down into atomic units.
+- You can write each test case around a specific requirement. The end result is that the test cases form the specification for your feature.
+- writing tests first helps you structure your code around the requirements not the other way around.
+- Also helps to abide by **You Aren't Going to Need It Again (YAGNI)** which prevents you from implementing features that aren't actually needed.
+
+### Tests as documentation
+- Test cases can essentially act as code samples and form part of the documentation.
+
+### Short Development Cycles
+Because TDD focuses on a single functional block at a time, it's dev cycles are usually pretty short (minutes/hours). This means, small incremental changes can be made and released rapidly.
+
+### Difficulties with TDD adoption
+- **Inexperienced team**: TDD only works if the whole team adopts it. Many junior devs never learned to write tests. Good news is that it isn't too hard to learn.
+- **Slower initial development speed**: TDD requires product owner to create specification doc and for the developers to write the tests b efore any functional code is written. Slower but in the pay now or pay interest later way.
+- **Legacy Code**: Many legacy have incomplete or zero tests written for it. This is tricky because TDD means you write your tests first; if you already have all you code then its can't be TDD.
+- **Slow tests**: TDD is only pratical when the tests can be run quickly (within a few seconds). If the test suite takes a few minutes to run, then developers would not receive quick enough feedback for those tests to be useful. 
+    - The simplest way to mitigate this is by breaking the code into smaller modules and running tests on them individually.
+    - However, some tests, such as large integration and UI tests are inevitably slow, sometimes these can only be run in CI environments which we will get to later.
+
+### When not to use TDD
+- TDD isn't a silver bullet
+- TDD induces a high intial cost so might not be useful in projects that are simply **Proof-of-Concept (PoC)**. 
+- Secondly, may not be useful when the product owner has not defined clear requirements (or does not want to), like in some startups where pivoting is likely. Writing tests may be a waste of time if your project ends up pivoting to something else entirely.
+
+### Review Questions
+1. What is technical debt?
+    - What are some of its causes?
+2. What is TDD and how can it help with technical debt?
+3. What are some more benefits of TDD?
+4. How can you incorporate TDD into your workflow?
+5. What is Good Code and what are its benefits?
