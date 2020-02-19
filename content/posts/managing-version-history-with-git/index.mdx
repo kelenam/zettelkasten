@@ -102,7 +102,7 @@ Here, the staging area acts as a temporary environment to collect these related 
 ### Branching and Merging
 So far we have been dealing with linear history. But what if you and your teammate are working on different features/multiple taks at the same time? Our git history is going to look disjointed which is not ideal. This is why Git **branches** were created.
 
-#### Git Branches
+### Git Branches
 Instead of contantly commiting to master (bad practice) its better to create feature/bug fix branches as to group together related changes in a separate branch that can be added to the history tree. If and when we fix or feature complete, we can merge this branch back into `master`.
 
 The end result is the same, but the Git history is now much easier to read and understand. Branches allow you to write and commit experimental code in an isolated part of the repository so your changes, which may introduce new bugs and regressions, won't affect others until they have been tested and peer-reviewed.
@@ -114,7 +114,49 @@ The workflow we just described is an example of a **branching model**, which is 
 #### The Driessen model
 ![Driessen branching model](./driessen-branching-model.png)
 
+In Driessen's model there are two permanent branches: 
+- `dev` (or `develop`, or `development`): The main branch that developers work on.
+- `master`: Only production-ready code can be commited to this branch. Tested and approved by stakeholders.
 
+There are also other non-permenant branches:
+- **Feature branches**: Branching from the `dev` branch, feature branches are used for developing new features, or fixing non-critical bugs. Feature branches will eventually be merged back into `dev` branch.
+- **Release branches**: One enough features or bug fixes have been implemented and merged back into `dev`, a release branch can be created from the `dev` branch to undergo more scrunity before being released. Once thoroughly tested, can be merged into `master`.
+- **Hotfix (or patch) branches**: Hotfixes are issues (not always bugs) that are in production which must be fixed as soon as possible, before the next planned release. In these cases, *the developer would cut a branch from `master`,* make the required changes, and merge directly back into `master`. ⭐ These hotfix branches should also be merged back into the `dev` branch and any other release branches.
+
+### Creating a development Branch
+- first check which branch we are on with: `git branch --list` or simpply `git branch`
+- The asterisk (*) will indicate which branch we are currently on.
+- To create a new branch from the current branch we can run `git branch dev`
+- However, instead we are going to run `git checkout -b dev master`, which creates a new branch and makes it active at the same time.
+
+### Creating Feature Branches
+Any new features should be develop by branching off `dev`.
+- Be sure to pick a clear and concise name for your feature branch. e.g. working on a social login feature your branch could be called `social-login`.
+- If that feature has sub-features from the main feature branch. e.g. `facebook-login` and `twitter-login`. under `social-login`.
+
+#### Naming sub-branches
+There are multiple ways to name sub-branches, but the most popular convention uses **grouping tokens** with various **delimiters**. For example, our fb and twitter login sub-branches canbe grouped under the `social-login` grouping token, with a period as a delimiter and a **sub-token** such as `facebook` or `twitter`:
+```
+social-login
+social-login.facebook
+social-login.twitter
+```
+
+Most conventions use the forward slash (/) as the delimiter...
+```
+social-login/main
+social-login/facebook
+social-login/twitter
+```
+However, the only problem this poses is that branches are stored as text files under their respective directory branches. That means social-login is already in use as the name of the branch/file and cannot act a directory at the same time. The workaround is providing a default sub-token somthing like: `social-login/main`
+
+### Merging Branches
+
+
+
+### Review Questions
+1. What is the difference between using `git branch {newBranchName}` versus `git checkout -b {newBranchName} master`?
+1. In the Driessen model, which branch should all feature branches be branched from?
 
 ### Links
 - Root: [Building Enterprise JavaScript Applications](/building-enterprise-javascript-applications)

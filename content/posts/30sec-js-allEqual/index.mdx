@@ -1,0 +1,30 @@
+---
+title: allEqual - JavaScript helper function (30 seconds of code)
+date: 2020-02-17
+slug: 30sec-js-allEqual
+tags:
+  - 30soc
+  - JS
+  - Array
+  - Function
+---
+
+### allEqual
+`allEqual` checks if all elements in an array are equal.
+
+Use `Array.prototype.every()` to check if all the elements of the array are the same as the first one. Elements are compared using the strict comparison operator, which does not account for `NaN` self-inequality.
+
+```js
+const allEqual = arr => arr.every(val => val === arr[0]);
+
+// Examples
+allEqual([1,2,3,4,5,6]); // --> false
+allEqual([1,1,1,1,1,1]); // --> True
+```
+
+### Why/When might we use this?
+Perhaps as a more specific use-case alternative to [`all`](/30sec-js-all) where instead of defining the predicate behavior, we are simply looking for equality across a set.  
+Maybe in a situation where we are using this to bridge some ensuing action, like, gathering test results, we have an array of passing tests that are all supposed to be `true`. If all tests are passing then something else can proceed, the `allEqual` function can serve as a mini-validation step.
+
+### Links
+- [`all`](/30sec-js-all)
