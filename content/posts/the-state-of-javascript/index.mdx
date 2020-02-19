@@ -1,0 +1,82 @@
+---
+title: The State of JavaScript
+date: 2020-02-18
+slug: the-state-of-javascript
+tags:
+  - JS
+  - Book
+  - BEJA
+  - Daniel Li
+  - State of JS
+---
+
+JS historically seen more of as a 'toy/web-only scripting lang' until the advent of **Node.js**.
+- Allowed for server-side/back-end JS, and perhaps more significantly, the use of the same lanugage on both sides of the application.
+- Also lead to rise in **Isomorphic** or **Universal**, JavaScript frameworks such as Meteor. These types of frameworks allow you to write applications entirely in JS that run on both the client and the server.
+
+### Evolution of the web application
+When visiting a url, you make a request to a server and sends back data/HTML/response back to the client.
+- The browser parses the HTML and all the files that are dependent therein (CSS, images, JS, etc) and renders them to the page.
+
+This scheme is known as the **client-server model**. In this model, most of the processing is handled server-side; the client's role is limited to simple and superficial uses, such as rendering the page, animating menus etc.
+- This model was popular in the 90s and 2000s at a time when web-browsers were less powerful
+- (Aside: and now we are going back to static-sites and server-side rendered things: Gatsby, Next, etc.)
+
+### Just-In-Time (JIT) Compilers
+Between 2008 and 2009, Mozilla introduced *tracemonkey* the first JIT compliler for JS (Chrome with V8) and Chakra for IE and Edge (aside: this has likely changed since MS went Chromimum within the last 2 years)
+ 
+Traditionally the JS engine uses an **interpreter** which translates the JS source code into **Machine code** that your computer could run.
+The JIT compiler improved the performance of the engine by identifying blocks of code that are frequently run, compiling them, and adding them to a cache. When the same block of code needs to be run again, the cache version is run instead of needing to re-compile/interpret it, greatly improving performance.
+
+### Single Page Applications (SPAS)
+Because of the performance boost of the JIT compiler, feature-rich JS applications began to emerge.
+- Google was the first co to take advantage of this with the advent of Angular (on 20 October 2010) and releasing the first *client-side web application framework*.
+- Since then, Ember, React, Vue, etc. have been released.
+
+Angular is a framework for building SPAs, instead of delegating the bulk of the processing to the server, the client takes on most of the responsibility.
+
+#### Before SPAs
+In the client-server model, when the server receives a request from the client, it will fully compose the HTML, typically in a template, and attach it as a payload to the response.  
+Any time new data was requested, it would wrap the data in that composed HTML and send the whole payload back down to the client.
+
+
+#### With SPAs
+In the SPA model, the server would initially send the entire application (HTML,CSS,JS) to the client. ALl the application logic, including routing now resides on the client.
+- Because of this, client can update the UI of the application almost instantaneously
+- Whenver the client requires info it does not have, such as certain entries in a database, it will send a request to the server.
+- The server would then respond with the raw data, usually in JSON, and nothing else. It is then the client's job to process this information and update the UI.
+- For most SPAs, most of the logic is handled client-side; the server's job is simply to retrieve and send back data.
+
+#### SPAs benefits over Client-Server Model
+- It frees up the server to handle more requests, as requests are simpler to process
+- It allows the UI of the app to respond more quickly to user interaction because the UI does not need to wait for the server to respond before updating itself.
+
+### Isomorphic JavaScript Applications
+Some of the shortcomings of SPAs is that more code needs to be transferred at the beginning, which can increase the initial load time of the page. To counter this deficiency a technique called **server-side rendering (SSR)** can be employed.
+
+With SSR, the initial page is processed and rendered on the server in the same way as the traditional client-server model, however, the returned HTML contains a tag that'll request the rest of the application to be downloaded at a later time, after the initial page has been successfully rendered.
+- SSR is alos useful for ensuring SEO performance, as it helps web crawlers quickly decipher how a page should look without having to download all the assets.
+
+SSR can be used alongside other techniques, such as **code splitting** and **tree shaking**, to reduce the size of the initial response payload, thus reducing the **first-time-to-render (FTTR)** and improving the user experience.
+
+This is the state of the web application today (2019/2020). HTTP/2 and WebAssembly and other future techs could/will change this.
+
+### Benefits of Node.js
+Many reaons, but to main here:
+- Context Switching (front-end, back-end are the same language, requires less mental gear switching between front and backends)
+    - Same language: same syntax, same paradigms
+    - More efficient pipeline, single dev can develop an entire feature from start to finish.
+- Shared Code:
+    - NPM packages, package managers,
+    - Common logic shared across both environments, 
+    - JS in front and back allow to improve maintainability , reduce compatabilityu issues, and conserve manpower/dev time.
+
+### Review Questions
+1. What have some of the more seismic shifts been in modern web development?
+2. What is the primary differences between the client-server model and SPAs?
+3. Why was the advent of Node.js so powerful/beneficial to the web-dev landscape?
+
+### Links
+- Root: [Building Enterprise JavaScript Applications](/building-enterprise-javascript-applications)
+- Prev: [Test-Driven Development](/tdd-the-importance-of-good-code)
+- Next: [Managing Version History with Git](managing-version-history-with-git)

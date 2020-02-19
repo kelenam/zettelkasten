@@ -1,0 +1,122 @@
+---
+title: Managing Version History with Git
+date: 2020-02-18
+slug: managing-version-history-with-git
+tags:
+  - JS
+  - Book
+  - BEJA
+  - Daniel Li
+  - Git
+  - version control
+---
+
+As an example we will be creating a simple user directory which we will call "alist".
+
+For this we will be using something known as **version control (VC)**. The simplest way to implement version control is to copy the entire codebase into date-stamped directories, however, thi is tedious and space-consuming.  
+A better approach is using a **Version Control System (VCS)** like Git.
+
+There have been many VCS: Source Code Control System (SCCS), Revision Control System (RCS), SVS, SVN, DVCS, etc. But Git is the standard now, thanks, Linus.
+
+### Setting up Git
+Firstly, git must be installed:
+
+Git is available for macOS, Windows, and Linux. Using a Unix system we can use the default **Advanced Packaging Tool (APT)** to run some commands.
+- `sudo apt update` - to make sure packages are up to date.
+- Then we can run: `sudo apt0-get install git`
+
+### Creating a new repository
+- Navigate to your project directory and type in `git init` to initialize the repo and start tracking our changes.
+- Running `git init` creates a `.git` directory, which holds all version-control-related information about the project.
+- When we interact with Git using its CLI, alls its doing is manipulating the content of this `.git` directory. (Aside: Checkout notes from Nina's Advanced Git course, linked below)
+
+### Configuring Git
+- We can configure git using the command `git config`
+    - This command will manipulate the `.git/config` file on our behalf.
+    - You can use the `tree` tool (make sure its' installed: `sudo apt install tree`) to checkout the contents of the .git dir.
+
+- To configure Git, we must first understand that there are 3 scopes or levels of configurations, each corresponding configuration file stored at different locations:
+1. **Local**: Applies only to the current repository; the configuration file is stored at `<repositorty-root>/.git/config`
+2. **Global**: Applies to all repos under the uers's home dir; the config file is stored at `$HOME/.config/git/config` and/or at `$HOME/.gitconfig`, with the latter being only available in newer versions of Git. `$HOME/.gitconfig` will override `$HOME/.config/git/config`.
+3. **System**: Applies to all repos in your machine; the config file stored at `/etc/gitconfig`.
+
+⭐ The local config settings will override the global settings, which, in turn, override the system settings.
+
+### Configuring a user
+When we ask Git to take a snapshot of our code (also called **committing**), Git will record several pieces of information, such as the time and author of the commit. The information abotu the author is saved as Git configurations, which saves us from having to re-type them each time we commit.
+
+If you are the only one using your machine, you can set your git user settings globally:
+` $ git config --global user.name "First Last Name"` 
+` $ git config --global user.email "email@email.com"`
+
+This will cause future commits to be, by default, identified as your credentials.
+
+### Learning the Basics
+The primary purpose of Git is to keep a history of changes, or revisions.
+
+#### Commit to history
+You can use `git log` to list history of past commits.
+`git status` will tell you the current state of our repo.
+
+If we create a new file, like a README, and do nothing else, we will have untracked changes since we haven't staged/commited anything. So let's understand the state a repo can be in...
+
+#### Understanding file states in Git
+In Git, every file can be in one of two generics states: **tracked** and **untracked**.
+
+Initially, all files exists in the **workspace** (also known as the **working tree** or **working diretory**) and are in an **untracked** state (essentially ignored by git until tracked)
+When we commit a new file to the repo using `git add` and `git commit`, it transitions from untracked to tracked.
+- Remember commit messages should be specific and informative, e.g. `Fixes rounding error bug in calculateScore`
+
+#### The three tracked states
+To be more precise, the tracked state can be further subdivied into three substates: **modified**, **staged**, **committed**.
+- Git will pay attention to all the tracked files, if we modify any of them (deletions, renames, edits), they will change their state from *commited* to *modified*.
+
+Modified files, alongside any untracked files, will be listed when we run `git status`.
+
+You might be wondering why we had to run `git add` before we commited, well...
+`git add` places the untracked or modified file into what is known as the **staging area** which is also known as the **index** or **cache**. When a file is placed into the staging area, it is in the staged state. When we commit, only changes in the staging area are added to the repository; changes that remain in the workspace are not commited.
+
+### Staging our Changes
+By having a staging area, we can `git add` multiple related changes and `git commit` them all at the same time - as a single commit. 
+
+Here, the staging area acts as a temporary environment to collect these related changes. Changes that are related to each other should be commited together.
+
+### Quick Recap
+- **Workspace/working directory**: all the files and directories currently in our filesystem.
+- **Index/staging area/cache**: All the modifications you want to commit
+- **Repository**(the `.git` directory): Hosts a history of all your commited and tracked files.
+
+```
+        Workspace /                Index / Staging              Repository 
+    Working directory               Area / Cache                  (.git)
+             |                           |                          |
+             |<-----------------------------------------------------|
+             |                           |    (checkout)            |
+             |                           |                          |
+             | ------------------------->|                          |
+             |        (stage)            |                          |
+             |                           |------------------------->|
+             |                           |    (commit)              |
+```
+
+### Branching and Merging
+So far we have been dealing with linear history. But what if you and your teammate are working on different features/multiple taks at the same time? Our git history is going to look disjointed which is not ideal. This is why Git **branches** were created.
+
+#### Git Branches
+Instead of contantly commiting to master (bad practice) its better to create feature/bug fix branches as to group together related changes in a separate branch that can be added to the history tree. If and when we fix or feature complete, we can merge this branch back into `master`.
+
+The end result is the same, but the Git history is now much easier to read and understand. Branches allow you to write and commit experimental code in an isolated part of the repository so your changes, which may introduce new bugs and regressions, won't affect others until they have been tested and peer-reviewed.
+
+#### Branching Models
+The workflow we just described is an example of a **branching model**, which is just a term that desibes how you structure your branches. There are many different models, we will use a model *Vincent Driessen* espouses in his article: *A successful Git branching model*.
+- The most important thing is you and your team stick to a conistent model.
+
+#### The Driessen model
+![Driessen branching model](./driessen-branching-model.png)
+
+
+
+### Links
+- Root: [Building Enterprise JavaScript Applications](/building-enterprise-javascript-applications)
+- Prev: [The State of JavaScript (2019)](/the-state-of-javascript)
+- Next: 
