@@ -121,7 +121,8 @@ In Driessen's model there are two permanent branches:
 There are also other non-permenant branches:
 - **Feature branches**: Branching from the `dev` branch, feature branches are used for developing new features, or fixing non-critical bugs. Feature branches will eventually be merged back into `dev` branch.
 - **Release branches**: One enough features or bug fixes have been implemented and merged back into `dev`, a release branch can be created from the `dev` branch to undergo more scrunity before being released. Once thoroughly tested, can be merged into `master`.
-- **Hotfix (or patch) branches**: Hotfixes are issues (not always bugs) that are in production which must be fixed as soon as possible, before the next planned release. In these cases, *the developer would cut a branch from `master`,* make the required changes, and merge directly back into `master`. ⭐ These hotfix branches should also be merged back into the `dev` branch and any other release branches.
+- **Hotfix (or patch) branches**: Hotfixes are issues (not always bugs) that are in production which must be fixed as soon as possible, before the next planned release. In these cases, *the developer would cut a branch from `master`,* make the required changes, and merge directly back into `master`. 
+    - ⭐These hotfix branches should also be merged back into the `dev` branch and any other release branches.
 
 ### Creating a development Branch
 - first check which branch we are on with: `git branch --list` or simpply `git branch`
@@ -151,14 +152,237 @@ social-login/twitter
 However, the only problem this poses is that branches are stored as text files under their respective directory branches. That means social-login is already in use as the name of the branch/file and cannot act a directory at the same time. The workaround is providing a default sub-token somthing like: `social-login/main`
 
 ### Merging Branches
+**After creating our sub-feature branches: how can we get these changes back onto the `master` branch?**  
+Well, following the *Driessen Model* we must...  
+1. Merge the two sub-feature branches onto the main feature branch, then  
+2. Merge the feature branch into the `dev` branch  
+3. Then create a release branch off of `dev` and  
+4. Merge that release branch into `master`
+
+To get started, let's merge `social-login/facebook` branch into the `social-login/main` branch using `git merge`.     
+To do so, make sure we are on the `social-login/main` branch using `git checkout social-login/main` followed by `git merge social-login/facebook`  
+Git will automatically try and merge these branches and only pause in the instance of a merge conflict.
+
+A **merge conflict** occurs when the chnages from two branches being merged overlap each other. The merge conflict might look something like this...
+```git
+<<<<<<<<  HEAD
+facebook
+========
+twitter
+>>>>>>>> social-login/twitter
+```
+The part between `<<<<<<<<< HEAD` and `========` is the version on our current branch, which is `social-login/main`; the part between `========` and `>>>>>>> social-login/twitter` is the version on the `social-login/twitter` branch.
+
+- We must resolve this merge conflict before the merge is complete
+- To do so, we simply need to edit the file to the version we want and remove the Git-specific sequences. In our example, we want to add the text for `twitter` after `facebook` so we would edit the file to become the following:
+```
+facebook
+twitter
+```
+
+Now the conflict is resolved, we need to complete the merge by adding `social-login.txt` to the staging area and commiting it:
+`$ git add -A && git commit -m "Resolve merge conflict"`
+
+### Examining more realistic examples
+Our previously example was a bit contrived. In all likelihood there will be many feature/bug fix branches that stem from `dev`. Let's look at a more realistic example.
+
+Say we add a new file `user-schema.js` to a new branch called `user-schema/main` cut from `dev`. Say we finish this feature and merge it back into `dev` but we still have our `social-login/main` branch still on its own branch.
+Now, we could merge that `social-login/main` branch back into `dev`, however we should not do this because:
+- **Breaking Changes**: The implementation of the social login feature may depend on the user's schema being a certain shape which may introduce bugs. Remember the `dev` branch is the one that other swill develop new feaures from, and so it should be kept bug-free at all times.
+- **Complicated Git history**: The history tree is already quite hard to read, let's not make it harder.
+
+#### Keeping the dev branch Bug-free
+⭐ The first issue ('breaking changes') can be tackled by merging the `dev` branch into `social-login/main`, testing that everything works as normal, and then merging it back into `dev`.
+- This allows bug fixess to be handled off of the `dev` branch
+
+#### Keeping our history clean
+To address the second issue ('complicated git history'), merging `dev` into `social-login/main` will make our tree look even messier but not if we use rebase.
+The reason our Git history looks complicated is because `git merge` creates a separate commit for the merge. This is good bc it doesn't alter the history of any of the branches but it looks more messy.
+
+⭐ To prevent the complicated history tree, we can use `rebase` a command that allows us to merge changes, as well as keep our history clean.
+
+#### Keeping our history clean with git rebase
+With `git rebase` instead of creating a new commit for the merge, it will try to place the changes on the feature branch as if they were made directly after the last commit on the main branch.
+
+So let's revisit our example except instead of `git merge` we use `git rebase`.
+As no changes have been made on `social-login/main` since the branching occured, it makes no difference whether we use `git merge` or `git rebase`.  
+AFter our merge, there is now a change on the `social-login/main` branch since `social-login/twitter` branched from it. Here's where `git rebase` is useful...
+```
+$ git checkout social-login/twitter
+$ git rebase social-login/main
+```
+There's still going to be a merge conflict like we had before and we should resolve it as we did before, but this time use `git rebase --continue` instead of `git commit`....
+So instead of doing: `$ git add -A && git commit -m "Resolve merge conflict"` we do...
+``` 
+$ git add -A
+$ git rebase --continue
+```
+
+The difference is, the `git` history for the social login feature is linear, as if the changes on the `social-login/twitter` branch were made straight after those on the `social-login/main` branch.
+
+Next we need to fast-forward the `social-login/main` branch to follow the `social-login/twitter` branch:
+```
+$ git checkout social-login/main
+$ git merge social-login/twitter
+```
+
+Lastly, we can rebase our `social-login/main` branch onto the `dev` branch.
+```
+$ git checkout social-login/main
+$ git rebase dev
+```
+
+Finally, branch to where the `social-login/main` branch is.
+```
+$ git checkout dev
+$ git merge social-login/main
+```
+
+### Using merge and rebase together
+- git rebase is not a drop in "cleaner" replacement for git merge, there are pros and cons for each method.
+
+- `git rebase`: rewrites or alters the existing history of the repo by trying to replicate changes on the sub-branch at the end of the main branch. This makes the history look cleaner and more linear but loses the context of when and where changes are integrated together - we lose the information that `social-login/twitter` was originally branched off from `social-login/main`.
+
+⭐ The advise here is: use `git rebase` for feature/bug-fix branches. 
+- This allows you to commit small and often, making **work-in-progress (WIP) commits**, without having to care too much about cleanliness. After your feature is complete, you can then clean up your commit history using `git rebase`, before merging into the permanent branches.
+
+⭐ On the other hand, when integrating changes from a feature branch into the `dev` branch, or from the `dev` branch into `master`, use `git merge` because it provides contexta as to where those features were added.
+- ⭐ Futhermore, we should add a `--no-ff` flag to `git merge`, which ensures the merge will *always* create a new commit, even when fast-forwarding is possible.
+
+### Releasing Code
+Now that we have a sizable chunk of features that we can release. We should create a release branch from `dev`. 
+
+This release branch should be named after the version of the release, prefixed by `release/`, such as `release/0.1.0`. 
+
+The code to be released should  then be deployed to a staging server, where automated UI testing, manual testing, and acceptance testing should be conducted. 
+- Any bug fixes should be commited on the release branch and merged back into the `dev` branch.
+
+When the release branch is ready, it can then be merged into `master`.
+
+So the question is how do we name/version our releases? Here, we will use **semantic versioning** or **semver**.
+
+### Semantic versioning
+In semver, everything is versioned with three digits, `MAJOR.MINOR.PATCH`, which start at 0.1.0 and are incremeneted as follows:
+- **Patch**: After a backward-compatible hotfix
+- **Minor**: After a backward-compatible set of features/bug-fixes have been implemented
+- **Major**: After a backward-incompatible change
+
+### Creating a release branch
+Now, let's create our release branch and name it `release/0.1.0`:
+```
+$ git checkout dev
+$ git checkout -b release/0.1.0
+```
+
+If this was a real scenario, we would like have this release branch on a staging server for more thorough testing. 
+
+If we find a bug, let's fix it add and commit our changes. Then test again and when there are no more bugs, then we can merge it into master.  
+Lastly, we should remember to apply the bug fixes we made on the release branch back into `dev`, if we have any other active release branches, we should apply it to those as well.
 
 
+### Tagging releases
+Lastly, we should tag our release.
+**Tags**, *in Git, are markers that highlight certain poitns in the commit history as being important*.
+
+Releases are important, so the convention is to represent releases as tags on the `master` branch.
+
+There are two types of tags:
+1. **lightweight**: simply a pointer to a particular commit.
+2. **annotated**: full objects in the Git database, and contain info about the tagger, the date and an optional message.
+
+We should use annotated tags to tag releases.
+
+⭐ Check out the `master` branch and add an annotated tag by running `git tag` with the `-a` flag.  
+The name of the tag should be the semver version, and you should add a message describing the release:
+```
+$ git checkout master
+$ git tag -a 0.1.0 -m "Implement social login. Update user schema"
+$ git show 0.1.0
+```
+
+### Hotfixes
+Although our code should have already been thoroughly tested, some bugs slip in, and we must fix them quickly. This is called a **hotfix**.
+
+Working on a hotfix branch is very similar to working on a release branch; the only difference is that we are branching off `master` instead of `dev`.
+
+Like the release branches, we'd make the changes, test it, deploy it onto a staging environment, and perform more testing, before merging it back into `master`, `dev`, and any current release branches.
+
+```
+$ git checkout -b hotfix/user-schema-incompat master
+$ touch user-schema-patch.txt # Dummy hotfix
+$ git add -Applications
+$ git commit -m "Patch user schema incompatability with social login"
+```
+Then we merge it into `master`:
+```
+$ git checkout master
+$ git merge --no-ff hotfix/user-schema-incompat
+```
+
+As we have added something new to master, it essentially becomes a new release and therefore we must increase the version number (by increasing patch number) and tag this new commit.   
+Lastly, don't forget to merge the hotfix changes back into `dev` and, if relevant, other release branches.
+
+## Working with others
+Since Git is a *distributed* VCS, it means any local repo can act as the remote repo for someone else. This means your colleagues can **pull** your changes onto their machine.
+However, this would mean you'd have to pull from everybody's machine regularly to get all the latest changes. Plus you'd have to deal with merge conflicts. SO while it is technically possible to follow this distributed workflow, most teams elect a single repository that they consider to be the central one.
+
+By convention, tihs remote repository is called `origin`.
+
+When you want to update your local repoistory with changes made by your colleagues, you *pull* from the `origin` repository. When you have changes that you think are ready to be incorporated, you push them into `origin`.
+
+### Creating a remote repository
+There are many ways to do this depending on what service you are using. You're already pretty familiar with this so we'll move on.
+
+### Pulling and Pushing
+Next, we need to update our local repo so it konws the address of the remote repo:
+```
+$ git remote add origin https://github.com/userName/repoName
+$ git push -u origin master
+```
+
+The `-u` tag sets the upstream repository to be `origin`. Without it, we would have to specify which remote repository we want to push to or pull from every time we run `git push` and `git pull`, subsequent pushes/pulls we can omit the -u tag.
+
+By default, `git push` doesn't push tags to remote repositories. So, we'd have to push tags manually. The syntax for pushing tags is similar to that of pushing branches:
+`$ git push origin [tagname]`
+
+Alternatively, if you want to push all tags, you can run the following command:
+`$ git push origin --tags`
+
+### Cloning a repository
+`$ git clone [repoURL/repoSSH]`
+This creates a new dir inside the dir where `git clone` was run.
+
+You collaborators can then work on this local copy of the reop, commit changes, and add new branches. Once the yare ready to make their changes available to others, they can pull from the remote repo, resolve merge conflicts, and then push their changes back to `origin`.
+```
+$ git pull
+# Resolves any conflicts
+$ git push
+```
+
+### Conducting peer review through pull requests
+Most of the time, it's fine to allow anyone to push and pull from the repo. However, for more important projects, you may want to prevent junior devs from pushing to permanent branches. Instead have them create new branches, push to that branch, and create a **pull request (PR)**.
+This PR (a feature of github/bucket as opposed to git itself) is a formal request for their branch to be merged back to `dev` or `master`.
+
+After receiving the PR, the owner will review your work and provide feedback then merge in when acceptable. 
+
+Benefits of using PRs in your dev process:
+- You can notify your peers that feature/bug fix has been completed
+- It is a formal process where all comments and discussions are logged
+- You can invite reviewers to peer-review changes you've made. This helps with code quality and and error spotting.
 
 ### Review Questions
+1. What are the three levels of configuration in git? And what repos do each level correspond to?
+1. Files can either be tracked or untracked. How do we track a file? Where do all tracked/untracked files reside?
+1. Once tracked, what are the 3 states a tracked file can be in? What 'stage' do tracked files reside?
+1. Where do commited files reside and how do they get there?
 1. What is the difference between using `git branch {newBranchName}` versus `git checkout -b {newBranchName} master`?
 1. In the Driessen model, which branch should all feature branches be branched from?
+1. How might we go about merging a featureBranch1 back into `dev` when featureBranch0 has already been cleared and merged back into dev? Merging directly into dev might create bugs from featureBranch0 and featureBranch1 interactions.
+1. What is the most important thing your team should do no matter which git workflow you adopt?
 
 ### Links
+- Ninas Git course
+--------------------------------------------------------------------------
 - Root: [Building Enterprise JavaScript Applications](/building-enterprise-javascript-applications)
 - Prev: [The State of JavaScript (2019)](/the-state-of-javascript)
-- Next: 
+- Next: [Setting up Development Tools](setting-up-dev-tools)
