@@ -1,0 +1,32 @@
+---
+title: any - JavaScript helper function (30 seconds of code)
+date: 2020-02-18
+slug: 30sec-js-any
+tags:
+  - 30soc
+  - JS
+  - Array
+  - Function
+  - Beginner
+---
+
+### any
+`any` Returns true if the provided predicate function returns `true` for at least one element in a collection, `false` otherwise.
+
+Use `Array.prototype.some()` to test if any elements in the collection return `true` based on `fn`. Omit the second argument, `fn`, to use `Boolean` as default.
+
+
+```js
+const any = (arr, fn = Boolean) => arr.some(fn);
+
+// Examples
+any([0,1,2,0], x => x >= 2); //--> true
+any([0,1,1,0]); //--> true
+```
+
+### When / Why would I use this?
+Maybe you are looking at a data set where any group that has a passing predicate value should be included and passed onto a list for further analysis. Why you might use this over just using `.some()` might be providing `Boolean` as the default function if one is not provided. Perhaps it may be more composable for your use case?
+
+### Links
+- [`all`](/30sec-js-all)
+- [`allEqual`](/30sec-js-allEqual)
