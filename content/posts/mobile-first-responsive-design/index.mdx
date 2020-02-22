@@ -19,7 +19,7 @@ Setup your base html template.
 - Liveserver, the VSCode plugin, to preview your static page
 - create and link a stylesheet
 
-### HTML Template
+## HTML Template
 - New file `assets` for all your image assets
 - create a new `nav` element and call it `site-nav grid`
   - nested in nav is h1 : Cosmo Junkie
@@ -32,9 +32,9 @@ Setup your base html template.
 - we are also adding a form in the contact section
 - we also have a footer with copyright and social media icons
 
-### Mobile-First approach
+## Mobile-First approach
 
-#### Mobile-First Design
+### Mobile-First Design
 - Design & code websites for mobiles first
 - Gradually built it up to larger screens / desktops
 - Polar opposite of what we used to do, mobile-site based on the desktop site. Often lead to smooshed poor-UX versions of our desktop site.
@@ -46,36 +46,223 @@ Next thing is to setup the media-queries to set the break points. Here is how ou
 
 ```css
 /* variables */
-
 /* resets */
-
 /* base styles */
-
 /* fonts */
-
 /* mobile styles */
-
 /* small tablet styles */
 ```
 
+So starting from the mobile styles we want to write our media queries moving upwards, so next would be the small tablet styles, so let's go ahead and create that media query...
 
+```css
+/* variables */
+/* resets */
+/* base styles */
+/* fonts */
+/* mobile styles */
+/* small tablet styles */
+@media screen and (min-width: 620px) {
 
+}
+```
+- Basic syntax, `@media` to specify the media query
+- `screen` to target anything with a screen  
+- `and` to specify the condition which is going to be ...
+- `(min-width:620px)` - so as soon as a user with a screen of at least 620px that's where these styles will start applying.
 
+Let's move onto the next media queries we would do...
+```css
+/* variables */
+/* resets */
+/* base styles */
+/* fonts */
+/* mobile styles */
+/* small tablet styles */
+@media screen and (min-width: 620px) {
 
+}
 
+/* large tablets & laptop styles */
+@media screen and (min-width: 960px) {
 
+}
 
+/* desktop styles */
+@media screen and (min-width: 1200px) {
 
-### Base Styles
-### Fonts
-### Grid Basics
-### Creating a 12-Column Grid
-### Mobiles Styles (Part 1)
-### Mobiles Styles (Part 2)
-### Mobiles Styles (Part 3) 
-### Tablet Styles 
-### Laptop Styles (Part 1)
-### Laptop Styles (Part 2)
-### Desktop Styles
+}
+```
+There are no hard-absolute rules for media query break-points, but the following will work for the site we are creating:
+- `620px` for small tablets
+- `960px` for large tablets and laptops
+- `1200px` for desktop styles
+
+### The order in which we will write our styles
+So the order in which we will write our styles is starting from the top of our comment seperators:
+1. variables, resets, base styles, fonts
+2. mobile styles
+3. small tablet styles
+4. large tablets & laptop styles
+5. desktop styles
+
+## Base Styles
+We can create **variables** in css to store commonly used values used throughout our styles, like font-sizes or colors.
+```css
+/* variables */
+:root {
+  --primary: #FFC636;
+  --secondary: #0A0B5B;
+}
+```
+This allows us to change our styles for our colors in one place and not every where its referenced.
+
+### resets to get rid of default browser styles
+The next thing we want to address is the resets of the default browser styles.
+```css
+/* variables */
+body,p,a,ul,li {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+}
+li {
+  list-style-type: none;
+}
+```
+
+### Moving on to our base styles
+```css
+/* base styles */
+body {
+  background: var(--secondary);
+  overflow-x: hidden;
+}
+```
+- To use our css variables, we use the `var` keyword followed by parens and the name of our variable, in this case `--secondary`
+
+The next thing we specify is the overflow in the x direction to be `hidden`, the reason for this is we want the hero image to be off screen a little bit and we don't want users to be able to scroll and view that image.
+
+#### Style our `<button>` class
+```css {6-13}
+/* base styles */
+body {
+  background: var(--secondary);
+  overflow-x: hidden;
+}
+.button {
+  background: none;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.6);
+  display: inline-block;
+}
+```
+- `display: inline-block` is going to help with styling and adding some margin to it so it's not overlapping with the p tag above it.
+- We also want a hover effect so we say `button:hover`
+- Benefit of variables, is we can just keep themed colors at the top and update everywhere else.
+
+#### Style input,textarea
+```css
+input,textarea {
+    background: rgba(0,0,0,0.05);
+    padding: 10px 16px;
+    border-radius: 20px;
+    border: 2px solid #9893D8;
+    color: #f2f2f2;
+}
+```
+
+## Fonts
+We want to use the Rubik font. Once downloaded from google fonts, we can go ahead and include it in our `assets` folder within a new folder called `fonts`, all we need is the `.ttf` file, for the `Rubik-Regular` font.
+
+Now we can use this font in our css, we will do use using the `@font-face` rule.
+
+### @font-face rule
+- This is how we use a custom font, because normally we can only use web-safe fonts, but if we use our own, we can register it by saying
+```css
+/* fonts */
+@font-face {
+  font-family: 'Rubik Regular'
+}
+```
+- So now, once we've given it a name, we can now reference this font by the name(alias) we've given it, e.g. like in the body tag we can just say `font-family: 'Rubik Regular'`.
+- We also need to say where we get that font from and we do so with the `src` property:
+- We must provide the path, relative to the styles file.: `src: url('assets/fonts/Rubik-Regular.ttf')`;
+
+- Next let's move on to headers and p,a,li tags:
+```css
+/* fonts */
+@font-face {
+  font-family: 'Rubik Regular'
+}
+h1,h2,h3,h4 {
+  color: #DDDBFF;
+  font-weight: normal;
+}
+p,a,li {
+  color: #9893D8;
+}
+h1,h3 {
+  font-size: 1.2em;
+}
+h2 {
+  font-size: 1.6em;
+}
+h4 {
+  font-size: 1.1.em;
+}
+.leading {
+  font-size: 1.1em;
+}
+```
+- we use ems for our h1,h3. ems are scalable units instead of fixed px size.
+  - ems get their value from the default browser style and then multiples it by the given em. e.g. default browswer could be 16px, 2em would be 32px.
+- You can always override the default font size in our `body` selector.
+- ⭐ When it comes to responsive design its much easier to use a base default font size in the `body` selector and then use ems for the different elements. 
+  - Because then in most cases, that means you just need to define your font styles once using ems once and then we can just update the default font size in each media query selector for the different screen types and they will scale accordingly.
+```css
+/* large tablets & laptop styles */
+@media screen and (min-width: 960px) {
+  body {
+    font-size: 18px;
+  }
+}
+
+/* desktop styles */
+@media screen and (min-width: 1200px) {
+  body {
+    font-size: 20px;
+  }
+}
+```
+
+## Grid Basics
+## Creating a 12-Column Grid
+## Mobiles Styles (Part 1)
+## Mobiles Styles (Part 2)
+## Mobiles Styles (Part 3) 
+## Tablet Styles 
+## Laptop Styles (Part 1)
+## Laptop Styles (Part 2)
+## Desktop Styles
 
  
+## Review Questions
+1. What do we use css variables for, and how do we use them?
+
+## Primary Insights
+* What! **CSS Variables**, How cool are these! Syntax is:
+  - `:root` is the CSS selector that defines its scope. You can use `body` as well, (I also tried `html` and that worked), but stick with `:root`
+  - the variable name must begin with two dashes (--) and is case-sensitive
+  - the syntax of the `var()` is `var(custom-name, value)` e.g. `var(--secondary, #000000)
+    - Note, that `value` is a fallback value used if the custom property is invalid
+* The `@font-face` rule. 
+  - downloading and importing customize fonts, we use the `@font-face` rule and `font-family` to provide the name for the font. 
+  - we use `src: url('/relativePath/fileName')` to provide the location of the font file.
+
+
+## Links

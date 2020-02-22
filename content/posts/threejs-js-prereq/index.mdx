@@ -21,7 +21,7 @@ You Need to Know:
 
 Here are some refreshers
 
-### es6 modules
+## es6 modules
 - es6 modules can be loaded via the `import` keyword in a script or inline via...
 - `<script type="module">` tag. Here's an example of both:
 ```html
@@ -33,14 +33,14 @@ import * as THREE from './resources/threejs/r113/build/three.module.js';
 * Paths must be absolute or relative. 
 - Relative paths alwayus start with `./` or `../` which is different than other tags like `<img`> and `<a>` and css references.
 
-### document.querySelector and document.querySelectorAll
+## `document.querySelector` and `document.querySelectorAll`
 You can use `document.querySelector` to select the first element that matches a CSS selector.
 - `document.querySelectorAll` returns all elements that match a CSS selector.
 
-### You don't need onbody
+## You don't need onbody
 ``<body onload="somefunction()">` is a deprecated (20-year+ old way of doing things). Instead put your scripts at the bottom of the page or use the `defer` property.
 
-### Know how closures work 
+## Know how closures work 
 ```js
 function a(v) {
     const foo = v;
@@ -56,7 +56,7 @@ console.log(g()); // --> prints 456
 ```
 In the code above the function `a` creates a new function every time it's called. That function `closes` over the variable `foo`.
 
-### Understand how this works
+## Understand how `this` works
 `this` is not magic. It's effectively a variable that is automatically passed to functions just like an argument is passed to a function. The simple explanation is when you call a function directly like....
 ```js
 someFunction(a,b,c);
@@ -82,13 +82,13 @@ From MDN:
 > 
 > In most cases, the value of `this` is determined by how a function is called (**runtime binding**). It can't be set by assignment during execution, and it may be different each time the function is called. ES5 introduced the `bind()` method *to set the value of a function's `this` regardless of how it's called*, and ES2015 introduced arrow functions which don't provide their own `this` binding (it retains the `this` value of the enclosing lexical context).
 
-### ES5/ES6/ES7 stuff
+## ES5/ES6/ES7 stuff
 - `var` is deprecated. Use `const` and/or `let`
 - No reason to use `var` at this point EVER.
 - Use `const` if the variable will never be reassigned which is most of the time.
 - Use `let` in those cases where the value changes.
 
-#### Use for(elem of collection) never for(elem in collection)
+### Use for(elem of collection) never for(elem in collection)
 - `for of` is new, `for in` is old. `for in` had issues that are solved by `for of`
 
 Example: iterating over all key/value pairs of an object
@@ -97,11 +97,12 @@ for (const [key, value] of Object.entries(someObject) {
     console.log(key, value);
 })
 ```
+<br />
 
-#### Use `forEach`, `map`, and `filter` where useful
+### Use `forEach`, `map`, and `filter` where useful
 - Arrays added the functions `forEach`, `map`, and `filter`, and are used fairly extensively in modern JS.
 
-#### Use destructuring
+### Use destructuring
 Assume an object `const dims = { width: 300, height: 150}`
 
 Old code:
@@ -114,8 +115,9 @@ New code:
 ```js
 const { width, height } = dims;
 ```
+<br />
 
-#### Use object declaration short cuts
+### Use object declaration short cuts
 Old Code:
 ```js
  const width = 300;
@@ -141,8 +143,9 @@ const obj = {
     },
 };
 ```
+<br />
 
-#### Use the spread operator (...)
+### Use the spread operator (`...`)
 
 The spread operator has a ton of uses:
 ```js
@@ -158,16 +161,17 @@ Another...
 const position = [1,2,3];
 somemesh.position.set(...position);
 ```
+<br />
 
-#### Use classes
+### Use `classes`
 The syntax for making class like objects pre ES5 was relying on factory functions (what es5 classes are under the hood).
 As of ES5 you can now use the `class` keyword closer to the sytle of C++/C#/JavaScript
 
-#### Understand getters and setters
+### Understand `getters` and `setters`
 The `get` syntax binds an object property to a function that will be called when that property is looked up.
 The `set` syntax binds an object property to a function to be called when there is an attempt to set that property.
 
-#### Use arrow functions where appropriate
+### Use arrow functions where appropriate
 **Arrow functions** are especially useful with callbacks and promises.
 ```js
 loader.load((texture) => {
@@ -182,18 +186,31 @@ const foo (args) => {/* code */}
 ```js
 const foo = (function(args) {/* code */ }.bind(this));
 ```
+<br />
 
-#### Promises as well as async/await
-**Promises** help with asynchronous code. Async/await help use promises.
+### Promises as well as async/await
+[`Promises`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises) help with asynchronous code. Async/await help use promises.
 
+- A **promise** is an object representing the eventual completion or failure of an asynchronous operation.
+- async/await, "basically act as syntactic sugar on top of promises, making asynchronous code easier to write and to read afterwards. They make async code look more like old-school synchronous code, so they're well worth learning."
 
-### Learn JavaScript coding conventions
+### Use Template literals
+- that use backticks instead of quotes. They basically have 2 features
+1. They can be multiline
+2. You can use JS expressions inside of them using `${js-expression}`
+
+## Learn JavaScript coding conventions
 - Variables, function names, method names, in JavaScript are all lowerCasedCamelCase. Constructors, the names of classes are CapitalizedCamelCase
 - Use a linter like ESLint
+They can help catch things like:
+```js
+const v = new vector(); // clearly an error if all classes start with a capital letter
+const v = Vector();     // clearly an error if all functions start with a lowercase latter.
+```
 
-### Consider using Visual Studio Code
+## Consider using Visual Studio Code
+With ESLint, VScode can be really powerful in helping you write code with less bugs.
 
 
-
-### Links
+## Links
 - [ES6 Modules / Setting up Development Tools](/setting-up-dev-tools)

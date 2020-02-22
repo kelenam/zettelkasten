@@ -8,10 +8,10 @@ tags:
   - JTS
   - Andrei Neagoie
 ---
-### Overview
+## Overview
 Turning JS a dynamically typed language into a statically typed one.
 
-### Dynamic vs Static Typing
+## Dynamic vs Static Typing
 
 JS doesn't force us to write the type of the binding we want to create...
 Statically typed languages does.
@@ -29,12 +29,12 @@ In dyanamic languages, time checking is performed at run time.
 - Slower dev process, make sure not have any type errors
 
 
-### Weakly vs Strongly Typed
+## Weakly vs Strongly Typed
 
 Weakly: Type coercion, pitfall but there isn't a protection against it
 Strongly: Prevents us from doing things like implicit type mixing.
 
-### Static Typing in JS
+## Static Typing in JS
 - Elm
 - TypeScript
 - ReasonML (based on OCaml) made by FB
@@ -50,12 +50,12 @@ ReasonML and ELM are their own languages and don't depend heavily on the directi
 
 As developers we need to know what works for our project and team and when to use something and when to not.
 
-### TypeScript Compiler
+## TypeScript Compiler
 
 `npm install -g typescript` for global install. Once we've done that, we can just run the ts compiler command which is simply : `tsc`
 
 
-### TypeScript 
+## TypeScript 
 All we need to do to create a typescript file is the `.ts` filetype...
 As an example if we wrote a program with an error, function it will actually transpile it down into ES5 readable code in the new `.js` file it creates. 
 In that way, it is doing what Babel does. Transpiling our code. This let's use new features of JavaScript and compile it down into ES5.
@@ -68,14 +68,14 @@ Now if we wrote something like `sum(4 + 5)` we'll get an error because two argum
 - This is what we mean by catching errors at compile time. This code won't make it to production, because it must first be compiled into JS. 
 - Note (that we can still pass in say a string and it will print out in our converted js file, but we will get a TS error thrown in console letting us know about type violations)
 
-### TypeScript 2
+## TypeScript watch mode
 - Kind of annoying to run tsc on our files each time, the fix is to initialize our project as a typescript project by simply running : `tsc --init` this will create a config file for us full with configurations for our project. This config file gives us a ton of options to configure our compilation.
 
 To run typescript in watch mode, simply use the command: `tsc fileName.ts --watch` Now it watches for changes on every time we save. 
 
-### TypeScript 3
+## TypeScript going over types
 
-The first time is a boolean type...
+The first type is a boolean type...
 ```ts
 //boolean
 let isCool: boolean = true;
@@ -103,10 +103,10 @@ let noo: null = null;
 ```
 - Again, the great thing about TS is that it tells you your mistakes before you even run your code.
 - Two ways of declaring arrays in TS, Andrei prefers the second way with `Array<string> = ...`
-- remember when specify type to keep it lowercase, because Object !== object. Also keep an eye out for the helpful type syntax highlighting.  
+- **remember when specifying type to keep it lowercase**, because Object !== object. Also keep an eye out for the helpful type syntax highlighting.  
 - The power of TS is the new types/features it provides, we'll take a look at those in the next video.
 
-### TypeScript 4
+## TypeScript additional types/features
 
 The rest of the these types are types that some other languages formally have, JS doesn't by default, so TS provides them formally as a superset of JS...
 
@@ -119,16 +119,16 @@ basket = ['basketball', 5]
 enum Size = { Small = 1, Medium = 2, Large = 3}
 let sizeName: string = Size[2];
 ```
-- A tuple is just Array syntax with two types inside of it that can be paired.
-- for enum (enumerable), we usually Capitalize the enum name, in this case it's Size.
-- The ouput from sizeName is going to be the string `'Medium'`. If I had to describe what's happening, it's as if you are creating a new data structure type, that seems like a custom array that returns the value or property declared in the `enum` by the "index" it's given in it's brackets. A real world use case might be like a shopping card for instance. It also can function in reverse... so long as you specify the right type, you can get the index from the value.
+- A **tuple** is just Array syntax with two types inside of it that can be paired.
+- for **`enum`** (enumerable), we usually Capitalize the enum name, in this case it's `Size`.
+- The ouput from `sizeName` is going to be the string `'Medium'`. If I had to describe what's happening, it's as if you are creating a new data structure type, that seems like a custom array that returns the value or property declared in the `enum` by the "index" it's given in it's brackets. A real world use case might be like a shopping cart for instance. It also can function in reverse... so long as you specify the right type, you can get the index from the value.
 ```js
  let sizeName: number = Size.Small;
  //--> 1
 ```
 So when would this be useful? Well `enum`s let's use defined a set of named constants. Useful for specific types of things, like sizes, or directions like up,down, etc. with each value associated with a corresponding meaning.
 
-### TypeScript 5
+### TypeScript - `any`, `void`, `never`
 The next type comes with a warning. You need to be careful when using it.
 ```js
 // Any - !!!!!!!!!! BE CAREFUL
@@ -137,7 +137,7 @@ let whatever: any = 'aaaggghhhh noooo!!!!';
 
 // void 
 let sing = (): void => {
-    console.log('lalalalla);
+    console.log('lalalalla');
 }
 
 // never
@@ -145,13 +145,13 @@ let error = (): never => {
     throw Error('ooppps');
 }
 ```
-- So what's the point of any? Aren't we using TS for it's types? Yes, by using it you are neglecting all the benefits of using TS for static typing. However, it can be useful if you are converting your JS code into TS code over a long period of time. 
-- For functions we can specify `void` if we are not expecting anything to be returned, like the console.log() above we are just use a side-effect. If we were returning something, we can specify the expected type of the return instead of using `void`. 
+- So what's the point of `any`? Aren't we using TS for it's types? Yes, by using it you are neglecting all the benefits of using TS for static typing. **However, it can be useful if you are converting your JS code into TS code over a long period of time.**
+- For functions we can specify `void` if we are not expecting anything to be returned, like the `console.log()` above we are just use a side-effect. If we were returning something, we can specify the expected type of the return instead of using `void`. 
 - `never` looks for two things: (1) the function neither has a return type nor (2) a reachable endpoint. IF we tried using `never` in place of `void` in our sing() function for instance we will get an error, because console.log() runs and then it ends. `never` is looking for an unreachable endpoint so typically used with `Error`.
 
 
-### TypeScript 6
-- interface works really well with objects
+### TypeScript - interface
+- `interface` works really well with objects
 - Common practice to make interfaces start with a capital letter, like our emums.
 ```js
 // interface
@@ -165,13 +165,13 @@ let fightRobotArmy = (robots: RobotArmy) => {
     console.log('FIGHT!');
 }
 ```
-- So what is robots: RobotArmy doing? It's making sure that the parameter we are receiving here is going to have all the properties of RobotArmy we listed, count, type, magic otherwise it will throw an error. This is super useful for React and props. The above would be same as saying: ` let fightRobotArmy = (robots: { count:number, type: string, magic:string }) => { console.log('FIGHT!'); }` But using interface allows us to more elegantly create, well, interfaces for our objects. `RobotArmy` in this way acts as a type, that must follow the conventions of it as a RobotArmy type and follow the properties and interface rules set out in its declaration.]
+- So what is `robots: RobotArmy` doing? It's making sure that the parameter we are receiving here is going to have all the properties of RobotArmy we listed, count, type, magic otherwise it will throw an error. This is super useful for React and props. The above would be same as saying: ` let fightRobotArmy = (robots: { count:number, type: string, magic:string }) => { console.log('FIGHT!'); }` But using interface allows us to more elegantly create, well, interfaces for our objects. `RobotArmy` in this way acts as a type, that must follow the conventions of it as a RobotArmy type and follow the properties and interface rules set out in its declaration.]
 - You could say `type RobotArmy = {...}` instead, but `type` doesn't create an alias for our RobotArmy name, and it's not as straightforward.
 - https://medium.com/@martin_hotell/interface-vs-type-alias-in-typescript-2-7-2a8f1777af4c for more info on the difference between `type` and `interface` 
 
-### TypeScript 7
+### TypeScript - Type assertions & optional properties
 
-#### Type assertions
+### Type assertions
 type assertions allow you to override a type any way you want. It's telling the compiler you know what you're doing.
 ```js
 // Type Assertion
@@ -187,7 +187,7 @@ dog.count
 - We are telling the compiler, don't worry about `dog` it is a `CatArmy` regardless of the fact that dog doesn't have .count, we are overriding any error that TS will tell me and say, trust me, this dog is a CatArmy. Obviously this is really dangerous and something we need to be careful with.
 - Type assertion is another complex topic, here is an additional resource: https://basarat.gitbooks.io/typescript/docs/types/type-assertion.html
 
-#### Optional properties
+### Optional properties
 What happens with optional properties?
 Say RobotArmy only sometimes has a magic property? Well that's where the `?` comes into play...;
 ```js
@@ -201,7 +201,7 @@ interface RobotArmy {
 ```
 Now this `?` says, this magic property may, or may not be part of this object.
 
-### TypeScript 8
+## TypeScript 8
 
 ```ts
 // Function
@@ -229,11 +229,11 @@ class Animal {
 let lion = new Animal('RAWWWR');
 lion.greet();
 ```
-In the fightRoboyArmy4 example, you can start to see a potential downside to TS, if you're not used to it, it can be pretty verbose and cluttered you can lose track of what is going on in a function. It's an extra layer of complexity.
+In the `fightRoboyArmy4` example, you can start to see a potential downside to TS, if you're not used to it, it can be pretty verbose and cluttered you can lose track of what is going on in a function. It's an extra layer of complexity.
 
-So in our Animal class, the cool thing here, is that we can set our properties to either `private` or `public` (which is the default)
+So in our `Animal` class, the cool thing here, is that we can set our properties to either `private` or `public` (which is the default)
 
-### TypeScript 9
+### Union types
 One last type, it's a new one to TS
 ```ts
 // Union
@@ -255,12 +255,12 @@ x = 'hello'
 // --> will give use an error that x is supposed to be a number not a string.
 ```
 
-### DefinitelyTyped 
+## DefinitelyTyped 
 
 How do we use TS with 3rd party libraries?
 Well TS lets you use what are called **declaration files** that let you define the shape of code that the file is written in, it's essentially a way to tell TS, hey I'm also using this library, use these types we just made out for you.
 
-####  definitelytyped.org
+###  definitelytyped.org
 definitelytyped.org is the definitive place to go to look for typed versions of common libraries, notice the use of @types, like @types/react of these packages.
 - this @types/ gives us the declaration file to make sure our TS compiler understands the library's syntax.
 - If you look in the declartion file for React for instance, there are a ton of types, but don't be overwhelmed. 
@@ -268,7 +268,7 @@ definitelytyped.org is the definitive place to go to look for typed versions of 
 - Again this is adding complexity, more types, so it's a tradeoff.
 
 
-### Create React App with Typescript
+## Create React App with Typescript
 - `npx create-react-app my-app --typescript`
 - `npm install --save typescript @types/node @types/react @types/react-dom @types/jest`
 Then convert our files to tsx files.
