@@ -41,6 +41,7 @@ all([1, 2, 3]); // true
 - Takes a callback as an argument. 
 - That callback can take up to 3 parameters: element, index, array.
 - The return value of every is `true` if the callback function returns a truthy value for every array element. Otherwise, `false`.
+- I think the hickup comes remembering that the callback, and how its effectively defined is dependent on the implemented of `.every()`. `.every()` as we define it in `all` is how it uses that callback (`fn`) to be applied to each item in the array.
 - Okay, that makes sense.
 
 ##### Why might I use or write this `all` function over simply using `Array.protoytype.every()`?

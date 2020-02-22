@@ -9,6 +9,7 @@ tags:
   - Daniel Li
   - Node.js
   - JavaScript modules
+  - ES6 Modules
   - Babel
   - yarn 
   - npm
@@ -30,3 +31,210 @@ This section will cover:
 
 > Technically, it is inaccurate to classify a lang as interpreted/compiled. How a lang is processed depends on the implementation. Someone can build a compiler that converts JS into machine code and run it; in that instance, JS would be a compiled lang.  
 > However, since JS is always interpreted by a JS engine, you will hear JS be referred to as as interpreted lanugage.
+
+Different browsers use different JS engines. Chrome uses V8, Firefox uses Spidermonkey, WebKit for Safari.
+
+Node.js uses V8 as its JavaScript engine and adds C++ bindings that allow it to access operating system resources, such as files and networking. (Aside: checkout Will Setence's course notes here.)
+
+### Terminology
+- Other langs have it where their runtimes do actually execute the code, JS is a bit different, despite being considered an "interpreted language".
+- The JS engine !== the JS runtime
+
+- The JS engine is the software that translate the high-level JS code into machine executeable code, and then executes it.
+- The JS engine then exeposes all the objects obtained from parsing the code to the JS runtime environment, which can then use it.
+
+That means JS in the browser has a different runtime environment than Node. This is evident by `window` object in browsers and `global` objects in node. Conversely, the browser runtime lacks the `require` global, and cannot act on system resources such as file systems (thankfully, althought this may change as the web becomes more powerful, still would be security-scary to have browsers accessing the fs).
+
+### Modules
+Clean code should be structured in a modular way. It's important because without it...
+- Logic from one business domain can easily be interwoven with that of another
+- when debugging, it's hard to identify where the bug is
+- There'll likely be duplicate code
+
+Writing modular code means:
+- Modules are logical separations of domains. This ensures a clear **separation of concerns**.
+- Each modules should have a very specific purpose--that is, it should be granular. This ensures there is as much **code reusability** as possible.
+- Each modules provides an API for other modules to interact with. It should also hide internal properties and methods to ensure that the API is as minimal as is practical.
+
+#### The dawn of modules
+JS was initially design to add small bits of interactivity to web pages, not for building full-fledged web apps. 
+- Script tags had to be loaded in a specific order based on dependencies
+    - this is fine when dependency tree is small, however SPAs and node.js increased complexity of web-apps: posed issues of namespace clashing, override conflicts, etc.
+- Because of increasing complexity **package managers** created to standardize formats, and make it easier to share modules.
+
+At time of writing:   
+- three major package managers: **NPM**, **Bower**, **Yarn**. 
+- four major standards in defining modules: **CommonJS**, **AMD**, **UMD**, and **ES6 modules**.
+    - each format has corresponding tools, e.g.: **RequireJS**, **Browserify**, **Webpack**, **Rollup**, and **SystemJS**.
+
+#### The birth of Node.js modules
+Using modules on the client was infeasible bc of an application could have hundreds of dependencies making for a really long **time-to-first-render (TTFR)**. 
+
+JS modules as we know them, began on servers with Node.js modules.
+
+In Node.js, a single file correponds to a single module.
+
+#### Adoption of the CommonJS standard
+In Node.js modules are written in the CommonJS format, which provides two global objects (allowing for modules to remain encapsulated):
+1. `require`: a function that llows the current module to import and use variables defined in other modules
+2. `exports`: is an object that allows a module to make certain variables publicly available to other modules that `require` it.
+
+For example:
+```js:title=greeter.js
+const helloWorld = function (name) {
+    process.stdout.write('hello ${name}! \n')
+};
+const internal = function (name) {
+    process.stdout.write('This is a private function')
+};
+exports.sayHello = helloWorld;
+```
+- These two functions only useable within the file (module)
+- When we assign the `helloWorld` function to the `sayHello` property of `exports`, it makes the `helloWorld` function accessible to other modules that `require` the `greeeter` module.
+
+To demo this...
+```js:title=main.js
+const greeter = require('./greeter.js');
+greeter.sayHello("Daniel");
+//-->  hello Daniel!
+```
+- To `require` a module, you can either specifiy its name or its file path.
+
+### Fufilling the encapsulation requirement
+- You can export multiple constructs from a single module by adding them as properties to the `exports` object.
+- Constructs that are not exported are not available outside the module because Node.js wraps its modules inside a **module wrapper** which is simply a function that contians the module code:
+```js
+(function(exports, require, module, __filename, __firname) {
+    // Module Code
+})
+```
+
+### Standarizing module formats
+- **AMD** (Asynchronous Module Definition) is an early fork of the CommonJS format. It supports **Asynchronous module loading**.
+- **UMD** (Universal Definition Module) tried to standarize AMD and CommonJS and become just another standard.
+
+Eventually, Ecma International took it upon themselves to standardize the modules and do so in the ECMAScript2015 (ES6) version of JS.
+- This format uses two keywords: `import` and `export`. The same `greeter` example would look liek this with ES6 modules.
+
+The same example from before using ES6 Modules looks like:
+```js
+// greeter.js
+const helloWorld = function(name) {
+    process.stdout.write(`hello ${name}!\n`);
+};
+const privateHelloWorld = function(name) {
+    process.stdout.write(`This is a private function`);
+};
+export default helloWorld;
+
+// main.js
+import greeter from "./greweter.js";
+greeter.sayHello("Daniel");
+```
+- still two files, only syntax slight different with `export` and `import`.
+- ES6 modules are **static**, meaning they cannot be changed at runtime: the reason is modules must be first analyzed and dependency graph to be created beforehand.
+- Node.js and popular browsers are quickly adding support for ES6 feature but currently none of them fully support modules (Q4 2019)
+- Luckily, there are tools that can convert ECMAScript2015 modules into the universally supported CommonJS format: **Babel** and **Traceur**.
+
+### Installing Node
+There are many ways to dl node. 
+- Easiest way is to use **Node Version Manager (nvm)**, has added benefit of switching between different versions of Node.
+
+### Using nvm to install Node
+You can install nvm using the shell script, using curl from the repo.
+```
+$ curl -o- https://{nvmrepo}/install.sh | bash
+$ source ~/.nvm/nvm.sh
+```
+
+### Documenting Node versions
+
+### Starting Projects with npm
+
+### Using yarn instead of npm
+
+#### Package version locking
+
+#### Offline cache
+
+#### Speed
+
+#### Installing yarn
+
+### Getting familiar with the yarn CLI 
+
+### npm and yarn, together
+
+### Creating an HTTP Server
+
+#### Our HTTP server in detail
+
+### Transpiling ES6 with Babel
+
+#### A Transpiler and more
+
+#### Different faces of Babel
+
+#### @babel/cli
+
+#### @babel/register
+
+#### Using @babel/register for tests
+
+#### @babel/node
+
+#### @babel/core
+
+#### @babel/polyfill
+
+#### Adding Babel CLI and polyfill
+
+#### Using Babel CLI to transpile our code 
+
+#### Plugins and presets 
+
+##### The env preset
+
+### Separating source and distribution code
+
+#### Importing the Babel polyfill
+
+#### Consolidating commands with npm scripts
+
+#### Ensuring cross-platform compatability
+
+#### Automating development using nodemon
+
+## Linting with ESLint
+
+### Installing ESLint
+
+#### Linting Our Code
+
+#### Adding lint script to package.json
+
+#### Installing the ESLint extension
+
+#### Adding pre-commit hooks
+
+### Commint our code into Git
+
+#### Using .gitignore to ignore files
+
+
+
+
+### Summary Insights
+- `exports` is simple an object. We are adding properties on that object in order to export that bundled function/functionality.
+- **Module wrappers** leverage JavaScript's function scoping in order to keep the module contents encapsulated. Seems obvious once you think about it, but kind of cool tidbit to reflect on.
+- This section clarified for me how/why/who ES6 Modules came from. I can see the syntax changes between the two.
+
+ 
+
+
+### Links
+- Hard Parts: Node.js & Server
+--------------------------------------------------------------------------
+- Root: [Building Enterprise JavaScript Applications](/building-enterprise-javascript-applications)
+- Prev: [Managing Version Control with Git](/managing-version-history-with-git)
+- Next:  

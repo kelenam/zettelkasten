@@ -1,0 +1,199 @@
+---
+title: Three.js Prerequisites
+date: 2020-02-20
+slug: threejs-js-prereq
+tags:
+  - JS
+  - 3D
+  - Three.js
+  - WebGL
+  - ES6
+  - ES6 Modules
+---
+
+You Need to Know:
+- The DOM
+- HTML elements
+- how to use ES6 modules via import and via `<script type="module">`
+- Some CSS and CSS Selectors
+- ⭐**That the browswers run JS only via events and callbacks.**
+- Closures
+
+Here are some refreshers
+
+### es6 modules
+- es6 modules can be loaded via the `import` keyword in a script or inline via...
+- `<script type="module">` tag. Here's an example of both:
+```html
+<script type="module">
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+...
+</script>
+```
+* Paths must be absolute or relative. 
+- Relative paths alwayus start with `./` or `../` which is different than other tags like `<img`> and `<a>` and css references.
+
+### document.querySelector and document.querySelectorAll
+You can use `document.querySelector` to select the first element that matches a CSS selector.
+- `document.querySelectorAll` returns all elements that match a CSS selector.
+
+### You don't need onbody
+``<body onload="somefunction()">` is a deprecated (20-year+ old way of doing things). Instead put your scripts at the bottom of the page or use the `defer` property.
+
+### Know how closures work 
+```js
+function a(v) {
+    const foo = v;
+    return function() {
+        return foo;
+    };
+}
+
+const f = a(123);
+const g = a(456);
+console.log(f()); // --> prints 123
+console.log(g()); // --> prints 456
+```
+In the code above the function `a` creates a new function every time it's called. That function `closes` over the variable `foo`.
+
+### Understand how this works
+`this` is not magic. It's effectively a variable that is automatically passed to functions just like an argument is passed to a function. The simple explanation is when you call a function directly like....
+```js
+someFunction(a,b,c);
+```
+`this` will be `null` (when in strict mode or in a module) where as when you call a function via the dot operator `.` like this.
+```js
+someObject.someFunction(a,b,c);
+```
+`this` will be set to `someObject`.
+
+The part where people get confused is with callbacks
+```js
+const callBack = someObject.someFunction;
+loader.load(callback);
+```
+The above doesn't work as one might expect because when `loader.load` calls the callback it's not calling it with the dot `.` operator so by default `this` will be `null` (unless the loader explicitly sets it to something). If you want `this` to be `someObject` when the callback happens, you need to tell JavaScript that by binding it to some function.
+```js
+const callback = someObject.someFunction.bind(someObject);
+loader.load(callback)
+```
+From MDN:
+> A function's this keyword behaves a little differently in JavaScript compared to other languages. It also has some  differences between strict mode and non-strict mode.
+> 
+> In most cases, the value of `this` is determined by how a function is called (**runtime binding**). It can't be set by assignment during execution, and it may be different each time the function is called. ES5 introduced the `bind()` method *to set the value of a function's `this` regardless of how it's called*, and ES2015 introduced arrow functions which don't provide their own `this` binding (it retains the `this` value of the enclosing lexical context).
+
+### ES5/ES6/ES7 stuff
+- `var` is deprecated. Use `const` and/or `let`
+- No reason to use `var` at this point EVER.
+- Use `const` if the variable will never be reassigned which is most of the time.
+- Use `let` in those cases where the value changes.
+
+#### Use for(elem of collection) never for(elem in collection)
+- `for of` is new, `for in` is old. `for in` had issues that are solved by `for of`
+
+Example: iterating over all key/value pairs of an object
+```js
+for (const [key, value] of Object.entries(someObject) {
+    console.log(key, value);
+})
+```
+
+#### Use `forEach`, `map`, and `filter` where useful
+- Arrays added the functions `forEach`, `map`, and `filter`, and are used fairly extensively in modern JS.
+
+#### Use destructuring
+Assume an object `const dims = { width: 300, height: 150}`
+
+Old code:
+```js
+const width = dims.width;
+const height = dims.height;
+```
+
+New code:
+```js
+const { width, height } = dims;
+```
+
+#### Use object declaration short cuts
+Old Code:
+```js
+ const width = 300;
+ const height = 150;
+ const obj = {
+   width: width,
+   height: height,
+   area: function() {
+     return this.width * this.height
+   },
+ }
+```
+
+New Code:
+```js
+const width = 300;
+const height = 150;
+const obj = {
+    width,
+    height,
+    area() {
+        return this.width * this.height;
+    },
+};
+```
+
+#### Use the spread operator (...)
+
+The spread operator has a ton of uses:
+```js
+function log(className, ...args) {
+    const elem = document.createElement('div');
+    elem.className = className;
+    elem.textContent = [...args].join(' ');
+    document.body.appendChild(elem);
+}
+```
+Another...
+```js
+const position = [1,2,3];
+somemesh.position.set(...position);
+```
+
+#### Use classes
+The syntax for making class like objects pre ES5 was relying on factory functions (what es5 classes are under the hood).
+As of ES5 you can now use the `class` keyword closer to the sytle of C++/C#/JavaScript
+
+#### Understand getters and setters
+The `get` syntax binds an object property to a function that will be called when that property is looked up.
+The `set` syntax binds an object property to a function to be called when there is an attempt to set that property.
+
+#### Use arrow functions where appropriate
+**Arrow functions** are especially useful with callbacks and promises.
+```js
+loader.load((texture) => {
+    // use texture
+});
+```
+* **Arrow functions bind `this`**
+```js
+const foo (args) => {/* code */}
+```
+...is a shortcut for...
+```js
+const foo = (function(args) {/* code */ }.bind(this));
+```
+
+#### Promises as well as async/await
+**Promises** help with asynchronous code. Async/await help use promises.
+
+
+### Learn JavaScript coding conventions
+- Variables, function names, method names, in JavaScript are all lowerCasedCamelCase. Constructors, the names of classes are CapitalizedCamelCase
+- Use a linter like ESLint
+
+### Consider using Visual Studio Code
+
+
+
+### Links
+- [ES6 Modules / Setting up Development Tools](/setting-up-dev-tools)
