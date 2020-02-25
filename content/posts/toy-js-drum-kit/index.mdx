@@ -1,0 +1,123 @@
+---
+title: JS Drum Kit
+date: 2020-02-25
+slug: toy-js-drum-kit
+tags:
+  - JS
+  - HTML
+  - CSS
+  - Wesbos
+  - toy
+  - JS30
+---
+
+### Goals
+- Creating a toy project that plays a corresponding sound of nine separate elements, each with a key on the keyboard (a-l) on the homerow.
+    - clap
+    - hihat
+    - kick
+    - openhat
+    - boom
+    - ride
+    - snare
+    - tom 
+    - tink 
+- The sound of each elements plays via keyboard input as well as keypress.
+- Mild animation and 
+
+### Notes
+- Each html element has a `data-key` property
+- Each activation of the key element adds a class of playing which will kick in the css for `.playing` we are going to be (scaling it up by 1.1.) change border color and the box shadow. 
+- Works because our regular `.key` class has a transition property: `transition: all 0.07s` that happens really fast.
+
+### Focusing on keydown event
+- grabbing whatever element we are listening for in this case we are listening for the event on the window, and the event is the `keydown` event.
+- Next we will have a function that will execute the function on the event.
+- `e` is just the event describing what happened on the event we are listening for
+- We want to be paying attention to the keycode, that is essentially
+
+### Selecting our audio element
+- on our audio elements, there aren't any classes, we could technically add one but it's cleaner to just use the elements on `data` attribute already on there. 
+    - **Attribute selectors** in JS work the same way as they would in CSS, they would look like this:
+    - `audio[data-key=65]`
+    - And instead of using a hardcoded value we can just saying `[data-key="${e.keyCode}"]` when we use it with backticks.
+    - Don't forget, you need quotes around your numebrs/keycode
+
+- We can use `if(!audio) return;` to simply stop the function form running all together, if a key that isn't one of our keycoded keys is pressed.
+
+- The whole audio file is going to play (~2 seconds), if you call `audio.play()` on something already playing it won't do anything since it's already playing.
+- What we can kind of do is rewind it, or reset it preceeding to its reinvokation with `audio.currentTime = 0`. Essentially rewind time to start.
+
+- We now want that cool style to be applied when we hit the corresponding key.
+
+`const key = document.querySelector(`.key[data-key="${e.keyCode}"]` );`
+
+- the only property that matters on the `.key` property is the `transition: all 0.07s` one because when you add a class to that `.key` we are going to transition to that new class state as definined in `.playing`
+
+#### Removing the Styling from our `.key`
+So we're adding the class but we aren't removing the class.
+- We could add a `setTimeout` to remove the class afterwords but it might conflict with the timing of our transition if it falls out of sync.
+- It's better to use a transition end event that will stop when a thing has animated itself in.
+
+#####  What is a `transitionend` event? 
+Well what is a click event? Well an event listner for when something was clicked. Like that there are events when an elements transition has completed. What we can do is listen on each key for when the transition end event happens. We want to listen for all keys so we say...
+`const keys = document.querySelectorAll('.key');`
+
+So now we need to add an event listner to each one, we do so with `.forEach`
+
+##### Adding event listeners to an array/Node List of elements
+Why do we have to use `.forEach`, why couldn't we just do something like `keys.addEventListener` like you might be able to do in jQuery? Well the problem *is that if you have an array(more accurately a Node List) of elements you need to explicitly loop over and attaach an event listener to each element*
+
+```js
+function removeTransition(e) {
+    // if we console logs our events you will see 
+    // all our transitions that happen
+    console.log(e);
+
+    //let's pick the longest-timed transform
+    if(e.propertyName !== 'transform') return; // skip it if it's not a transform
+    
+    this.classList.remove('playing');
+}
+
+const keys = document.querySelectorAll('.key');
+keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+```
+
+In our `removeTransition` function we need to use `this`, because we need to refer to the thing that the event got called against, what is the thing that got called against our eventListner? `.key`. So `this` refers to the `.key` associated with the event.
+
+#### JavaScript Portion
+```js
+(function init() {
+    const keys = document.querySelectorAll('.key');
+    keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+
+    console.log("Image credit: Gabriel Barletta via Unsplash.com\nProject credit: Wesbos's JS30 series")
+})();
+
+function playSound(e) { 
+    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+    const key = document.querySelector(`.key[data-key="${e.keyCode}"]` );
+
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.play();
+
+    console.log(audio);
+    key.classList.add('playing'); 
+}
+
+function removeTransition(e) {
+    this.classList.remove('playing');
+}
+
+window.addEventListener('keydown', playSound);
+```
+- Essentially the same just wrapped some of the other functionality and wrapped it in an IIFE.
+
+### Key Insights
+- We use `el.classList.add('className')` to add classes to an element where `el` is the element selected. Similarly we also have `.remove` and `.toggle`
+- Remember: when we are using a query selector, we are grabbing the whole element associated by a certain property of that element, so in saying `document.querySelector('.key');` for instance we are grabbing an element or in this case many elements (that make up the Node List) with the class of `.key`. 
+
+### Links
+- [**Finished Project**](https://kelenam.github.io/js-drum-kit/)

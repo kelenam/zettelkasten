@@ -398,6 +398,89 @@ At the moment, this image is a bit big, and that's because it is showing at the 
 It's the anchor tag in our welcome-text so `.welcome-text a`, let's set it's top and bottom margin to 20px and left and right to 0.
 
 ## Mobiles Styles (Part 2)
+Let's style our Portfolio section
+```css 
+#portfolio {
+  background: url(assets/square_bg.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  padding: 30px 20px;
+} 
+#portfolio {
+  margin-bottom: 0;
+  text-align: center;
+}
+.projects a {
+  grid-template-columns: 1/9;
+  margin: 20px 0;
+}
+```
+Our projects are in the grid, so we need to grab those via their anchor tags.
+- On mobile we want these to stack on top of each, the full length of the grid. That means from column line 1 to 9.
+
+### Addressing Image Size and Centering
+```css {15-20}
+#portfolio {
+  background: url(assets/square_bg.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  padding: 30px 20px;
+} 
+#portfolio {
+  margin-bottom: 0;
+  text-align: center;
+}
+.projects a {
+  grid-template-columns: 1/9;
+  margin: 20px 0;
+}
+.projects a * {
+  margin: 0 20px;
+  max-width: 40%;
+  align-self:
+}
+.projects h4 {
+  color: #9994f7;
+}
+```
+- `.projects a *` is saying grab everything from within that `a` tag, in our case it's going to be the img and the h4. We want to style both of these at the same time, hence the `*`.
+- When we are saying `max-width: 40%` we are basically saying, at MAX width, the images will only take up 40% of the actual columns.
+- The last thing we want to use is `align-self: center`, this takes the current things we are selecting (the h4 and the img) and align it to the center
+
+The next thing we want to do is get the text up to the side of the images, and to do that we can just say, that the row (everthing in the a tag) is going to have a display of flex. Because when we say that the elements automatically sit next to each other.
+
+### Skills Section
+- Want to give this some color a bit to match the #porfolio bg image
+```css 
+#skills {
+  padding: 30px 20px;
+  background: #07083E;
+}
+#skills h3 {
+  text-align: center;
+}
+#skills ul {
+  margin: 40px 0;
+}
+#skills li {
+  padding: 10px;
+  background: rgba(0,0,0,0.2);
+  grid-column: span 4;
+  text-align: center;
+}
+#skills img {
+  height: 80px;
+  margin: 10px auto;
+}
+```
+- For our `grid-column` instead of saying something like each one goes from `1/4` instead we just want each one to take up 4 columns in width, and that means we are going to have 2 rows because we have 8 columns. The way we do that is by saying `grid-column: span 4`
+  - This is going to auto-populate the items in the grid into those columns, 2 on top 2 on bottom.
+- We also say `text-align: center` to center them.
+- Notice we have no gaps between the grid, so we can go up to our `.grid` class and apply a gap property with a value of 10px.
+
+
 ## Mobiles Styles (Part 3) 
 ## Tablet Styles 
 ## Laptop Styles (Part 1)

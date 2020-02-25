@@ -25,7 +25,6 @@ Repo Link: https://github.com/source-academy/sicp
 [PDF Edition](https://sicp.comp.nus.edu.sg/sicpjs.pdf)
 [e-book edition](https://sicp.comp.nus.edu.sg/sicpjs.epub)
 
-
 ### Contents
 1. Building Abstractions with Functions
     1. The Element of Programming 
@@ -51,10 +50,101 @@ Repo Link: https://github.com/source-academy/sicp
         1. Functions as Returned Values
 2. Building Abstractions with Data
     1. Introduction to Data Abstraction
+        1. Example: Arithmetic Operators for Rational Numbers
+        1. Abstraction Barriers
+        1. What is Meant by Data?
+        1. Extended Exercise: Interval Arithmetic
     1. Hierarchical Data and the Closure Property
+        1. Representing Sequences 
+        1. Hierarchical Structures
+        1. Sequences as Conventional Interfaces
+        1. Example: A Picture Language
     1. Symbolic Data
+        1. Strings
+        1. Example: Symbolic Differentiation
+        1. Example: Representing Sets
+        1. Example: Huffman Encoding Trees 
     1. Multiple Representations for Abstract Data
+        1. Representations for Complex Numbers 
+        1. Tagged data 
+        1. Data-Directed Programming and Additivity
+        1. Systems with Generic Operations 
     1. Systems with Generic Operations
+        1. Generic Arithmetic Operations 
+        1. Combining Data of Different Types
+        1. Example: Symbolic Algebra
 3. Modularity, Objects, and State
+    1. Assignment and Local State 
+        1. Local State Variables
+        1. The Benefits of Introducing Assignment
+        1. The Costs of Introducing Assignment
+    1. The Environment Model of Evaluation
+        1. The Rules of Evaluation
+        1. Applying Simple Functions
+        1. Frames as the Repository of Local State
+        1. Internal Definitions 
+    1. Modeling with Mutable Data
+        1. Mutable List Structure
+        1. Representing Queues
+        1. Representing Tables
+        1. A Simulator for Digital Circuits
+        1. Propogation of Constraints
+    1. Concurrency: Time Is of the Essence
+        1. The Nature of Time in Concurrent Systems
+        1. Mechanisms for Controlling Concurrency
+    1. Streams
+        1.Streams are Delayed Lists
+        1. Infinite Streams
+        1. Exploiting the Stream Paradigm
+        1. Streams and Delayed Evaluation 
+        1. Modularity of Functional Programs and Modularity of Objects 
 4. Metalinguistic Abstraction
+    1. The Metacircular Evaluator 
+        1. The Core of the Evaluator
+        1. Representing Statements and Expressions
+        1. Evaluator Data Structures
+        1. Running the Evaluator as a Program 
+        1. Data as Programs
+        1. Internal Declarations
+        1. Separating Syntactic Analysis from Execution
+    1. Lazy Evaluation
+        1. Normal Order and Applicative Order
+        1. An Interpreter with Lazy Evaluation
+        1. Streams as Lazy Lists
+    1. Nondeterministic Computing
+        1. Amb and Search
+        1. Examples of Nondeterministic Programs
+        1. Implementing the amb Evaluator 
+    1. Logic Programming 
+        1. Deductive Information Retrieval
+        1. How the Query System Works
+        1. Is Logic Programming Mathematical Logic?
+        1. Implementing the Query System
 5. Computing with Register Machines
+    1. Designing Register Machines 
+        1. A Language for Describing Register Machines
+        1. Abstraction in Machine Design 
+        1. Subroutines 
+        1. Using a Stack to Implement Recursion 
+        1. Instruction Summary
+    1. A Register-Machine Simulator 
+        1. The Machine Model 
+        1. The Assembler
+        1. Generating Execution Functions for Instructions
+        1. Monitoring Machine Performance
+    1. Storage Allocation and Garbage Collection
+        1. Memory as Vectors
+        1. Maintaining the Illusion of Infinite Memory 
+    1. The Explicit-Control Evaluator
+        1. The Code of the Explicit-Control Evaluator
+        1. Sequence Evaluation and Tail Recursion
+        1. Conditionals, Assignments, and Definitions 
+        1. Running the Evaluator 
+    1. Compilation 
+        1. Structure of the Compiler
+        1. Compiling Expressions
+        1. Compiling Combinations
+        1. Combining Instruction Sequences
+        1. An Example of Compiled Code
+        1. Lexical Addressing 
+        1. Interfacing Compiled Code to the Evaluator 
