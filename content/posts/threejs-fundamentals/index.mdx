@@ -50,8 +50,12 @@ Given all that, we are going to make the smallest "Hello Cube" setup that looks 
 #### First, you need to load three.js
 ```html
 <script type="module">
-// Note, that we will be using the r113 provided from threejsfundamentals, and not the relative path way as if we had installed locally for the sake of this exercise
+/* 
+Note, that we will be using the r113 provided from threejsfundamentals
+and not the relative path way as if we had installed locally for the sake of this exercise
+*/
 //import * as THREE from './resources/threejs/r113/build/three.module.js'
+
 import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r113/build/three.module.js';
 
 </script>
@@ -102,9 +106,19 @@ function main() {
 </script>
 ```
 - `fov` is short for `field of view`. In this case, 75 degrees is the vertical dimension. 
-  - Note: ⭐ that most angles in three.js are in radians but for some reason the perspective camera takes degrees.
-
+  - ⭐that most angles in three.js are in radians but for some reason the perspective camera takes degrees.
 - `aspect` is the display aspect of the canvas. By default a canvas is 300x150 pixels which makes the aspect 300/150 or 2.
+- `near` and `far` represent the space in front of the camera that will be rendered. Anything before or after that range will be **clipped** (not drawn).
+
+⭐ These 4 settings (`fov`, `aspect`, `near`, `far`) define a **frustum**. A **frustum** is the name of a 3d shape that is like a pyramid with the tip sliced off. Think of a 'frustum' as another 3d shape like a sphere, cube, etc.
+![](/frustum.png)
+- The height of the near and far planes are determined by the field of view.
+- The width of both panes is determined by the field of view and the aspect.
+- Anything inside frustum will be drawn, anything outside will not.
+- **The camera defaults to looking down the -Z axis with +Y up**
+
+We will have to move the camera a bit back since our cube is at the origin.
+`camera.position.z = 2`;
 
 ## Thoughts
 - Learning Blender at the same time is actually really helpful in better understanding how things are working from a different perspective. 

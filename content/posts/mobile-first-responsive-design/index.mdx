@@ -27,7 +27,7 @@ Setup your base html template.
     - then li with `<a href="#portfolio">`
     - then li with href of skills 
 
-- Creating a nav with 3 linked sections via a tags in lis in an unordewred list.
+- Creating a nav with 3 linked sections via a tags in lis in an unordered list.
 - The sections and titles themselves aren't of class grid, only their contents which are wrapped in a div are going to be the things we want with a class of grid.
 - we are also adding a form in the contact section
 - we also have a footer with copyright and social media icons
@@ -241,8 +241,162 @@ h4 {
 ```
 
 ## Grid Basics
+
+How does CSS Grid work? Imagine that your page is comprised of an underlying grid of say (4 rows and 6 columns; it's up to you).
+
+Grid lines are what separate these grids into sections.
+- <a href="##Grid Basics">grid lines</a> start from left to right horizontally. If we have 6 columns, we will have 7 grid lines.
+- grid lines increase vertically from top down for rows.
+
+### Grid Container
+In order for us to use the grid we must make a parent element a grid container...
+- we do that by using a css selector and setting that elements `display` property to `grid`
+```html
+<div>
+  <a>one</a>
+  <a>two</a>
+  <a>three</a>
+</div>
+```
+```css
+div {
+  display: grid;
+}
+```
+
+### Setting # of columns and their width
+Next we need to define the number of columns and what their width should be.
+- If we want 3 columns we define 3 different widths by providing the width of each column...
+- You can use pixels for defining your widths, however, fractions work better, e.g. `1fr`
+- the `fr` unit means whatevever the full width of the grid is, the fraction is 1 equal fraction of that grid.
+
+```css
+div {
+  display: grid;
+  grid-template-columns: 200px 200px 200px;
+}
+```
+- In our project, we set the `.projects` to use css grid, with 3 1fr columns.
+
+### Centering items within their column
+The next thing we want to do is center those images to their column:
+```css {4,7-10}
+projects {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+projects a {
+  text-align: center;
+  padding: 20px;
+}
+```
+- we also have access to a `gap` property that we add to the gird container that gives us the ability to create gaps between columns/rows.
+- What automatically happens if there is another item in the container is that item goes into the next row. 
+
+### Section Review 
+1. Set your parent/wrapper element's `display` property to `grid`.
+2. Define the number of columns that grid should have and what width each column should be.
+  - using the property `grid-template-columns`. The # of values you provide is how many columns you want.
+  - the value you pass is their width, e.g. `200px` or `1fr`. 
+
 ## Creating a 12-Column Grid
+Normally most layout systems in CSS make use of a 12 column grid system. So, let's try creating a 12 column grid with CSS instead.
+- Remember, line numbers are always one more than the the number of columns we have.
+- We could technically do something like:
+```css
+/* NOT THE BEST WAY */
+selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+```
+- The above is a bit unslightly, instead we can use the `repeat` function: `repeat(#ofTimesToRepeat, columnSize)`.
+  - Under the hood its doing what we see above, but its easier for us humans to read.
+```css
+selector {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+```
+- By default,  If we have 3 items in the container, they get automatically placed in the first 3 columns to the left.
+- However, we can control where they go with `grid-column: columnToStart/columnToEnd` e.g. `grid-column: 1/5;`
+- We can even use `grid-row: desiredRow` to specify which row to put the element on.
+![](/12-column-grid.png)
+
+- If we apply to this to our project, and use `repeat(12, 1fr)`, it won't look like things change that much and that is because the images we are using are stretching the individual cells to be as big.
+If we set the `.projects img` to have a `max-width: 100%`, you will see that our images are appearing as the first 3 elements in the 12 column grid.
+
+#### Using nth-child pseudo-class to grab nth item
+- We can use the `nth-child()` pseudoclass to grab specific elements in our ul by saying....
+```css
+.projects a:nth-child(1) {
+  grid-column: 2/6;
+  grid-row: 1;
+}
+.projects a:nth-child(2) {
+  grid-column: 8/12;
+  grid-row: 1;
+}
+.projects a:nth-child(3) {
+  grid-column: 5/9;
+  grid-row: 2;
+}
+```
+
 ## Mobiles Styles (Part 1)
+
+### Setting up our grid class and styling our h1
+Delete the grid testing code we did, and let's apply what we learned to the mobile styles.
+- You can see we have the `grid` class used in a few places. We are going to be using an 8 column grid for this design.
+```css
+/* mobile styles */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+.site-nav {
+  margin: 0 20px;
+}
+.site-nav ul {
+  display: none;
+}
+.
+```
+- We want to give a bit of margin to our site-nav, however our sitenav ul doens't really need to be shown on mobile so we can hide it.
+- We also want to style up site-nav h1 and give it a bit of a border at the bottom. Since it's in a grid parent, it become a grid item, and right now its being smooshed because its only sitting in one columb by default: let's give it more columns to spread across: `grid-column:1/4` let's be explicit and set its row to 1, and give it some 10px padding on the bottom and a 3px solid primary colored bottom border.
+
+### Styling Welcome
+- aside: a lot of people don't like using id in CSS and instead prefer using classes, but if you use ids properly then this shouldn't be problematic.
+- We will style our #welcome id element.
+```css
+#weclcome {
+  padding: 0 0px 20px 20px;
+}
+.welcome-text {
+  grid-column: 1/6;
+}
+.welcome-img {
+  grid-column: 6/9;
+}
+.welcome-img img {
+  width: 200%;
+}
+.welcome-text a {
+  margin: 20px 0;
+}
+```
+
+#### Resizing images: width % is container size not image size
+At the moment, this image is a bit big, and that's because it is showing at the default size. Let's override that with
+`width: 200%;`. **This isn't 200% of the original image size, but instead it means 200% of whatever is containing it**, in this case it's the width of these columns.
+
+> Note: I got mixed up in application, trying to apply the width to the welcome-img div itself, and forgetting to specifically specify `.welcome-img img`, using the `img` selector.
+
+### Styling our Button
+It's the anchor tag in our welcome-text so `.welcome-text a`, let's set it's top and bottom margin to 20px and left and right to 0.
+
 ## Mobiles Styles (Part 2)
 ## Mobiles Styles (Part 3) 
 ## Tablet Styles 
@@ -250,7 +404,6 @@ h4 {
 ## Laptop Styles (Part 2)
 ## Desktop Styles
 
- 
 ## Review Questions
 1. What do we use css variables for, and how do we use them?
 
@@ -263,6 +416,11 @@ h4 {
 * The `@font-face` rule. 
   - downloading and importing customize fonts, we use the `@font-face` rule and `font-family` to provide the name for the font. 
   - we use `src: url('/relativePath/fileName')` to provide the location of the font file.
-
+* CSS Grid:
+  1. Set your parent/wrapper element's `display` property to `grid`.
+  2. Define the number of columns that grid should have and what width each column should be.
+    - using the property `grid-template-columns`. The # of values you provide is how many columns you want.
+    - the value you pass is their width, e.g. `200px` or `1fr`.
+* When you are setting the width of an image element with %, like when we are setting it to 200%, we are actually saying we want the width of that image to be 200% of the images width container, not 200% of the image size itself.
 
 ## Links

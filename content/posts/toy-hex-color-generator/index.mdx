@@ -1,0 +1,201 @@
+---
+title: Hex Color Generator 
+date: 2020-02-24
+slug: toy-hex-color-generator
+tags:
+  - JS
+  - HTML
+  - CSS
+  - Tyler Potts
+  - toy
+  - Youtube
+---
+
+## Goals
+The aim of this project is to create a random hex code generator.
+- Two elements: 
+1. an h1 displaying the current hex value 
+2. A "GENERATE" button that changes the value of the hex, and in doing so changes the h1 to reflect that value as well as the background color of the page to match it.
+
+## HTML & CSS
+We will start with the HTML and the css.
+
+- [**CSS Box Sizing**](https://www.w3schools.com/css/css3_box-sizing.asp): The CSS box-sizing property allows us to include the padding and border in an element's total width and height.
+    - By default, the width and height of an element is calculated like this:
+        - width + padding + border = actual width of an element
+        - height + padding + border = actual height of an element
+    - The `box-sizing` property allows us to include the padding and border in an element's total width and height. This leads to more uniform and predictable element sizes. This is why a lot of develoeprs want all elements to work this way and use the `*` to apply: `box-sizing: border-box;`
+
+### Hover effect
+To undertand what we are doing with our button effect.
+
+#### `background-size`
+
+#### Better understanding `rem`
+
+## JavaScript
+```js
+function setColor() {
+    let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+}
+```
+- TP uses an intersting approach to generate the random hex. You can understand from context that this is what is going on, but there are a few questions and definitely a few approaches for understanding this.
+- First we could just google-fu: generate random hex, and get a decent solution. In fact, this blog post was particularly interesting: https://www.paulirish.com/2009/random-hex-color-code-snippets/ as they walk through a few different approaches at first.
+- The second approach could be to break everything down one by one.
+    - For instance, you might be wonderinging, why 16777215? 
+    - You might be asking, what is toString(16) doing in this case?
+    - Doesn't a hex have alpha characters as well? How are those being generated.
+    - What are the assumptions I am being to generate about this code? Why do I believe those things?
+- Overall, I think its interesting to observe what you are doing when you trying to understand code that you're ensure about. I do think that googling the problem is a good first place to start, but then let's go over the questions we start asking ourselves with the second approach/mode.
+
+### Challenging assumptions
+Let's start at the beginning and break it apart:
+
+#### What is hexidecimal?
+You know that color values can be represented as hex values, but let's even break down the work itself: You know that "hex" means six, "dec", or deci" you commonly understand to be 10. So from that you could make the assumption that hex-decimal is base-16... Let's confirm:
+
+> In mathematics and computing, [**hexadecimal**](https://en.wikipedia.org/wiki/Hexadecimal) (also base 16, or hex) is a positional system that represents numbers using a base of 16. Unlike the common way of representing numbers with ten symbols, it uses sixteen distinct symbols, most often the symbols "0"–"9" to represent values zero to nine, and "A"–"F" (or alternatively "a"–"f") to represent values ten to fifteen.
+
+From this alone, you might recognize, it in the code above as being the argument we are passing to `.toString(16)`. That must mean that the argument that `.toString()` takes (the optional argument, because you might already be familiar with how `.toString()` works without the arg, hence the possible confusion you experienced in the first place) is the base or [**radix**](https://en.wikipedia.org/wiki/Radix).
+
+Going to mdn, we see that the syntax for `toString` is : `numObj.toString([radix])`
+Where the `**radix**` is pptional. An integer in the range 2 through 36 specifying the base to use for representing numeric values.
+
+#### Understanding `.toString()`
+In fact, the very example on the MDN docs for `.toString` uses base-16 in the example:
+```js
+function hexColour(c) {
+  if (c < 256) {
+    return Math.abs(c).toString(16);
+  }
+  return 0;
+}
+
+console.log(hexColour(233));
+// expected output: "e9"
+
+console.log(hexColour('11'));
+// expected output: "b"
+```
+
+What is interesting to observe from here is, we have another number 256. 256 might make you think of bits and char types:
+- **char** The char type takes 1 byte of memory (8 bits) and allows expressing in the binary notation 2^8=256 values. The char type can contain both positive and negative values. The range of values is from -128 to 127.
+- It might even make you think of encryption.
+
+Even more, from just observing the output from `233` in the example we can see we are producing a value of two chars, `e9`.We know the html color codes typically have 6 of these chars, if not, here is a refresher:
+
+**HTML Codes format:**
+Each HTML code contains symbol "#" and 6 letters or numbers. These numbers are in hexadecimal numeral system. For example "FF" in hexadecimal represents number 255 in Decimal.
+
+**Meaning of symbols:**
+The first two symbols in HTML color code represents the intensity of red color. 00 is the least and FF is the most intense. The third and fourth represents intensity of green and fifth and sixth represents the intensity of blue. So with combining the intensity of red, green and blue we can mix almost any color that our heart desire...
+
+Examples:
+`#FF0000` - With this HTML code we tell browser to show maximum of red and no green and no blue. The result is of course pure red color:     
+
+`#00FF00` - This HTML code shows just green and no red and blue.  
+`#0000FF` - This HTML code shows just blue and no red and green. 
+
+From that, if we did something like 256^3 we arrive at 16777216! 
+
+So let's go back to the original Googled response and check out some of the comments because they are interesting.
+
+At first this would seem like a more elegant solution:
+```js
+"#" + Math.random().toString(16).slice(2, 8);
+```
+- Antother commenter points out there might be a chance for trailing zeros:
+> It is extraordinarily unlikely, to the extent that you don't really need to worry about it.  
+>
+> However, by definition, the `Math.random()` function returns a floating-point, pseudo-random number in the range `[0, 1]`. That includes, for example 0.0625 (that is, 1/16). If you run `0.0625.toString(16).slice(2, 8)` you will see that the result is '1'. In this case, and others like it, this method fails since `0.0625.toString(16)` evaluates to '0.1' and does not have enough digits to return a six-digit answer.
+
+Here was the revised response:
+```js
+'#' + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6);
+```
+
+Another interesting comment here is:
+> The zeroes would have to go on the right of the string to avoid biasing the result towards green!
+`"#" + (Math.random().toString(16) + "00000").slice(2, 8)`
+
+I'm not sure why this would occur, but the first thing that came to mind is [**Benford's law**](http://mathworld.wolfram.com/BenfordsLaw.html) but I don't think that's what is happening here.
+
+Then there is this guy:
+
+I think there's a flaw in both Paul's and Remy's scripts. You're multiplying `Math.random()` by 16777215, which is FFFFFF (hex) in decimal. Then, you’re rounding the whole thing down using Math.floor() (or in Remy’s case, a double bitwise NOT).
+
+However, `Math.random()` returns a pseudo-random number in the range `[0,1]` — that is, between 0 (inclusive) and 1 (exclusive).
+
+Since Math.floor() will never return 1, the random color generator will never return #FFFFFF, since Math.floor(1 * 16777215) === 16777215.
+
+The solution is simple: just use 16777216 instead of 16777215. This number has the added advantage of being a power of 2 (2^24), so using some bitwise left shiftin’ love you can shorten it to 1<<24.
+
+`'#'+(Math.random()*(1<<24)|0).toString(16);`
+
+And another guy's response to that :
+
+Here is my version with notes. Most of this has been mentioned in earlier comments but here it is all in one place.
+
+`'#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);`  
+
+1. `Math.random()` really needs to be multiplied by 0xFFFFFF + 1 or 16777216, which can be represented by 1<<24.
+2. `<<0` works just fine for flooring the value, but so does |0. As long as we are going for conciseness why not save a   character. 
+3. The random value needs to be padded with at most 5 additional zeros on the left. To get the last 6 characters other commenters are using substr(-6) which works in most browsers, but some (ahem IE) don't handle negative indexes on substr correctly. The slice method can handle the job without compatibility issues.
+
+> So this is definitely going into a bit of a rabbit hole. I don't want to implement a solution I don't fully undertand so I'll back to bitwise opeartors/shifting a bit later. For now I am going to go with this...
+```js
+let randomHexColor = `#${("00000" + Math.random().toString(16)).slice(2, 8).slice(-6)}`
+```
+
+#### `Document.querySelector()`
+> The `Document` method `querySelector()` returns the first `Element` within the document that matches the specified selector, or group of selectors. If no matches are found, `null` is returned.
+
+#### Copying to Clipboard
+```js
+function copyHex() {
+    // Create a <textarea> element
+    const el = document.createElement('textarea');  
+
+    // Set its value to the string that you want copied
+    // Make it readonly to be tamper-proof
+    el.value = color.innerHTML;
+    el.setAttribute('readonly', '');            
+
+    // Move outside the screen to make it invisible
+    // Append the <textarea> element to the HTML document
+    el.style.position = 'absolute';                 
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+
+    // Check if there is any content selected previously
+    // Store selection if found
+    // Mark as false to know no selection existed before
+    const selected = document.getSelection().rangeCount > 0 
+    ? document.getSelection().getRangeAt(0) : false;
+    
+    // Select the <textarea> content    
+    el.select();                   
+    
+    // Copy - only works as a result of a user action (e.g. click events)
+    document.execCommand('copy');
+
+    // Remove the <textarea> element
+    // If a selection existed before copying
+    document.body.removeChild(el);                  
+    if (selected) {                    
+        // Unselect everything on the HTML document             
+        document.getSelection().removeAllRanges();
+        // Restore the original selection
+        document.getSelection().addRange(selected);   
+    }
+    
+    alert(`${color.innerText} copied to clipboard`)
+};
+```
+## References
+- [**CSS Box Sizing**](https://www.w3schools.com/css/css3_box-sizing.asp)
+- [**HTML Color Codes**](https://html-color-codes.info/)
+- [**Random Hex Color Code Generator in JavaScript**](https://www.paulirish.com/2009/random-hex-color-code-snippets/)
+- [**Copying tet to clipboard with JavaScript**](https://hackernoon.com/copying-text-to-clipboard-with-javascript-df4d4988697f)
+-----------------------
+- [**Finished Project**](https://kelenam.github.io/hex-color-generator/)

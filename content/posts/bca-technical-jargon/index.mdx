@@ -1,0 +1,64 @@
+---
+title: Technical Jargon
+date: 2020-02-12
+slug: bca-technical-jargon
+tags:
+  - JS
+  - BCA
+  - Technical Jargon
+  - Servers
+  - Youtube
+---
+Clarifying a few technical terms. For the most part I'm fairly comfortable and understand a bulk of these, but its nice to get another refresher/pov on things.
+
+## REST
+- [**REST**]() stands for REpresentational State Transfter
+- A language between a client and a server, used for receiving information and performing operations.
+- a standard most commonly used with HTTP, used primarly to get/fetch/change/manipulate data. 
+- Used in a lot of APIs, thus REST APIs.
+- Express of Node.js would be considered a REST framework.
+- example: you have a react front-end, node backend, you would use the REST standard to communicate between your front-end and your back-end.
+
+## API
+- [**API**]() stands for Application Programming Interface
+- A set of pre-defined rules for communication
+- "REST API" would mean an API that is defined using a REST architecture
+- Different from REST in that, REST is more of a standard, and an API is more of a customized 'lanugage' you can build on top of your REST standard.
+- Example: you have an API for working with videos (the ability to view, download, or delete a video). You have these 3 different feeatures that would collectively referred to as your API. These 3 features are the programmtic interface in which we can interact with the application.
+    - Your REST API may be available via a *REST endpoint* in which case, that API would be considered a [**REST API**]() which would mean an API defined using a REST architecture.
+    - You could also have SOAP API or GraphQL APIs
+
+## Endpoint
+- [**endpoint**](): The URL where a particular web service can be accessed.
+    - difference between [**web service**]() and [**website**](). A website is something visited by an end-user where a web service is something typically visited by a front-end or back-end.
+- POST to https//api.example.com/users might be the endpoint for adding a new user
+- GET to https://api.example.com/users might be the endpoint getting all users
+    - Even though we are using the same URL, by changing the HTTP method effects how our API should work
+- POST and GET are two examples of HTTP methods
+
+## Monolith
+- [**Monolith**](): "monolithic architecture
+- A monolithic API is one that has all (or most) of its endpoints in a single service / process
+- e.g. a single Node process that hosts all the endpoints for a particular service would be a monolithic
+- contrast with microservice architecture
+- Pro: simple to set up and build
+- Con: must deploy all at once (noticeable downtime), scales poorly
+ 
+## Microservices
+- [**microservice**](): "micro-service architecture"
+- Microservices each contain part of the whole service's API
+- e.g. one microservice to handle all video uploads and downloads, another on to handle payments, etc.
+    - you also need to develop a communication channel to handle communication between the microservices
+- Pro: each individual part can be replicated, scaled, tested, deployed, independent to others 
+- Con: much more difficult to architect than a monolith, in many cases unnecessary
+
+## Serverless
+- [**serverless**](): contrasted tiwth typical server-based computing
+- All you do is write code and set up some configuration in a text file
+- The code is deployed onto a *serverless vendor*, e.g. AWS Lambda, Google Cloud functions, Azure Functions, etc.
+- When someone calls a particular endpoint or API, the code is run
+- Pro: infinite scaling up or down to meet demands at any time; cost-scaling: pay for what you use.
+- Con: usually tied into a particular vendor, although this can be addressed, cold starts can make serverless very slow. (I'd also like to add that it probably gets decently expensive, smallest fluctuations in rates can balloon your expenses; coupled with vendor lock-in you end up being at the mercy of your service provider).
+
+## Key Insights
+I thought it was helpful to kind of think of your API as a kind of dialect itself. An API can be RESTful (and thus a RSET API) so long as it utilizes a REST architecture or built on top of the REST standard.  
