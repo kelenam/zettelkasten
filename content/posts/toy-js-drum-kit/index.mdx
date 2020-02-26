@@ -11,7 +11,7 @@ tags:
   - JS30
 ---
 
-### Goals
+## Goals
 - Creating a toy project that plays a corresponding sound of nine separate elements, each with a key on the keyboard (a-l) on the homerow.
     - clap
     - hihat
@@ -25,7 +25,21 @@ tags:
 - The sound of each elements plays via keyboard input as well as keypress.
 - Mild animation and 
 
-### Notes
+## HTML & CSS
+I add the following css styling to all the elements the `kbd` and the `span` so that you don't get the background highlight when clicking frequently.
+
+```css
+.key * {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently */
+}
+```
+
+## Notes
 - Each html element has a `data-key` property
 - Each activation of the key element adds a class of playing which will kick in the css for `.playing` we are going to be (scaling it up by 1.1.) change border color and the box shadow. 
 - Works because our regular `.key` class has a transition property: `transition: all 0.07s` that happens really fast.
@@ -54,18 +68,18 @@ tags:
 
 - the only property that matters on the `.key` property is the `transition: all 0.07s` one because when you add a class to that `.key` we are going to transition to that new class state as definined in `.playing`
 
-#### Removing the Styling from our `.key`
+### Removing the Styling from our `.key`
 So we're adding the class but we aren't removing the class.
 - We could add a `setTimeout` to remove the class afterwords but it might conflict with the timing of our transition if it falls out of sync.
 - It's better to use a transition end event that will stop when a thing has animated itself in.
 
-#####  What is a `transitionend` event? 
+###  What is a `transitionend` event? 
 Well what is a click event? Well an event listner for when something was clicked. Like that there are events when an elements transition has completed. What we can do is listen on each key for when the transition end event happens. We want to listen for all keys so we say...
 `const keys = document.querySelectorAll('.key');`
 
 So now we need to add an event listner to each one, we do so with `.forEach`
 
-##### Adding event listeners to an array/Node List of elements
+### Adding event listeners to an array/Node List of elements
 Why do we have to use `.forEach`, why couldn't we just do something like `keys.addEventListener` like you might be able to do in jQuery? Well the problem *is that if you have an array(more accurately a Node List) of elements you need to explicitly loop over and attaach an event listener to each element*
 
 ```js
@@ -86,38 +100,87 @@ keys.forEach(key => key.addEventListener('transitionend', removeTransition));
 
 In our `removeTransition` function we need to use `this`, because we need to refer to the thing that the event got called against, what is the thing that got called against our eventListner? `.key`. So `this` refers to the `.key` associated with the event.
 
-#### JavaScript Portion
+## JavaScript Portion
 ```js
 (function init() {
-    const keys = document.querySelectorAll('.key');
-    keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+  const keys = document.querySelectorAll(".key");
+  keys.forEach(key => {
+    key.addEventListener("click", playSound);
+    key.addEventListener("transitionend", removeTransition);
+  });
 
-    console.log("Image credit: Gabriel Barletta via Unsplash.com\nProject credit: Wesbos's JS30 series")
+  console.log(
+    `Image credit: Gabriel Barletta via Unsplash.com\nProject credit: Wesbos's JS30 series`
+  );
 })();
 
-function playSound(e) { 
-    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
-    const key = document.querySelector(`.key[data-key="${e.keyCode}"]` );
+function playSound(e) {
+  let keyCode = e.keyCode;
 
-    if (!audio) return;
-    audio.currentTime = 0;
-    audio.play();
+  if (e.type === "click") {
+    keyCode = this.attributes[0].value;
+  }
 
-    console.log(audio);
-    key.classList.add('playing'); 
+  const audio = document.querySelector(`audio[data-key="${keyCode}"]`);
+  const key = document.querySelector(`.key[data-key="${keyCode}"]`);
+
+  if (!audio) return;
+  audio.currentTime = 0;
+  audio.play();
+
+  key.classList.add("playing");
 }
 
 function removeTransition(e) {
-    this.classList.remove('playing');
+  this.classList.remove("playing");
 }
 
-window.addEventListener('keydown', playSound);
-```
-- Essentially the same just wrapped some of the other functionality and wrapped it in an IIFE.
+window.addEventListener("keydown", playSound);
 
-### Key Insights
+```
+- So the bit that I ended up adding was an additional click handler for each key.
+- You can't just add the click handler in the `init` because `playSound` is built on the expected keydown event so `e.keyCode` of a click event isn't going to exist since there is no corresponding `keycode`.
+    - Instead, we have access to what was clicked via this, and from there we can derrive that `.key`'s specific data-key by saying `this.attributes[0].value`. From there we can just change the binding we added for the keyCode in the condition that its a click event with `if (e.type === "click")` 
+    - We also added some styling to prevent the kbd and span elements from being highlighted/selected.
+    - Update: Just reviewing the data-attributes docs on mdn, I decided to change `this.attributes[0].value` to be more inline with using data attributes appropriately via the dataset property: `this.dataset.key`. It's also more explicit at what this is grabbing. 
+
+## Using data attributes
+
+### What are they?
+> HTML5 is designed with extensibility in mind for data that should be associated with a particular element but need not have any defined meaning. data-* attributes allow us to store extra information on standard, semantic HTML elements without other hacks such as non-standard attributes, extra properties on DOM, or `Node.setUserData()`.
+
+### Syntax
+The syntax is simple. Any attribute on any element whose attribute name starts with `data-` is a **data attribute**.
+```html
+<article
+  id="electric-cars"
+  data-columns="3"
+  data-index-number="12314"
+  data-parent="cars">
+...
+</article>
+
+<script>
+const article = document.querySelector('#electric-cars');
+ 
+article.dataset.columns // "3"
+article.dataset.indexNumber // "12314"
+article.dataset.parent // "cars"
+</script>
+```
+
+### CSS Access
+> Note that, as data attributes are plain HTML attributes, you can even access them from CSS. For example to show the parent data on the article you can use generated content in CSS with the `attr()` function:
+```css
+article::before {
+  content: attr(data-parent);
+}
+```
+
+## Key Insights
 - We use `el.classList.add('className')` to add classes to an element where `el` is the element selected. Similarly we also have `.remove` and `.toggle`
 - Remember: when we are using a query selector, we are grabbing the whole element associated by a certain property of that element, so in saying `document.querySelector('.key');` for instance we are grabbing an element or in this case many elements (that make up the Node List) with the class of `.key`. 
+- Learning more about [**data attributes**](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes)
 
 ### Links
 - [**Finished Project**](https://kelenam.github.io/js-drum-kit/)
