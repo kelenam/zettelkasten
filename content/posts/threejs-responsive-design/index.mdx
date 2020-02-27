@@ -1,0 +1,73 @@
+---
+title: Responsive Design in Three.js
+date: 2020-02-20
+slug: threejs-responsive-design
+tags:
+  - JS
+  - 3D
+  - Three.js
+  - WebGL
+  - ES6
+  - ES6 Modules
+  - responsive design
+---
+
+## Summary Questions
+1. In the web platform of Three.js what is the recommended way to set the size of something?
+1. When we are resizing our canvas with CSS what are the two problems we may encounter?
+1. How would we go about correcting for the first issue we may encounter when resizing via CSS?
+
+## Intro
+In the fundamentals example, we used `<canvas id="c"></canvas>`, a plain canvas with no CSS and no size.
+- That canvas defaults to 300x150 CSS pixels in size.
+
+>* In the web platform, the recommended way to set the size of something is to use CSS.
+```CSS
+html, body {
+    margin: 0;
+    height: 100%;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+```
+In HTML the body has a margin of 5 pixels by default so setting the `margin` to `0` removes the margin. Setting the `html` and `body` `height` to `100%` makes them fill the window. Otherwise they are only as large as the content that fills them.
+
+Next we tell the `id=`c element to be `100%` the size of its container which in this case is the body of the document.
+
+Finally we set its `display` mode to `block`. A canvas's default display mode is inl`ine. Inline elements can end up adding whitespace to what is displayed. By setting the canvas to `block` that issue goes away.
+
+- You can see the canvas is now filling the page but there are 2 problems
+    1. our cubes are stretched
+    2. they are blurry
+
+### Fixing strechy problem first
+The fix is setting the aspect of the camera to the aspect of the canva's size. 
+>* We can do that by looking at the `canvas.clientWidth` and `canvas.clientHeight` properties.
+
+We'll update the render loop like this:
+```js
+function render(time) {
+    time *= 0.001;
+
+    const canvas = render.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+}
+```
+
+### Fixing the blockiness
+- Canvas elements have two sizes. One size is the size the canvas is displayed on the page. That's what we set with CSS.
+- The other size is the number of pixels in the canvas itself.
+- This is no different than an image. e.g. we have a 128x64px image and using CSS we might display as 400x200 pixels...
+```html
+<img src="some128x64image.jpg" style="width:400px; height:200px">
+```
+- A canvas's internal size 
+
+### Summary Answers.
+1. By using CSS.
+1. (a) Are objects may be stretched/warped looking (b) They can appear pixeled/boxy
+1. By selecting the canvas with `renderer.domElement` and binding it to a constant that we can call it's `.clientWidth` divided by its `.clientHeight` properties on then update the camera by calling the camera's `updateProjectionMatrix()` function.

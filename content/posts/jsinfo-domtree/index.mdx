@@ -1,13 +1,21 @@
 ---
-title: Browser environment, specs, DOM
+title: DOM tree
 date: 2020-02-26
-slug: jsinfo-browswer-env-specs-dom
+slug: jsinfo-domtree
 tags:
   - web
   - JS.Info
   - browser
   - DOM
 ---
+## Review Questions
+1. What is the backbone of an HTML document?
+1. According to the DOM what is every HTML tag?
+1. Because all these tags are __________, we can do what with the resulting DOM elements?
+1. How does the DOM handle spaces/newlines?
+1. What is something to keep in mind when using `<table>` elements?
+1. Is a comment considered an element node?
+1. How many node elements are there in total, and which 4 do we care most about?
 
 ## Summary
 An HTML/XML document is represented inside the browser as the DOM tree.
@@ -23,10 +31,10 @@ Here we covered the basics, the most used and important actions to start with. T
 DOM nodes have properties and methods that allow us to travel between them, modify them, move around the page, and more. We’ll get down to them in the next chapters.
 
 ## DOM tree
-- The backbone of an HTML document is tags.
-- According to the DOM, every HTML tag is an **object**. Nested tags are "children" of the enclosing one. The text inside a tag is an object as well.
+>* The backbone of an HTML document is tags.
+>* According to the DOM, every HTML tag is an **object**. Nested tags are "children" of the enclosing one. The text inside a tag is an object as well.
 
-* **All these objects are accesible using JavaScript, and we can use them to modify the page.**
+>* **All these objects are accesible using JavaScript, and we can use them to modify the page.**
 
 For example, `document.body` is the object representing the `<body>` tag.
 
@@ -38,11 +46,56 @@ setTimeout(() => documeny.body.stylebackground = "", 3000);
 ```
 
 ## An Example of the DOM
+```HTML
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>About elk</title>
+</head>
+<body>
+  The truth about elk.
+</body>
+</html>
+```
+![](/dom-tree.png)
+- Every tree node is an object
+- ***tags*** are *element nodes* (or just elements) and form the tree structure: `<html>` is at the root, and then `<head>` and `<body>` are its children.
+- The text inside elements forms *text nodes*. A *text node* contains only a string. It may not have children and is always a leaf of the tree.
+
+Spaces and newlines are totally valid characters, like letters and digits. They form text nodes and become a part of the DOM.
+
+- There are only two top-level exclusions:
+  1. Spaces and newlines before `<head>` are ignored for historical reasons.
+  2. If we put something after `</body>`, then that is automatically moved inside the body, at the end, as the HTML spec requires that all content must be inside `<body>`. So there can’t be any spaces after `</body>`.
+  In other cases everything’s straightforward – if there are spaces (just like any character) in the document, then they become text nodes in the DOM, and if we remove them, then there won’t be any.
+
+Here are no space-only text nodes:
+```HTML
+<!DOCTYPE HTML>
+<html><head><title>About elk</title></head><body>The truth about elk.</body></html>
+```
 
 ## Autocorrection
+- If the browser encounters malformed HTML, it automatically corrects it when making the DOM.
+- While generating the DOM, browsers automatically process errors in the document, close tags and so on.
+- A document with unclosed tags …will become a normal DOM as the browser reads tags and restores the missing parts:
+
+⚠️ Tables always have `<tbody>`
+An interesting “special case” is tables. By the DOM specification they must have `<tbody>`, but HTML text may (officially) omit it. Then the browser creates `<tbody>` in the DOM automatically.
 
 ## Other node types
+**comment nodes** are a type of a node.
 
-## Review Questions
-1. What is the backbone of an HTML document?
-1. According to the DOM what is every HTML tag?
+We may think – why is a comment added to the DOM? It doesn’t affect the visual representation in any way. But there’s a rule – if something’s in HTML, then it also must be in the DOM tree.
+
+>* **Everything in HTML, even comments, becomes a part of the DOM.**
+
+Even the `<!DOCTYPE...>` directive at the very beginning of HTML is also a DOM node. We are not going to touch that node, we even don’t draw it on diagrams for that reason, but it’s there.
+
+The `document` object that represents the whole document is, formally, a DOM node as well.
+
+>* There are 12 node types. In practice we usually work with 4 of them:  
+>   1. `document` – the “entry point” into DOM.
+>   2. **element nodes** – HTML-tags, the tree building blocks.
+>   3. **text nodes** – contain text.
+>   4. **comments** – sometimes we can put information there, it won’t be shown, but JS can read it from the DOM.

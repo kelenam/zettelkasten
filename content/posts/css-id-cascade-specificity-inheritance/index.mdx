@@ -9,8 +9,11 @@ tags:
   - Book
   - Keith J. Grant
 ---
-## Review Questions
+## Summary Questions
 1. The cascade considers three things to resolve potentially conflicting rulesets, what are they? 
+1. What are two common example of style sheet origins? 
+1.
+1. How do you override inline declarations in your stylesheets? What if the inline styles are marked `!important`?
 
 ## The Cascade
 The "C" in CSS.
@@ -21,37 +24,76 @@ The "C" in CSS.
 Rulesets can target the same element, how they get resolved depends on how the rules are defined.
 The ***cascade*** is the name for this set of rules.
 
-The cascade considers three things to resolve potentially conflicting rulesets:
-
-1. ***stylesheet origin***- Where the styles come from. Your styles are applied in conjunction with the browser's default styles.
-2. ***selector specificity***-Which selectors take precedence over which.
-3. ***Source order***-Order in which styles are declared in the stylesheet.
+> The cascade considers three things to resolve potentially conflicting rulesets:
+> 
+> 1. ***stylesheet origin***: Where the styles come from. Your styles are applied in conjunction with the browser's default styles.
+> 2. ***selector specificity***: Which selectors take precedence over which.
+> 3. ***Source order***: Order in which styles are declared in the stylesheet.
 
 ```
-                                          No                     No                     No
-Conflicting ----------> Different Origin-----> Is one an inline-------> Do selectors --------> Use declaration 
-declarations              or importance?       style? (Scope)           have Different         that comes later
-                                 |                  |                    specificity?           in source order.
-                                 |                  |                         |                       
-                                 | Yes              | Yes                     | Yes                   
-                                 v                  v                         v                       
-                        Use declaration with     Use inline                Use declaration
-                          higher-priority        declaration               with higher 
-                              origin                                       specificity
+                                      No                     No                     No
+Conflicting ------> Different Origin-----> Is one an inline-------> Do selectors --------> Use declaration 
+declarations          or importance?       style? (Scope)           have Different         that comes later
+                             |                  |                    specificity?           in source order.
+                             |                  |                         |                       
+                             | Yes              | Yes                     | Yes                   
+                             v                  v                         v                       
+                    Use declaration with     Use inline                Use declaration
+                      higher-priority        declaration               with higher 
+                          origin                                       specificity
 ```
 
-### A quick review of terminology
+#### A quick review of terminology
 - [***declaration***](), a css statement, e.g. `color: black` it's made up of a *property* and a *value*.
 - [***declaration block***]() a group of declarations inside curly braces compromise what is known as a declaration block.
 
-Together, the *selector* and the *declaration block* are called a [***ruleset**](). A [***ruleset**]() is also called a *rule*, but ruleset seems preferred nomenclature.
+Together, the *selector* and the *declaration block* are called a [***ruleset***](). A ruleset is also called a *rule*, but ruleset seems preferred nomenclature.
 
 - [***at-rules***]() are language constructs beginning with an "at" symbol, e.g. `@import`.
 
-
 ### Understanding stylesheet origin
 - There are different types of *origins* of stylesheets.
-- *user agent styles* are the browswers default styles
+- *user agent styles* are the browsers default styles
 - styles you write are called *author* styles which have greater priority.
+- after *user agents styles* are considered, the browser applied your styles - the *author styles*, this allows declarations you specify to **override** those set by the user agent.
 
 #### Important declarations
+- An [***important declaration***]() can be specified by adding `!important` to the end of the declaration, before the semicolon:
+```css
+color: red !important;
+```
+- Declarations marked `!important` are treated as highter-priority orign, so the overall order of preference, in decreasing order, is this:
+1. Author important
+2. Author
+3. User agent
+
+### Understanding specificity 
+>* If conflicting declarations can't be resolve based on their origin, the browser next tries to resolve them by looking at their *specificity*.
+
+>* The browser evaluatese specificity in two parts:   
+>   1. styles applied inline in the HTML  
+>   2. styles applied using a selctor.  
+
+[**Inline styles**](): if you use an HTML `style` attribute, to apply styles. The declarations are applied only to that element, they are in effect "scoped" declarations, which override any declarations applied from your stylesheet or a `<style>` tag.
+
+>* To override inline declarations in your stylesheets, you'll need to add an `!important` to the declaration, shifting it into a higher-priorty origin. If the inline styles are marked important, then nothing can override them.
+
+#### Selector specificity
+The second part of specificity is determined by the selectors. For instance, a selctor with two class names has a higher specificity than a selector with one.
+
+### Understanding source order
+
+### Two rules of thumb
+
+## Inheritance
+## Special values
+### Using the `inherit` keyword
+### Using the `initial` keyword
+## Shorthand properties
+### Beware shorthands silently overriding other styles
+### Understanding the order of shorthand values
+ 
+## Summary Answers
+1. 
+
+## Links

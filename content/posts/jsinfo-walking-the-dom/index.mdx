@@ -1,0 +1,23 @@
+---
+title: Walking the DOM
+date: 2020-02-27
+slug: jsinfo-walking-the-dom
+tags:
+  - web
+  - JS.Info
+  - browser
+  - DOM
+---
+
+## Summary
+Given a DOM node, we can go to its immediate neighbors using navigation properties.
+
+There are two main sets of them:
+
+For all nodes: `parentNode`, `childNodes`, `firstChild`, `lastChild`, `previousSibling`, `nextSibling`.
+For element nodes only: `parentElement`, `children`, `firstElementChild`, `lastElementChild`, `previousElementSibling`, `nextElementSibling`.
+Some types of DOM elements, e.g. tables, provide additional properties and collections to access their content.
+
+>* The DOM allows us to do anything with elements and their contents, but first we need to reach the corresponding DOM object.
+>
+>* All operations on the DOM start with the document object. That’s the main “entry point” to DOM. From it we can access any node.
