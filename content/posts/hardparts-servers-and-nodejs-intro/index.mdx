@@ -1,0 +1,152 @@
+---
+title: Servers and Node.js
+date: 2020-02-26
+slug: /hardparts-servers-and-nodejs-intro
+tags:
+  - Node.js
+  - FEM
+  - Will Sentence
+  - Servers
+---
+
+- Node provides server-side environment for JS
+- we can write applications end to end as JS devs.
+
+## Section Review Questions
+
+1. What is a server?
+1. Where do incoming HTTP requests land on the server? Is it in a JS environment?
+
+## Node OverView
+These are all web applications, they need code and data:
+- Need HTML, CS and JS
+    - Michale, opens his mac, and opens twitter.com/michel, opening in web browser
+    - Then Rich, opens his linux machine, and opens twitter.com/node, opening in web browser
+    - Then Zep, opens his phone, and opens twitter.com/, opening in web browser
+
+What kind of data are we going to load up... From tweeter....
+    - tweets
+    - images
+    - video
+
+So where is all this code and data coming from?
+Comes from a **server**, which is nothing but another computer connected to the internet, ready to receive a message from all requests being made, Michael, Rich, Zep.
+- Pinging the server to ask for all data/code being stored (and able to receive) the requests being made to it.
+
+We need to determine how to handle requests on that server(that computer).
+What do we need on that computer? We need code. Code that can [***introspect***](), *aka look into the message(request) being made of it*. Then it decides what to send back.
+
+### Servers are the behind-the-scences of all web applications-where our client-side code/data comes from
+Computer connected to the internet - a permanent store of code/data, always on, always ready to receive messages over the internet from users requesting code/data and send it back.
+- How's this computer know what to send back?
+- How can we access these inbound messages as developers and send code/data back in response?
+ 
+So the this server (this computer) is receving messages, where? On that computers *network card* so what languages would you use to command, to make instructutions to that computer to handle the network request? Some lanuguages would be, PHP, Java, Ruby, C, C++, JS.
+- Like a server, the server needs to server data back to the clients.
+
+Wouldn't it be great to use the computers networking ability to determine what to send back?
+We write code! 
+
+### Sending the right data back rquires using multiple features of the computer
+- ***network socket***, receive an send back messages over the internet
+- ***filesystem*** - thats where the html/css/js code is stored in files
+- ***CPU***: for cryptography and optimizing hashing passwords
+- ***kernel*** - I/O managagement
+
+Our dream - be able to use JS to control this computer because (1) we know JS and (2) it has some really nice design decisions.
+
+So we might need to manage the files and file storage that exist on the server.
+
+We know for sure we cannot use any of those internal features of the server. But that's the critical thing we need to do? What language would allow us to interface with the machine? Well C++
+So if we are able to use JS to access those features/inbound messages we need to leverage C/C++
+    - JS works in hand with C++ so we can write JS code to control C++ built features that allow us to control our computers internals
+    - C++ and JS together are known as **Node.js**.
+    - JS -> Node -> Computer Feature (e.g. network, filesystem)
+
+Does this mean we need to know C++ inside out?    
+It turns out we're going to get from JS, a ton of labels builts into JS that are gonna give us, labels like HTTP, FS< that we will have to sort of tell JS we want to use, that will give us access to C++ features that give us access to the computer's internals.
+
+We dont need to know C++ code, but we do need to understand the mental models of how its working. How these JS labels are going to trigger C++ features.
+- Much Node is C++ code. 
+
+## JavaScript, Node & the Computer
+
+### Each programming lang has difference levesl of ability to interact with these computer/server features directly
+- C++ has many features that let it directly interact with the OS directly.
+- JS does not! So it has to work with C++ to control these computer features, 
+
+Our request is going to hit the network card not going to go straight into a JS envrionment. We are going to need Node C++ built features to communicate to network features.
+To do so we are going to use JS labels to leverage Node/C++ features (they look like JS functions but under the hood they are commands to Node C++ features) and that will communicate with the Network.
+
+- A bulk of the hardwork is happening in the Node/C++ sphere, we should understand this intimately.
+- So C++ is actually interacting with abstraction layers of the OS to control the computer internals/OS.
+
+### Rewind, We had better understand JS to understand Node.js then...
+It's a language that does 3 thigns (and 1 involves a lot of help from c++)
+1. Saves data and functionality (code)
+2. Uses that data by running functionality (code) on it
+3. Has a ton of built-in labels that triggers Node features taht are built in C++ to use our computers internals.
+
+## Let's see the 2 things that JS does by itself - saving and using data
+
+## Executing JavaScript Code Review
+```js
+let num = 3;
+// 1. save a function (code to run, parameters awaiting inputs) 
+function muliplyby2(inputNumber) {
+    const result = inputNumber*2;
+    return result;
+}
+
+// 2a. Call/run/invoke/execute a function (with parens)
+// and 2b. insert an input (an agrgument)
+const output = multiplyBy2(num);
+const newOutput = multiplyBy2(10);
+
+```
+JS has a data store. That is just memory. A global variable environement.
+Global b/c available globally.  as opposed to local context like function scope.
+
+1. First line: declare variable num and assign it to 3
+2. Next (skip comment)line: Saves the function body and gives it a label called multiplyBy2.   
+    - Declare register, define, they all mean the same thing, they mean, take the function label and then its body and parameters and save the code. Do not do it now, save it for later.
+        - Two parts to running a function: 1) Running its Code (2) Inserting actually values as inputs
+        - Functions super important, bundling functionality we will save for later. Going to be doing a lot of saving code to be run later. 
+3. Declare output is a label, we don't know what to store yet since we haven't executed it yet, it's now in this kind of temporal deadzone where it isn't yet initialized.
+    - Aside; We are manually inserting the input/arg there, with num. I have a sneaking suspicion that Node might end up being the one who puts the parens on the end of our function code. who inserts the input automatically for us--this ends up being the entire paradigm of node.
+3.  Calling `multiplyBy2` with the value stored in num which is 3
+    - we are creating like a mini app, this is JS that has got memory and the ability to go through code line by line, aka **thread of execution**, that is the JS's ability to thread its way down the page line by line and execute the code as it goes. this is the hardest thing in the world to type with since the feeling of this 
+3.  Now we are going to execute...
+TO RUN CODE OF A FUNCTION, WHAT DO WE NEED? We need a new?? **Execution Context**
+    - It's just a mini app, like a mini app, like the big one we were just in...
+    - The two things we need to run code (1) Places to store stuff, memory (2) And the ability to go through it, line by line.
+    - This new memory is called local(temporary) and this memory is just for inside of this function.
+    - We do the same steps with result, then assing it the computation of 3 * 2, then return result which gets returned to global scope output binding with the assignment of the returned value 6.
+
+***That's all JS really does. It saves data and code and runs that code on the data***.
+- But we are the ones who tell it to run, currently, we are the ones putting the parens on at the end of functions.
+- As we will later see, Node is going to be taking over putting parens on the end/dictating execution.
+
+## Executing Node Code
+
+### So Let's see JS's other talent - built-in labels that trigger Node Features
+We can set up, with a JS label, a Node.js feature (ans so computer internals) to wait for requests for html/css/js tweets from our users.
+
+How? The most powerful built-in Node feature of all: **HTTP** (and its associtaed with built-in label in JS- also `http` conventiently).
+- **HTTP** is just the format by which you send messages or requests from a web browser
+- Whenver you type in a URL and press ENTER you send out a message and it sends it out in HTTP format
+- **socket** An open channel to the internet, two-way open channel. We need to have that channel prepped such in the way that it's ready to receive HTTP formatted messages.
+
+### Using http features of Node to set up an open socket
+```js
+const server = http.createServer()
+server.listen(80)
+```
+Inbound web request --> run code to send back message
+`if inbound message -> send back data`
+But at what moment?
+
+So reiterating. `http.createServer` is a Node/C++ label for JS that establishes a connection to inbound messages.
+- This label is not automatically availble to us in JS
+    - One line will bring it into our progam.
+ 

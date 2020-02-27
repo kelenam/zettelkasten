@@ -9,5 +9,49 @@ tags:
   - Book
   - Keith J. Grant
 ---
-  
+## Review Questions
+1. The cascade considers three things to resolve potentially conflicting rulesets, what are they? 
+
 ## The Cascade
+The "C" in CSS.
+- Fundamentally CSS is about declaring rules: that is, under various conditions, we want certain things to happen.
+* Key part of CSS development vomes down to writing rules in such a way that they are predictable.
+- First step towards this is understanding how the rules we write are applied.
+
+Rulesets can target the same element, how they get resolved depends on how the rules are defined.
+The ***cascade*** is the name for this set of rules.
+
+The cascade considers three things to resolve potentially conflicting rulesets:
+
+1. ***stylesheet origin***- Where the styles come from. Your styles are applied in conjunction with the browser's default styles.
+2. ***selector specificity***-Which selectors take precedence over which.
+3. ***Source order***-Order in which styles are declared in the stylesheet.
+
+```
+                                          No                     No                     No
+Conflicting ----------> Different Origin-----> Is one an inline-------> Do selectors --------> Use declaration 
+declarations              or importance?       style? (Scope)           have Different         that comes later
+                                 |                  |                    specificity?           in source order.
+                                 |                  |                         |                       
+                                 | Yes              | Yes                     | Yes                   
+                                 v                  v                         v                       
+                        Use declaration with     Use inline                Use declaration
+                          higher-priority        declaration               with higher 
+                              origin                                       specificity
+```
+
+### A quick review of terminology
+- [***declaration***](), a css statement, e.g. `color: black` it's made up of a *property* and a *value*.
+- [***declaration block***]() a group of declarations inside curly braces compromise what is known as a declaration block.
+
+Together, the *selector* and the *declaration block* are called a [***ruleset**](). A [***ruleset**]() is also called a *rule*, but ruleset seems preferred nomenclature.
+
+- [***at-rules***]() are language constructs beginning with an "at" symbol, e.g. `@import`.
+
+
+### Understanding stylesheet origin
+- There are different types of *origins* of stylesheets.
+- *user agent styles* are the browswers default styles
+- styles you write are called *author* styles which have greater priority.
+
+#### Important declarations
