@@ -12,8 +12,35 @@ tags:
 
 Use `Math.abs()` to compare the absolute difference of the two values to epsilon. Omit the third parameter, epsilon, to use a default value of 0.001.
 
+```js
+const approximatelyEqual = (v1, v2, epsilon = 0.001) => Math.abs(v1 - v2) < epsilon;
+
+approximatelyEqual(Math.PI / 2.0, 1.5708); // true
+```
 ### epsilon
+[**Epsilon**](http://mathworld.wolfram.com/Epsilon.html) In mathematics, a small positive infinitesimal quantity, usually denoted epsilon or epsilon, whose limit is usually taken as epsilon->0.
+
+Here we are using **epsilon** as the degree of closeness. Is the absolute difference between the first two args, less than than of epsilon (the optional third arg we pass).
+
+Is the difference of these two values, at least `e` in closeness where `e` is an optional third arg with a default of `0.001` in closeness.
+
+```js
+const approximatelyEqual = (v1, v2, epsilon = 0.001) => Math.abs(v1 - v2) < epsilon;
+
+approximatelyEqual(1.002, 1.001) //--> false
+approximatelyEqual(1.002, 1.001, 0.01) //--> true
+```
+In the example above, if we don't specify the third argument we will get `false` because...
+```js
+Math.abs(1.002 - 1.001)
+// --> 0.001000000000000112
+// this might not be what we are expecting
+// but it likely has to do with float arithmetic in JS as a language
+// We get this non-precise trailing values that makes
+// Math.abs(1.002 - 1.001) greater than 0.001
+```
+- If you need precise values, and are dealing with a lot of floats or decimals, make sure you have a solid understanding of how JS handles these values, because I myself am still a bit uncertain.
 
 ### `Math.abs()`
 For a second, let's talk about `Math.abs()`. Refresher, [**absolute value**](https://en.wikipedia.org/wiki/Absolute_value) is simply a numbers distance from 0. This works in either direction, positive or negative. e.g. the absolute value of 1 is 1 the absolute value of -1 is 1.
-
+ 

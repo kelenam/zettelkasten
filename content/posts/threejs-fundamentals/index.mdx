@@ -119,29 +119,150 @@ function main() {
 We will have to move the camera a bit back since our cube is at the origin.
 `camera.position.z = 2`;
 
+![](/camera-coordinates.png)
 
+- We are setting our camera on the z to 2, it's looking down the -Z axis.
+- Our frustum starts 0.1 untis from the front of the camera (`const near = 0.1`);
+- In this diagram we are looking down, the field of view is affected by the aspect.
 
+### Fifth, we make a `Scene`
+- A [**Scene**]() in three.js is the root of a form of scene graph. Anything you want three.js to draws needs to be added to the scene.
+`const scene = new THREE.Scene();`
 
+### Sixth, create a `BoxGeometry`
+[**BoxGeometry**](https://threejs.org/docs/#api/en/geometries/BoxGeometry): BoxGeometry is a geometry class for a rectangular cuboid with a given 'width', 'height', and 'depth'. On creation, the cuboid is centred on the origin, with each edge parallel to one of the axes.
+- Almost anything we want to display in Three.js needs geometry which defines the vertifcies that make up our 3D object.
+```js
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+```
 
+#### Specifying colors
+- Colors can be specified using standard CSS styler 6 digit hex color values.
+```js
+const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
+```
+
+#### Creating a Mesh
+A [**Mesh**]() represents the combination of a [**Geometry**](https://threejs.org/docs/#api/en/core/Geometry) a [**Material**](https://threejs.org/docs/#api/en/materials/Material) (how to draw the object, shiny or flat, what color, what texture(s) to apply. Etc.) as well as the position, orientation, and scale of that object in the scene.
+```js
+const cube = new THREE.Mesh(geometry, material);
+```
+
+### Finally, Add the Mesh to the scene & render
+```js
+scene.add(cube);
+
+renderer.render(scene, camera);
+```
+We render by calling the renderer's `render` function and passing it the `scene` and the `camera`.
+
+## Animating our Cube
+Our cube is being drawn in 3D but its hard to tell since its stationary.
+- To animate it we'll render inside a render looping using `requestAnimationFrame`
+- Here is our loop:
+```js
+function render(time) {
+  time *=0.01; //convert time to seconds
+
+  cube.rotation.x = time;
+  cube.rotation.y = time;
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+```
+### Creating a Light
+It's still hard to see the 3D, so let's add a light
+```js
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+  scene.add(light);
+```
+- **Directional lights** have a `position` and a `target`. 
+- Both deafult to 0,0,0. In our case we're setting the light's position to `-1,2,4` so it's slightly on the left, above, and behind our camera. The target is still `0,0,0`, so it will shine toward the origin.
+
+* ⭐ We also need to change the material. The `MeshBasicMaterial` is not aff4ected by lights.
+- Let's change it to `MeshPhongMaterila` which is affected by lights.
+```js
+const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
+```
+Here is our scene now:
+![](/3d-cube-with-lights.png)
+
+## Adding more cubes
+We'll use the same geometry for each cube but make a different material so each cube can be a different color.
+
+### Make a function that creates a new material with the specified color
+First we'll make a function that creates a new material with the specified color. Then it creates a mesh using the specified geometry and adds it to the scene and sets its X position.
+```js
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+ 
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+ 
+  cube.position.x = x;
+ 
+  return cube;
+}
+```
+Then we'll call it 3 times with 3 different colors and X positions saving the Mesh instances in an array.
+```js
+const cubes = [
+  makeInstance(geometry, 0x44aa88,  0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844,  2),
+];
+```
+Finally we'll spin all 3 cubes in our render function. We compute a slightly different rotation for each one.
+```js
+function render(time) {
+  time *= 0.001;  // convert time to seconds
+ 
+  cubes.forEach((cube, ndx) => {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+ ```
+
+With cubes at X = -2 and X = +2 they are partially outside our frustum. They are also somewhat exaggeratedly warped since the field of view across the canvas is so extreme.
+
+![](/scene-with-3-cubes.png)
+
+- we have 3 `Mesh` objects each referencing the same `BoxGeometry`. Each `Mesh` references a unique `MeshPhongMaterial` so that each cube can have a different color.
 
 ## Thoughts
 - Learning Blender at the same time is actually really helpful in better understanding how things are working from a different perspective. 
-
-<Title text="Banana" />
-
-
-
+ 
 ## Keywords
 - **Scene**: Scenes allow you to set up what and where is to be rendered by three.js. This is where you place objects, lights and cameras. Use `Scene()` to create a new scene object.
-- **Mesh**: Class representing triangular polygon mesh based objects. Also serves as a base for other classes such as SkinnedMesh.
+- [**Mesh**](https://threejs.org/docs/#api/en/objects/Mesh): Class representing triangular polygon mesh based objects. Also serves as a base for other classes such as SkinnedMesh.
 - **Geometry**: Geometry is a user-friendly alternative to BufferGeometry. Geometries store attributes (vertex positions, faces, colors, etc.) using objects like Vector3 or Color that are easier to read and edit, but less efficient than typed arrays.
 - **WebGLRenderer**: The WebGL renderer displays your beautifully crafted scenes using WebGL.
-
+- **PerspectiveCamera**: Camera that uses perspective projection. This projection mode is designed to mimic the way the human eye sees. It is the most common projection mode used for rendering a 3D scene.
+- **frustum** is the name of a 3d shape that is like a pyramid with the tip sliced off. In other words think of the word "frustum" as another 3D shape like sphere, cube, prism, frustum.
+- **Geometry** is a user-friendly alternative to BufferGeometry. Geometries store attributes (vertex positions, faces, colors, etc. using objects like Vector3 or Color that are easier to read and edit, but less efficient than typed arrays.
+- [**Material**](https://threejs.org/docs/#api/en/materials/Material): `Material` is an abstract base class for materials. Materials describe the appearance of objects. They are defined in a (mostly) renderer-independent way, so you don't have to rewrite materials if you decide to use a different renderer.
 
 
 ## Review Questsions
-1. Most angles in 
+1. What is the difference between WebGL and Three.js?
+1. Give the loosest overview of what a three.js project essentially is.
+1. What are geometries primarily responsible for?
+1. What two things make up a `Mesh`?
+1. If you're trying to recreate the cube example, what are the steps you would need to take in doing?
 
+## Key Insights
+- If you are building up just an html file, remember to set the type of the script to be that of module: `<script type="module"...>`
 
 ## Links
 - [**JavaScript Prerequisites**](/threejs-js-prereq)

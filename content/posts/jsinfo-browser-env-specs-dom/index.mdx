@@ -1,0 +1,91 @@
+---
+title: Browser environment, specs, DOM
+date: 2020-02-26
+slug: jsinfo-browswer-env-specs-dom
+tags:
+  - web
+  - JS.Info
+  - browser
+  - DOM
+---
+
+The JS language originally built for browsers. Now because of things like Node, JS can be run in most places, so we refer to where it's being run as the **host environment**.
+
+- A **host environment** provides its own objects and functions additional to the language core.
+    - Web browserss give a means to control web pages.
+    - Node.js provides server-side features.
+
+## JS in the web browsers
+![](/js-in-web-browser.png)
+- The root object is called `window`. It has two roles:  
+    1. Acts is the global object for JS code. 
+    1. It represents the *browser window* and provides methods to control it.  
+
+For instance, here we use it as a global object:
+```js
+function sayHi() {
+  alert("Hello");
+}
+
+// global functions are methods of the global object:
+window.sayHi();
+```
+
+And here we use it as a browser window, to see the window height:
+```js
+alert(window.innerHeight); // inner window height
+```
+
+## DOM (Document Object Model)
+
+**Document Object Model**, or **DOM** for short, represents all page content as objects that can be modified.
+
+The document object is the main “entry point” to the page. We can change or create anything on the page using it.
+
+For instance:
+```js
+// change the background color to red
+document.body.style.background = "red";
+
+// change it back after 1 second
+setTimeout(() => document.body.style.background = "", 1000);
+```
+
+Here we used `document.body.style`, but there’s much, much more. Properties and methods are described in the specification:
+
+### DOM is not only for browswers
+📝 The DOM spec simply explains the structure of a document and provides objects to manipulate it.
+- A non-browswer instrument that uses the DOM would be server-side scripts that download HTML pages and process them can also use the DOM. They may only support part of the spec though.
+
+### CSSOM for styling
+CSS Rules and stylesheets are structure in a different way than HTML. There is a different spec, [**CSS Object Model (CSSOM)**](https://www.w3.org/TR/cssom-1/), that explains how they are represented as objects, and how to read and write them.
+
+- CSSOM is used together with DOM when we modify style rules for the document. In practice, CSSOM is rarely required, becuase usually CSS rules are static.
+
+### BOM (Browser Object Model)
+The **Browser Object Model (BOM)** represents additional objects provided by the browser (host environment) for working with everything except the document.
+
+For instance:
+The `navigator` object provides background information about the browser and the operating system. There are many properties, but the two most widely known are: navigator.userAgent – about the current browser, and navigator.platform – about the platform (can help to differ between Windows/Linux/Mac etc).
+The `location` object allows us to read the current URL and can redirect the browser to a new one.
+```js
+alert(location.href); // shows current URL
+if (confirm("Go to Wikipedia?")) {
+  location.href = "https://wikipedia.org"; // redirect the browser to another URL
+}
+```
+Functions `alert`/`confirm`/`prompt` are also a part of BOM: they are directly not related to the document, but represent pure browser methods of communicating with the user.
+
+📝 BOM is the part of the general HTML specification.
+
+Yes, you heard that right. The HTML spec at https://html.spec.whatwg.org is not only about the “HTML language” (tags, attributes), but also covers a bunch of objects, methods and browser-specific DOM extensions. T
+
+
+## Review Questions
+1. What does a **host environment** do with regards to JS, and what do we mean by **host environment**?
+1. What does the DOM spec explain?
+1. Are the functions `alert`, `confirm`, and `prompt` apart of the DOM?
+1. What is the BOM?
+
+## Links
+- [Main](jsinfo-main)
