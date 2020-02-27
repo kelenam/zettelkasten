@@ -9,5 +9,31 @@ tags:
   - Array
   - destructuring
 ---
-The two most used data structures in JavaScript are `Object` and `Array`
 
+## Summary Questions
+1. When would we want to use 
+
+
+The two most used data structures in JavaScript are `Object` and `Array`
+- **Objects** allow us to create a single entity that stores items by key
+- **Arrays** allow us to gather data items into an ordered collection.
+
+> **But when we pass those objects or arrays to a function, it may not need an object/array as a whole, but rather individual pieces.**
+
+[***Destructuring assignment***]() is a special syntax that allows us to "unpack" arrays or objects into a bunch of variables.  
+
+Destructuring also works great with complex functions that have a lot of parameters, default values, and so on.
+
+## Array destructuring
+```js 
+// we have an array with the name and surname
+let arr = ["Ilya", "Kantor"];
+
+// destructuring assignment
+// sets firstName = arr[0]
+// and surname = arr[1]
+let [firstName, surname] = arr;
+
+alert(firstName); //---> Ilya
+alert(surname); //---> Kantor
+```

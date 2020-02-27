@@ -1,0 +1,89 @@
+---
+title: JavaScript Principles (JSHPv2)
+date: 2020-02-27
+slug: hardparts-js-v2-javascript-principles
+tags:
+  - Node.js
+  - FEM
+  - Will Sentence
+  - Servers
+  - Hard Parts
+  - thread of execution
+  - functions
+  - call stack
+---
+
+## Summary Questions
+1. In this line, `const ouput = multiplyBy2(num)`, what is the value of `output` prior to the execution of `multiplyBy2(num)`?
+2. When JS code runs, it does what two things, or depends on what two things?
+
+## Thread of Execution
+When JS code runs, it does two things:
+1. Goes through the code line-by-line and runs/'executes' each line -known as the [**thread of execution**]()
+1. Saves 'data' like strings and arrays so we can use that data later - in its [**memory**](), the fancy name for the place that we store data.
+
+- We can even save code ('functions');
+
+```js {1,2,7}
+const num = 3;
+function multiplyBy2 (inputNumber) {
+    const result = inputNumber*2;
+    return result;
+}
+
+const output - multiplyBy2(num);
+const newOutput = multipleBy2(10);
+```
+Walking through the code above:          
+**Line 1:** defining a constant called `num` and assigning it the value `3`   
+**Line 2**: Defining the function `multiplyBy2` and storing all of its code bundling it up and storing it in memory with the identifier `multiplyBy2`.   
+**Line 7**: Defining a constant called `output` and storing the output of `multipleBy2` function we are about to call.
+
+- on **Line 2**, there are two parts of a function declaration, there's our identifier, the label for something we are storing in the computer's memory, the identifier here is `multiplyBy2`. That means the thread of execution continues to line 7.
+- on **Line 7**, we are storing a function call. It's a command, where we can only store values, that's fixed final things, I can't store some "go do some work instruction". So for now, `output` will remain uninitalized, this is in contrast to the old days where it's `undefined` because again, if we are declaring a `const` ouptut and storing `undefined` we wouldn't be able to change it out with the value that returns from the function so we say its' not really even fully stored yet, it's unitialized.
+
+- Running a function is like a mini app, itself has...
+- Two parts to executing code: line by line (thread of execution) and a place to store (memory) any functions, variables, constants, etc. These two things combined are referred to as a brand new [***Execution Context***]()...
+
+## Functions 
+Code we save ('define') functions & can use (call/inboke/execute/run) later with the function's name/identifier + `()`
+
+### Execution Context
+- A [***Execution Context***]() is created to run the code of a function - has 2 parts:  
+    1. Thread of execution
+    1. Memory 
+
+So before we move on to any more lines of code (still on line 7) we need to create a brand new execution context within our global one (as soon as we start running our file of code, we create what's called a ***global execution context*** for running all the code in the file; the main program).
+
+When we create a function we are creating a 'mini' program.
+Again, this mini program has ( you ca visualize it on the left) memory, a place to store things. We call it [***local memory***]() because its just stuff available in the function context. 
+
+```js {2-5,7}
+const num = 3;
+function multiplyBy2 (inputNumber) {
+    const result = inputNumber*2;
+    return result;
+}
+
+const output - multiplyBy2(num);
+const newOutput = multipleBy2(10);
+```
+Whenever we run code in a function, the first thing we always handle is it's arguments/params. Here we have `inputNUmber`
+- Our ***parameter*** acts as the ***label/identifier*** for the piece of data that gets assigned the value of the ***argument*** we are passing into that function. When we are calling the function on Line 7 we are passing that function the value `3`, that has an identifier of `num`. So we are essentially saying, in the...
+    - local memory of the new execution context, create a variable (under the hood it's using let/var) named `inputNumber` and give it the value `3`.
+    - `inputNumber` is the ***parameter***, `3` is the ***argument***.
+- Then we create a new constant called `result` that gets assigned the value `3` * `2` which is `6`, so it gets assigned the value `6`.
+- The final line in the function is `return result`
+    - JS looks up, in local memory first, what `result` is and finds the value `6`
+    - Then `return` takes that number and 'returns it', shoots it back out to where it was called.
+    - What is happeneing is that the we are evaluating that function block and resolving it to a value. That function evaluates into the number `6` which becomes the values of the assignment `output`: 
+
+- We only have one thread of execution running at any given time. JS is single threaded.
+
+- **Line 8**: we are declaring a new constant called `newOuput` and similarly to `output` we don't immediately assign it anything, because we must create a new execution context to run `multiplyBy2` with the argument `10`. It runs, completes the above and finally gets assigned the value `20`.
+
+## Call Stack
+
+## Summary Answers
+1. It's not assigned a value, it's kind of just in limbo, waiting for its assignment from the return of its function call. That's because if we were to say it were `undefined` prior to completion of `multipleBy2` we wouldn't be able to change it's value as its been declared as a constant.
+2. Thread of Execution (going through code line by line) and Memory (a place to store data).
