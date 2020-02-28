@@ -1,0 +1,129 @@
+---
+title: Tailwind CSS Crash Course
+date: 2020-02-27
+slug: tailwind-css-crash-course
+tags:
+    - CSS
+    - Tailwind
+    - web
+---
+## What is TailwindCSS?
+[**tailwind**] is a utility-first, utility-based low level css framework.
+
+Fundamental difference between materialize/bootstrap in that it isn't comprised of premade components (navs, cards, components, etc), the downside is that all the sides look the same.
+- Tailwind instead gives you a whole bunch of utility classes to build our own components.
+- Tailwind based on utilities as opposed to components and its much lower level.
+
+### Installing
+- There is a CDN (with limitations), we are going to use:
+`npm install tailwindcss`
+or
+`yarn add tailwindcss`
+
+### Adding Tailwind to your css
+Use the `@tailwind `directive to inject Tailwind's base, components, and utilities styles into your CSS:
+```css
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+```
+We are going to have to run a build command to build out the css we want to include in our html, 
+we can make a new folder, `src` that holds `styles.css` where we add the above, then we will create a new folder called `dist` or whatever, that will be hold our `index.html` and our ouput stylesheet, we can just call the same `styles.css`
+
+- Over in `package.json` add a script: 
+```json
+"scipts": {
+    "build:css": "tailwind build src/styles.csss -o dist/style.css"
+}
+```
+In this way we are using the `-o` flag to mark the output name of the file which is going to be the `style.css` file in our `/dist` dir.
+
+Now we can go, in terminal and run the command `npm run build:css`
+
+Basically, that the `@tailwind` line are doing are importing base functionality as our styles, its kind of like a normalize css. A ton of utilities 
+
+### Background colors
+The first thing we are going to do is look at a bunch of the default utility colors we can see in the docs.
+let's make the body blue by giving it the class.
+```html
+<body class="bg-blue-700">
+    <button class="bg-blue-500 text-white font-bold py-2 px-4 rounded">
+        Find Friends
+    </button>
+```
+Then lets add a 500 shade blue button, make the inner text white (`.text-white`), if we want to make it bold we use `.font-bold`.
+- as far as padding goes: we use `py-2` for top and bottom padding of 2 units, and `px-4` for padding on the left and right of 4 units., and we want this all to be rounded so we add the rounded class. And inside this button we will have the text, `find friends`.
+
+What's really cool is that we haven't even touched any css, we can even handle hover effects with...
+`hover:bg-blue-400`
+
+There is a container class so lets move the button into the container div
+```html
+<div class="container mx-auto px-2">
+...
+</div>
+```
+If we look at the css for the container its just a max-width. No margin auto, no padding. It's all pretty unopinionated. We an change breakpoints of the max-width in the config file, we will create shortly...
+
+If we did want this to be margin auto and give it some padding, we could just say `mx-` (which is margin on the x-axis), `mx-auto` and for the padding we could do `px-2`, now it's in got some room in our container.
+
+### Create Your Tailwind config file
+We just run : `npx tailwind init`
+
+In this config file we can change the font family, the color, margins, breakpoints, etc. It's very customizeable.
+
+Let's go into that newly created `tailwind.config.js` file and set some properties on our `container`
+```js {4-7}
+module.exports = {
+  theme: {
+    extend: {},
+    container: {
+      center: true,
+      padding: '2rem'
+    }
+  },
+  variants: {},
+  plugins: [],
+}
+```
+Now, we can get rid of the `mx-auto` and the `px-2` in our `container` because this is the default we just set in the config file. To see this applied, we do have to rerun the build, using `yarn build:css`
+
+### Extending Utility classes with CSS
+If you wanted traditional styles like you wanted to add classic, button styles to a a `.btn` class you could, right beneat your `@tailwind imports in your src/style.css file.
+
+#### `@apply` directive
+There is even an `@apply` directive that allows us to use those same utilites right in our css..
+```css
+.btn {
+    @apply font-bold py-2 px-4 rounded;
+}
+```
+More work to do it this way, but just showing you that, you can.
+
+### Spacing / Padding
+- `.p-2` is going to be padding all around. 2 is in rem. 
+- `.py` is going to be y axis padding
+
+Same with margin except with `m` and width is just `w` goes up to 64, also has `-min` `-max` and `-auto`.
+
+### Flex
+Adding a class of flex, will turn the element into display flex.
+- align-items, stretch, etc.
+
+### Creating an alert
+```html
+    <!-- ALERT COMPONENT -->
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-5" role="alert">
+        <strong class="font-bold">Alert! </strong>
+        <span class="block sm:inline"></span>
+    </div>
+```
+- this line: `<span class="block sm:inline"></span>`, means that by default this span is going to be `block` by on screens small aand up `sm:inline` are going to be inline instead of block.
+
+### Creating a Card Column
+Outside of our container div, we can start adding our card columns.
+```html
+
+```

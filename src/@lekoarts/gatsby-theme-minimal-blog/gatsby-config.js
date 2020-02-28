@@ -3,13 +3,13 @@ const newsletterFeed = require(`./src/utils/newsletterFeed`)
 module.exports = options => ({
   siteMetadata: {
     siteTitle: `Kelena Mori`,
-    siteTitleAlt: `Minimal Blog - @lekoarts/gatsby-theme-minimal-blog`,
-    siteHeadline: `Minimal Blog - Gatsby Theme from @lekoarts`,
-    siteUrl: `https://minimal-blog.lekoarts.de`,
-    siteDescription: `Typography driven, feature-rich blogging theme with minimal aesthetics. Includes tags/categories support and extensive features for code blocks such as live preview, line numbers, and line highlighting.`,
+    siteTitleAlt: `The Zettelkasten of Kelena Mori`,
+    siteHeadline: `The Zettelkasten of Kelena Mori`,
+    siteUrl: `https://kelena-mori.netlify.com`,
+    siteDescription: `A hyper-linked collection of notes, thoughts, and reflections primarily related to design, computer science, programming, and web development.`,
     siteLanguage: `en`,
     siteImage: `/banner.jpg`,
-    author: `@lekoarts_de`,
+    author: `kelena mori`,
   },
   plugins: [
     {

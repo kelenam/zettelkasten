@@ -12,7 +12,7 @@ tags:
 ## Summary Questions
 1. The cascade considers three things to resolve potentially conflicting rulesets, what are they? 
 1. What are two common example of style sheet origins? 
-1.
+
 1. How do you override inline declarations in your stylesheets? What if the inline styles are marked `!important`?
 
 ## The Cascade
@@ -74,6 +74,7 @@ color: red !important;
 >   1. styles applied inline in the HTML  
 >   2. styles applied using a selctor.  
 
+#### Inline styles
 [**Inline styles**](): if you use an HTML `style` attribute, to apply styles. The declarations are applied only to that element, they are in effect "scoped" declarations, which override any declarations applied from your stylesheet or a `<style>` tag.
 
 >* To override inline declarations in your stylesheets, you'll need to add an `!important` to the declaration, shifting it into a higher-priorty origin. If the inline styles are marked important, then nothing can override them.
@@ -81,6 +82,17 @@ color: red !important;
 #### Selector specificity
 The second part of specificity is determined by the selectors. For instance, a selctor with two class names has a higher specificity than a selector with one.
 
+In our ongoing example if we said something like...
+```css 
+#main-nav a {
+  color: white;
+  background-color: #13a414; /* Teal background color */
+}
+
+.featured {
+
+}
+```
 ### Understanding source order
 
 ### Two rules of thumb

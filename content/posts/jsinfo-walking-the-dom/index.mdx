@@ -18,6 +18,19 @@ For all nodes: `parentNode`, `childNodes`, `firstChild`, `lastChild`, `previousS
 For element nodes only: `parentElement`, `children`, `firstElementChild`, `lastElementChild`, `previousElementSibling`, `nextElementSibling`.
 Some types of DOM elements, e.g. tables, provide additional properties and collections to access their content.
 
->* The DOM allows us to do anything with elements and their contents, but first we need to reach the corresponding DOM object.
->
+## Intro
+>* The DOM allows us to do anything with elements and their contents, but first we need to reach the corresponding DOM object. 
 >* All operations on the DOM start with the document object. That’s the main “entry point” to DOM. From it we can access any node.
+
+![](/walking-the-dom.png);
+
+### On top: `documentElement` and `body`
+The topmost tree nodes are available directly as `document` properties:
+`<html> = document.documentElement`
+The topmost document node is `document.documentElement`. That's the DOM node of the `<html>` tag.
+
+
+
+## Links
+- [Main]()
+- [Previous: DOM Tree](/jsinfo-domtree)

@@ -201,3 +201,123 @@ context.restore();
 
 ### Creating a 2D Unit Vector from an Angle
 ---
+A unit vector is a really handy construct for doing generative art. You can create one from an angle like so:
+```js 
+// angle is in radians
+const normal = [ Math.cos(angle), Math.sin(angle) ];
+```
+
+### Creating a Line Segment from a 2D Normal
+--- 
+If you have a 2D unit normal (or an angle, see the previous recipe), you can create a line segment of a specific length and thickness like so:
+```js
+const { vec2 } = require('gl-matrix');
+
+const normal = [ /* a 2D unit vector ... */ ];
+const length = 2;
+const thickness = 4;
+
+// The center of the line segment
+const center = [ 250, 100 ];
+
+// Extrude in either direction
+const line = [ -1, 1 ].map(dir => vec2.scaleAndAdd([], center, normal, dir * length));
+
+// Draw line segment
+context.beginPath();
+line.forEach(([ x, y ]) => context.lineTo(x, y));
+context.lineWidth = thickness;
+context.stroke();
+```
+### Looping Motion in `-1..1` Range
+---
+To create a looping motion from `-1..1` you can use `Math.sin()`, like so:
+```js
+const motionSpeed = 0.5;
+const v = Math.sin(time * motionSpeed);
+```
+You can map this value into `0..1` space and/or interpolate it to another range.
+
+### Ping-Pong Motion in `0..1` Range
+When you have a defined sketch `{ duration }` and you are using the `{ playhead }` prop, you can use `Math.sin()` to get a ping-pong motion from `0..1` which slowly varies from 0, to 1, and then back to zero.
+```js
+const v = Math.sin(playhead * Math.PI);
+```
+You can invert this with `1.0 - v` if you need it to vary from 1, to 0, and then back to 1.
+
+### Isometric ThreeJS Camera
+---
+In your setup, replace the perspective camera with:
+```js
+const camera = new THREE.OrthographicCamera();
+```
+In the `resize` function, replace the perspective camera configuration with:
+```js
+const aspect = viewportWidth / viewportHeight;
+
+// Ortho zoom
+const zoom = 1.0;
+
+// Bounds
+camera.left = -zoom * aspect;
+camera.right = zoom * aspect;
+camera.top = zoom;
+camera.bottom = -zoom;
+
+// Near/Far
+camera.near = -100;
+camera.far = 100;
+
+// Set position & look at world center
+camera.position.set(zoom, zoom, zoom);
+camera.lookAt(new THREE.Vector3());
+
+// Update the camera
+camera.updateProjectionMatrix();
+```
+
+### 3D Coordinate System
+---
+Here's a small reference you can use to remember XYZ axes in ThreeJS.
+<img src="https://github.com/mattdesl/workshop-generative-art/blob/master/docs/images/xyz-1.png?raw=true" style="width: 250px; display: inline; padding: 5px;" />
+<img src="https://github.com/mattdesl/workshop-generative-art/raw/master/docs/images/xyz-2.png" style="width: 250px; height: 250px;display: inline; padding: 5px;" />
+
+### Third-Party GLSL Modules
+---
+With [glslify](https://github.com/glslify/glslify) (built-in to canvas-sketch CLI), we can import GLSL modules and snippets directly form npm into our shader code.
+
+For example, after running `npm install glsl-noise`, you can use this:
+```js
+// Import glslify
+const glsl = require('glslify');
+
+// Wrap your GLSL string with glslify function
+const frag = glsl(`
+  precision highp float;
+
+  // We can now import GLSL snippets from npm into this shader
+  #pragma glslify: noise = require('glsl-noise/simplex/3d');
+
+  uniform float time;
+  varying vec2 vUv;
+
+  void main () {
+    float d = noise(vec3(vUv, time));
+    vec3 color = vec3(d);
+    gl_FragColor = vec4(color, 1.0);
+  }
+`);
+```
+### Looping Noise
+-----
+You can use the following to blend 2D noise seamlessly in a GIF/MP4 loop.
+```js
+function loopNoise (x, y, t, scale = 1) {
+  const duration = scale;
+  const current = t * scale;
+  return ((duration - current) * random.noise3D(x, y, current) + current * random.noise3D(x, y, current - duration)) / duration;
+}
+```
+
+## Links
+- [Next](/creativecoding-print-art-with-canvas)
