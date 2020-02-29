@@ -35,7 +35,7 @@ we can make a new folder, `src` that holds `styles.css` where we add the above, 
 - Over in `package.json` add a script: 
 ```json
 "scipts": {
-    "build:css": "tailwind build src/styles.csss -o dist/style.css"
+    "build:css": "tailwind build src/style.csss -o dist/style.css"
 }
 ```
 In this way we are using the `-o` flag to mark the output name of the file which is going to be the `style.css` file in our `/dist` dir.
@@ -120,10 +120,104 @@ Adding a class of flex, will turn the element into display flex.
         <span class="block sm:inline"></span>
     </div>
 ```
-- this line: `<span class="block sm:inline"></span>`, means that by default this span is going to be `block` by on screens small aand up `sm:inline` are going to be inline instead of block.
+- this line: `<span class="block sm:inline"></span>`, means that by default this span is going to be `block` by on screens small and up `sm:inline` are going to be inline instead of block.
 
-### Creating a Card Column
-Outside of our container div, we can start adding our card columns.
+### Creating a Card Component
+Outside of our container div, since we are going to be using the `max-width` utility anyways, we can start adding our card columns.
 ```html
-
+   <div class="max-w-sm mx-auto flex p-6 bg-white rounded-lg shadow-xl">
+        <div class="flex-shrink-0">
+            <img src="https://via.placeholder.com/150" alt="" class="h-12 w-12">
+        </div>
+    </div>
 ```
+- `max-w-sm`, means we are setting the max width of this size to small (not that big a few ems)
+- `mx-auto` make the l/r margin automatic
+- `flex` - going to be a flew
+- `p-6`- 6rem of padding all around   
+- `bg-white` - wht bg
+- `rounded`- rounded, we can even add `-lg` to 
+- `shadow-xl` - will give this an extra large shadow
+
+We don't want any of the internal content to shrink so we use a `flex-shrink-0` class here, then we add our image.
+Then we give it some height and width, of 12, which is actually rem, (goes up to h-64, 16rem)
+- Because we used `flex` for the parent, these children shouuld be side by side
+- Going to give this a margin of 6,
+- `pt-1` padding top of 1
+    - Inside this div, we are going to create an h4, by default the text doesn't have any kind of font size, its just a regular font size, we will give it text-xl and make it text-gray-900, with a title
+    - `text-base.text-gray-600` You have a new message.
+
+### Card Column 
+
+```html
+<div class ="container mt-5"
+    <!-- Flex on med screens and up  -->
+    <div class="md:flex">
+        <div class="flex-1 text-gray-700 text-center bg-gray-400 px-5 py-5 m-2 rounded">
+            <div class="lg:flex lg:items-center">
+                <div class="lg:flex-shrink-0">
+                    <img class="rounded-lg lg:w-64" />
+                    <div class="mt-4 lg:mt-0 lg:ml-6">
+                        <div class="uppercase tracking-wide text-sm-text-indigo-600 font-bold">
+                        <!-- ... --->
+```
+- We are creating another container, with a top of margin of 5
+- `md:flex` what this is going to do is make it responsive: on medium screens and up its going to be flexbox, the cards will go horizontal, but on smaller screens, it will stay veritcal.
+- two divs with flex-1 meaning they will be the same width 
+- then here, on line 5 we are going to have another flex for large screens, basically an image with some text next to it, on large screens we want text and image to be side by side, less than that and they will be on top of each other.
+- `lg:center` is also going to center it, and then essentially anything with an lg ensuiing will be related to adapting/flexing for the lg screen sizes.
+- `lg:w-64` the image on large screens is going to be 16rem or w64, anything below that it will just be 100% because that is the default.
+
+### Navbar Component
+There is no navbar component, but its made up of a bunch of utilities
+```html
+ <!-- NAVBAR COMPONENT -->
+    <nav class="flex items-center justify-between flex-wrap bg-gray-800 p-6">
+      <div class="flex items-center flex-shrink-0 text-white mr-6">
+        <span class="font-bold text-xl">Biznet</span>
+      </div>
+
+      <div class="w-full block flex-grow sm:flex sm:items-center sm:w-auto">
+        <div class="text-sm sm:flex-grow">
+          <a
+            href="#"
+            class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white mr-4"
+          >
+            Your Business
+          </a>
+          <a
+            href="#"
+            class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white mr-4"
+          >
+            Networking
+          </a>
+          <a
+            href="#"
+            class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white"
+          >
+            Blog
+          </a>
+        </div>
+        <div>
+          <a
+            href="#"
+            class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 md:mt-0"
+            >Login</a
+          >
+        </div>
+      </div>
+    </nav>
+```
+- we have our `nav` tag, we are centering all our items with `items-center`, we are using `justify-between` that means all the remaining space goes in between. we are using.
+- `w-full` is basically width 100%, small screens will be flex on small screens.
+
+## Key Insights
+- Emmet: just leading with your class names, and chaining them with `.` works if you want to create a div with those corresponding classes: e.g. `.max-w-sm.mx-auto`
+- Everything just kind of works out of the box and is super intuitive. I think this is what I had expected Bootstrap to be back in the day. I'm not too big a fan of how cluttered the html ends up looking. I'm wondering how this might look with react/vue, using styled components to keep the utilities at the top of the file might be interesting, I'll look into it more.
+
+## Source
+- [Primary source](https://www.youtube.com/watch?v=UBOj6rqRUME)
+- [TailwindCSS Docs](https://tailwindcss.com/docs/)
+
+## Links
+- [Resulting Codepen](https://codepen.io/kelena_mori/pen/yLNbRdO)

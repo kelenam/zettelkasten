@@ -1,0 +1,326 @@
+---
+title: Toy JavaScript Quiz App
+date: 2020-02-28
+slug: toy-js-quiz-app
+tags:
+  - JS
+  - HTML
+  - Tailwind
+  - TP 
+  - toy
+---
+
+Going to be using Tailwind for this project. Here is some boiler plate.
+Don't forget to setup/install/build-script your tailwind, for more info, refer to [here](/tailwind-css-crash-course)
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../dist/style.css" class="style">
+</head>
+<body class="m-0 bg-purple-100"> 
+        <div class="quiz flex text-center items-center w-full h-full">
+            <div class="question w-12">
+                <h3 class="question__title" id="title"></h3>
+                <div class="question__answers mt-15" id="answers"></div>
+                
+                <div class="question__actions flex flex-end">
+                    <button class="btn hover:bg-green-400 bg-green-600 text-white p-2 rounded shadow-m" id="action_btn">Submit</button>
+                </div>
+            </div>
+        </div>
+        <script src="index.js"></script>
+</body>
+</html>
+```
+We are also going to be making use of the JSON file that Tyler provides:
+```json 
+{
+	"questions": [
+		{
+			"id": "0",
+			"title": "Do you like my tutorials?",
+			"answers": [
+				{
+					"id": "0",
+					"answer": "Yes"
+				},
+				{
+					"id": "1",
+					"answer": "No"
+				}
+			],
+			"correct": "0"
+		},
+		{
+			"id": "1",
+			"title": "Which of the following variables cannot be changed?",
+			"answers": [
+				{
+					"id": "0",
+					"answer": "var"
+				},
+				{
+					"id": "1",
+					"answer": "let"
+				},
+				{
+					"id": "2",
+					"answer": "const"
+				}
+			],
+			"correct": "2"
+		},
+		{
+			"id": "3",
+			"title": "Which of the following is the correct way to add a new item to an array?",
+			"answers": [
+				{
+					"id": "0",
+					"answer": "array.add(\"item\");"
+				},
+				{
+					"id": "1",
+					"answer": "array.push(\"item\");"
+				},
+				{
+					"id": "2",
+					"answer": "add(array, \"item\");"
+				}
+			],
+			"correct": "1"
+		},
+		{
+			"id": "4",
+			"title": "Another question",
+			"answers": [
+				{
+					"id": "0",
+					"answer": "Please pick me"
+				},
+				{
+					"id": "1",
+					"answer": "No Pick me"
+				},
+				{
+					"id": "2",
+					"answer": "Pick me"
+				},
+				{
+					"id": "3",
+					"answer": "Definitely pick me"
+				}
+			],
+			"correct": "3"
+		}
+	]
+}
+```
+- We will be making a GET request to this JSON file, which is going to be local, but can be from external servers/whatever.
+
+## `/src/index.js`
+- First thing we are going to do is create a variable to store our questions.
+- another var for questionsCount, and currentQuestion
+```js
+let questions;
+let questionCount;
+let currentQuestion;
+let question_title_elem = document.getElementById("title");
+let answers_elem = document.getElementById("answers");
+let action_btn = document.getElementById("action_btn");
+```
+
+### Getting our questions
+```js 
+function getQuestions() {
+    let request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            questions = JSON.parse(this.responseText).questions;
+            console.log(questions)  
+        }
+    }
+
+    request.open("GET", "../api/questions.json", false);
+    request.send()
+}
+
+getQuestions();
+```
+let's write the function that will get our questions...
+- L2: We are going to do so making an `XMLHTTPRequest()`.
+- L3: We are going to then call this request function we are creating `.onreadystatechange` 
+- L5:  `JSON.parse` here is just going to convert our request into JSON, (when we get our json from the url, its going to come through as as string). 
+- L5: the `.questions` is referring to the property `questions` in our JSON file. 
+- L6: log for testing
+- L10: Actually opening the request; set the method with the first arg, making a GET request in our case, second arg, is going to be relative path of our questions.json file, `false` the 3rd arg, is we don't want this to be asychronous because we want this to run and then set it. For our case, synchronously should be fine.
+- L11: is now sending the request, it actually calls the request (lines 3-8)
+- L14: Now we need to actually call our function.
+
+### Displaying our questions
+```js {6,7,} 
+function getQuestions() {
+    let request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            questions = JSON.parse(this.responseText).questions;
+            questionsCount = questions.length;
+            currentQuestion = 0;
+        }
+    }
+
+    request.open("GET", "../api/questions.json", false);
+    request.send()
+}
+
+function displayQuestion(question) {
+    answers__elem.innerHTML = "";
+
+    question.answers.forEach(answer => {
+    })
+}
+
+// Initialization
+getQuestions();
+displayQuestion(questions[currentQuestion]);
+```
+## Refactoring
+```js
+const question_title_elem = document.getElementById("title");
+const answers_elem = document.getElementById("answers");
+const submit_btn = document.getElementById("submit_btn");
+const next_btn = document.getElementById("next_btn");
+const score_span = document.getElementById("score");
+const question_elem = document.querySelector(".question");
+const score_elem = document.querySelector(".score");
+let questions,
+  questionCount,
+  currentQuestion,
+  score = 0;
+
+function getQuestions() {
+  const request = new XMLHttpRequest();
+  request.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      questions = JSON.parse(this.responseText).questions;
+      questionsCount = questions.length;
+      currentQuestion = 0;
+    }
+  };
+  request.open("GET", "../api/questions.json", false);
+  request.send();
+}
+
+function displayQuestion(question) {
+  question_title_elem.innerHTML = "";
+  answers_elem.innerHTML = "";
+
+  const question_title = document.createTextNode(question.title);
+  question_title_elem.appendChild(question_title);
+
+  question.answers.forEach(answer => {
+    const label = document.createElement("label");
+
+    const answer_input = document.createElement("input");
+
+    answer_input.setAttribute("type", "radio");
+    answer_input.setAttribute("name", "answer");
+    answer_input.setAttribute("value", answer.id);
+    answer_input.classList.add("answer", "m-1");
+
+    const answer_title = document.createTextNode(answer.answer);
+    label.appendChild(answer_input);
+    label.appendChild(answer_title);
+    label.classList.add("p-2", "m-1", "rounded-lg", "bg-gray-400");
+
+    answers_elem.appendChild(label);
+
+    answer_input.addEventListener("click", () => {
+      submit_btn.classList.add(
+        "bg-green-600",
+        "hover:bg-green-400",
+        "cursor-pointer"
+      );
+      submit_btn.classList.remove("pointer-events-none");
+    });
+  });
+}
+
+function supplantElement(toHide, toShow) {
+  toHide.classList.add("hidden");
+  toShow.classList.remove("hidden");
+}
+
+/************ Initialize ***********/
+getQuestions();
+displayQuestion(questions[currentQuestion]);
+
+/************ Event Listeners ***********/
+
+submit_btn.addEventListener("click", () => {
+  const [...answers] = document.getElementsByClassName("answer");
+  const question = questions[currentQuestion];
+
+  answers.forEach(answer => {
+    answer.disabled = true;
+    if (!answer.checked) {
+      return;
+    } else if (answer.checked && question.correct === answer.value) {
+      answer.parentElement.classList.add("correct", "bg-green-300");
+      score++;
+    } else if (answer.checked && answer.value !== question.correct) {
+      answer.parentElement.classList.add("incorrect", "bg-red-300");
+    }
+    supplantElement(submit_btn, next_btn);
+    currentQuestion += 1;
+    submit_btn.classList.remove(
+      "bg-green-600",
+      "hover:bg-green-400",
+      "cursor-pointer"
+    );
+    submit_btn.classList.add("pointer-events-none");
+  });
+});
+
+next_btn.addEventListener("click", () => {
+  if (currentQuestion >= questionsCount) {
+    score_span.innerHTML = `${score}/${questionsCount}`;
+    supplantElement(question_elem, score_elem);
+    return;
+  } else {
+    displayQuestion(questions[currentQuestion]);
+    supplantElement(next_btn, submit_btn);
+  }
+});
+```  
+
+- So there is some refactoring I did with Tyler's example:
+    - In our action_btn event listeners, I'm destructuring the html elements with a classname of answer into an array so that I can iterate over them using `forEach` instead of using a for loop.
+    - `let` changed to `const` where I could.
+    - created `supplantElement` function to replace a lot of class hide/show functionality. Could be refactored further.
+- Added the ability/inability to not be be able to advance the question without first selecting a response and changed teh styling accordingly.
+- The UX of the whole thing could still be improved.
+- There are some hacks here. `answer.disabled = true;`, doesn't work below the conditional statements, because you can still click on non-selected answers. Moving `answer.disabled = true;` to the top of the `forEach` loop works, but with a side-effect. If a user clicks on the button without having selected an answer they are barred from doing so. The hack I settled on that needs fixing is to just set the class of pointer events to none, so that you prevent the click event from occuring without having selected an input first.
+
+## Key Insights
+- [***XMLHttpRequest***](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) Use `XMLHttpRequest` (XHR) objects to interact with servers. You can retrieve data from a URL without having to do a full page refresh. This enables a Web page to update just part of a page without disrupting what the user is doing. `XMLHttpRequest` is used heavily in AJAX programming.
+- And a refresher on AJAX... 
+- [***Asynchronous JavaScript And XML (AJAX)***](https://developer.mozilla.org/en-US/docs/Glossary/AJAX) is a programming practice of building more complex, dynamic webpages using a technology known as XMLHttpRequest.
+
+    What AJAX allows you to do is just update parts of the DOM of a HTML webpage instead of having to reload the entire page. AJAX also lets you work asynchronously, meaning your code continues to run while that part of your webpage is trying to reload (compared to synchronously which will block your code from running until that part of your webpage is done reloading).
+
+    *With interactive websites and modern web standards, AJAX is gradually being replaced by functions within JavaScript frameworks and the official Fetch API Standard.*
+
+## Thoughts
+- Aside: Interesting to see how AJAX and the use of it in things like Google Maps really started to change the landscape of web development, prior to async/await and the explosion of Node.js, among other things. I guess the last bit, italicized above kind of answered why the discussion/use of AJAX has been sort of tapering off.
+- Everything is an object. Using the `new` keyword to generate new instances from browser/imported APIs. Just as we would a new Three.js object.
+- I think when you are first starting out its kind of confusing to see objects referred to out of what seems 'thin air'. Overlooking the fact that we are including our script tag in our html document which is what enables us access to all the objects of the browser/dom. I think in this case it is helpful to remember that JS was built for specifically with browsers in mind, even if these days its not relegated to the them.
+
+- Creating html nodes from our question 
+- What are the best practices for handling a bunch of queryselctors, I know this is a sample projects.
+
+## Links
+- [Toy: Hex Color Generator](toy-hex-color-generator)
