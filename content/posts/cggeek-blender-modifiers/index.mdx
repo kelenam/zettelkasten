@@ -1,0 +1,88 @@
+---
+title: Modifiers | CG Geeks
+date: 2020-03-01
+slug: cggeek-blender-modifiers
+tags:
+    - Blender
+    - 3D
+    - Modeling
+    - Beginner
+---
+
+## Intro
+We will be touching on how to make that swirl. A tough shape to make, but made easy/possible with modifiers.
+We will be using a basic mesh with a twisted curve to give us a nice swirled pattern.
+The first we want to create is to start with a strip of icecream
+
+### 
+Then spin it.
+`shift + a` add a circle. 
+
+>- Z axis centering
+> So we want to be makign this circle above our cone, we do that by changing the views, so that we can see the blue guide line for the z axis above our selected object, then using `shift r-click` on that line to position the 3d cursor.
+
+Note, that we don't click off to create the circle since we want the Add circle option bar in the bottom left to appear so we can edit the properties on our circle a bit.
+Let's turn down the number of vertices to 12.
+
+- From here, we are going to grab every other vertex and with `shift r-flick`, then scale them down to create a star-ish pattern.
+- change to front view. Select the new object and type 90 to rotate it 90degrees, we can scale it down a little bit more, 
+- Edit mode, grab all verticies of icecream with `a` then `e` to extrude out and using `g,x,ctrl` we wil snap it out a little.gx
+
+### Array Modifier
+The [**array modifier**] will help us multiply our mesh over and over. 
+Let's go over to the modifer, select array, and its properties, we change which direction it multiplies itself by, lets set the offten instead of the x to the z, and set the count to 10. 
+
+We will be added a new mesh, a **curve**, we will use this curve to be the guideline for the icrecream shape/mesh we just created.
+
+create a new **bezier curve**, move it out from center so we can see it better, hit tab for edit mode, then use some of the left hand side tools. We can just use the draw tool (pencil like), then draw a few swirling circles, making it to the center.
+
+We can now use some proportional editing to make our icecream shape up.
+
+### Proportional Editing 
+Have our swirl seleted, and in the top middle nav, there is a little dot with a circle around it, thats the proportional editing button. What it does is it allows you to move one handle and use a weight to move everything within a nearby distance of that handle. Grab one of the center handles on our curve, then hit `g` and we can move or `r` to correct it. We can select the falloff option to be 'sharp' on the proportional editing dropdown to mimic more closely how icecream would dispense.
+
+We can use proportional editing to even out anywhere our circle isn't round enough..
+
+>* Remember to activate proportional editing you must click the icon of it to activaite it 
+
+Select the center handle...
+Let's jump into side view `~ + 7` for side view, then `g + z`and pull upwards, use the scroll wheel to pull all the rest of the mesh with it, until we can that nice ice-cream shape.
+
+### Adding icecream to curve
+- Make our icecream mesh visible again, grab that basic circle and select it and add a new modifier, the curve modifier. We want this circle/icecream to be curved around the object we just created, that bezier curve.
+    - To do this, our objects must share the same origin point as they currently differ.
+    - we can use `shift + s` on our selected object, then hit `2` or select the 'cursor to selected' option.
+    - For our curve, we can select it, then we can use the menu in the top left, 'Object', then 'Set Origin' > 'Origin to 3d cursor'
+    - Now you can see our ice-cream wrapping, but its not going up far enough, thats' because our array modifier is too low, the **fit type** is set to a fixed count, we can just select the curve we just created, and now the ice-cream scales up a bit further, but not all the way.
+        - What we can do now is hit `ctrl + a` to apply scale which will scale our icecream all the way up.
+
+### Smooth out our icecream
+Now that we have our mesh, we can select it, then hit `ctrl + 2`, this is going to add a modifer, like the subidivion modifer 1 we used previously, but its going to do it for us.
+- we can hit `w`(`right click`) and shade smooth. 
+- There is also some discoloration, we can smooth that out further, by selecting the checkbox: "merge" in our array modifier of the circle.
+
+### Sharpening our icecream edges
+- Select the icecream mesh, then tab into edit mode, then, we could use `ctrl + r` to add in another edge, or if we hit `N` *this brings up a properties tab.* From there we can select, 'Item', and adjust the crease, to about '.70' on our edges.
+- Maybe adding a crease of .3 or so on the outer edges.
+
+### Fixing our curve
+If you notice your icecream intersecting too much, in certain places, you can tab into edit mode on the curve, and start adjusting, and we want to kind of taper the top so we select the top of our curve and hit `alt + s` to scale the thickness of our icecream down into a nice pointed tip to give us a nice swirl.
+- we can grab the peak and even rotate and curve it back in.
+- you can also double tap `r` to give you more of a spin control
+
+## Final Result
+![](/icecream.png)
+- So I had a bit of difficult getting the icecream not to overlap the cone, my shape was also hard to manage, a lot of twisting was pushing the top in a weird angle. I feel like if I had an extra vertex/node in the curve I could manipulate the top and the twisty bit to be more manageable.
+
+## Discoveries
+- Edit mode gives you the ability to select cursor or 3dcursor mode / position easily. 
+- `~` or backtick, then hitting the corresponding num pad key also works to snap views. instead of using ` then mouse selecting from the pie menu.
+
+
+
+## Review Answers
+
+1. You can use `h` on your keyboard to hide objects we currently don't want in view, to bring them back it's just `option + h` or `alt + h`. Or clicking the eyeball in the Scene Collection view (upper right)
+
+## Links
+- [Prev](/cggeek-blender-modifiers)

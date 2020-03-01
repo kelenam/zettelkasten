@@ -105,16 +105,266 @@ When there is available room left in the container, we want each one of these it
     flex-grow: 1;
 }
 ```
-
 ## Flex Shrink
+`flex shrink` determines the rate at which these elements shrink. You won't notice anything until you start to bring in the browser/shrink the window, the rate at which we've assigned the properties will shrink at their corresponding rates. 
+```css
+.one {
+    background-color: red;
+    flex-shrink: 3;
+}
+.two {
+    background-color: blue;
+    flex-shrink:2;
+}
+.three {
+    background-color: green;
+    flex-shrink: 1;
+}
+```
+The higher the number, the faster this will shrink in relation to other sibiling shrink' property.
+- Note: flex-shrink, Not used too frequently
+
 ## Flex Wrap
+So say we have a min-width on our rectangles of about 200px, that means those items can't shrink beyond 200px. What will happen is if we shrink past a certain point, becaues the items can't condense past a certain point they will just go offscreen or overflow and that looks bad.
+
+This is where flex-wrap comes in. Once an element reaches its min width instead it can wrap to th next line instead of going off page.
+
+>* The way that we apply the flex-wrap property is by doing so to the parent's container. Now any children of that parent will wrap when they need to.
+
+```css
+<style>
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        [...]
+```
+- The properties of flex-wrap... 
+    - `wrap-reverse`: it will go wrap, upwards (if row), stack above
+    - `nowrap`: default behavior, it will not wrap
+
 ## Flex Basis
+`flex-basis` is similar to `min-width`, in that it defines a starting width of each of our elements, so instead of saying: `min-width` we could say...`flex-basis: 200px` in our `.box` class and all of those children elements will start at a width of 200px. So it behaves the same way with wrap, in that, if it comes to a certain point, where any of the elements can't be a minimum of 200px in width, then they are going to wrap to the next line.
+
+The reason they aren't growing to the full width, is because we haven't applied that flex-grow property to them.
+
+### Applying flex-basis to children
+This behaves the same way as min-width, with a catch.
+```css
+   .box {
+            height: 100px; 
+            flex-grow: 1;
+        }
+    .one {
+        background-color: red;
+        flex-basis: 100px;
+    }
+    .two {
+        background-color: blue;
+        flex-basis: 200px;
+    }
+    .three {
+        background-color: green;
+        flex-basis: 300px;
+    }
+```
+- Applying flex-basis to the children will each give them different starting widths, we can apply a flex-grow to all of them, and they are all going to grow to fill up the available space, but they are all going to have different widths because of their flex basis properties.
+- remember, flex-basis, is like saying, the minimum width of any object can be the specified value. It can be bigger, but it can't be smaller.
+
+### flex-basis vs. min-width
+If we applied a hard `min-width` value of the `.box` class to be `500px`, that means that if we shrink/view past 500px, we will be forced into the overflow and need to scroll to see the whole object, because remember, min-width is saying, I CAN'T be smaller than 500px so you will have to scroll to see all 500px of me.
+
+However...
+
+>- ⭐ If you use `flex-basis: 500px` instead of min-width, what happens is that past 500px you they will just flex shrink as normal flex items would. 
+
+### The `flex` shorthand property
+So far we've seen: `flex-grow`, `flex-shrink`, and `flex-basis`. Well all of this can be combined into one shorthand notation, called `flex`.
+
+The syntax is `flex: {flex-grow value} {flex-shrink value} {flex-basis value}`
+
+This is much easier to manage and is the preferred way to write it.
+```css
+.box {
+    height: 100px; 
+    flex-grow: 1;
+    flex: 1 0 200px;
+}
+```
+If you wrote something like `flex: 1` this would translate to, set the flex grow to 1, set the flex shrink to 1, and set the flex basis to 0 by default.
+
 ## Creating a Menu with Flexbox
+Here is the base document:
+```html 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>flex menu</title>
+    <style>
+        * {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            margin: 0;
+        }
+        body {
+            background: none;
+        }
+        .wrapper {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        nav {
+            background: #333;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav a {
+            text-decoration: none;
+            text-align: center;
+            color: #ffffff;
+            display: block;
+            padding: 10px;
+        }
+        nav a:hover{
+            background-color: #555555;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav>
+            <ul>
+                <li><a href="">Home</a></li>
+                <li><a href="">About</a></li>
+                <li><a href="">Store</a></li>
+                <li><a href="">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</body>
+</html>
+```
+
+Lets write some media queries for our larger screens.
+```css
+@media screen and (min-width: 768px) {
+    nav ul {
+        display: flex;
+    }
+    nav li {
+        flex: 1 1 0;
+    }
+}
+```
+- The first thing we are doing is grabbing our flex container in this case the ul.
+    - this makes them all line up left to right.
+    - saying `flex: 1 1 0` makes them all spread out nicely.
+
+### `justify-content` 
+If we uncomment out the `flex: 1 1 0` we just wrote we can play around with another property called.
+- `justify-content`, it has a few different values we can use:
+    - `center`: center
+    - `flex-end`: right specified
+    - `flex-start`: left side
+    - `space-evenly`: space evently
+    - `space-around`: gives them equal spacing around each element
+    - `space-between`: equal space between, but it gets rid of the spacing on the edges.
+
 ## Creating Nested Menu's with Flexbox
+```html 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>flex menu</title>
+    <style>
+        * {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            margin: 0;
+        }
+        body {
+            background: none;
+        }
+        .wrapper {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        nav {
+            background: #333;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav a {
+            text-decoration: none;
+            text-align: center;
+            color: #ffffff;
+            display: block;
+            padding: 10px; 
+        }
+        nav a:hover{
+            background-color: #555555;
+        }
+        nav ul {
+            display: flex;
+            justify-content: flex-start;
+        }
+        nav li { 
+            flex: 1 1 0;
+        } 
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav>
+            <ul>
+                <li><a href="">Home</a></li>
+                <li><a href="">About</a></li>
+                <li><a href="">Store</a></li>
+                <li><a href="">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</body>
+</html>
+```
+## Creating Nested Menu's with FLexbox
+Here we are just adding another ul with a class of social:
+```html
+<ul class="social">
+    <li><a href="" class="fb">Facebook</a></li>
+    <li><a href="" class="tw">Twitter</a></li>
+</ul> 
+```
+Why create a separate `ul` element? Well we want to style them a bit differently and have them grow at different rates
+Two separate flex containers (since styled accordingly), we want to go ahead and make the parent element, the `nav` itself a display of flex, so that the two child `ul`s themselves become flex items.
+That will allow us to say, `space-between` for our justify-content so we get them on either end of each.
+```css
+nav {
+    background: #333;
+    display: flex;
+    justify-content: space-between;
+}
+```
+Let's style these icons now, instead to being images/icons instead of just text.
+```css
+a.tw {
+    background: url(img/tw.png) no-repeat center;
+    background-size: 80%;
+}
+
+ 
 ## Axis
 ## Align items on the Cross Axis
-## Grid vs STacked Layout Example
+## Grid vs Stacked Layout Example
 ## Element Order
 
 ## Key Insights
-
+- `flex-basis` v.s `min-width`.
