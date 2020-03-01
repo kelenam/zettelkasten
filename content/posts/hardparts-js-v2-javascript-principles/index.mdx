@@ -14,7 +14,10 @@ tags:
 ---
 ## Summary Questions
 1. In this line, `const ouput = multiplyBy2(num)`, what is the value of `output` prior to the execution of `multiplyBy2(num)`?
-2. When JS code runs, it does what two things, or depends on what two things?
+1. When JS code runs, it does what two things, or depends on what two things?
+1.. What is the [**call stack**]()?
+1.
+1. What are the three core components of JavaScript?
 
 ## Thread of Execution
 When JS code runs, it does two things:
@@ -79,13 +82,49 @@ Whenever we run code in a function, the first thing we always handle is it's arg
 
 - We only have one thread of execution running at any given time. JS is single threaded.
 
-- **Line 8**: we are declaring a new constant called `newOuput` and similarly to `output` we don't immediately assign it anything, because we must create a new execution context to run `multiplyBy2` with the argument `10`. It runs, completes the above and finally gets assigned the value `20`.
+- **Line 8**: we are declaring a new constant called `newOuput` and similarly to `output` we don't immediately assign it anything, because we must create a new execution context to run `multiplyBy2` with the argument `10`. It runs, completes the above and finally gets assigned the value `20` into that global label `newOutput`.
+
+![](/functions-execution-context.png)
 
 ## Call Stack
+Let's talk about the thread of execution that wove in and out, we knew that the invocation of our function was going to come back out to global. How? (visually we can kind of see), but JS has to have a way to do so.
+
+>* JavaScript keeps track of what function is currently running by using something called the [**callstatck**]()
+
+### Call Stack
+The [**call stack**] is...
+- A way for JavaScript to keep track of what function is currently running. (where's the thread of exeuction). 
+- Run a function - add to call stack
+- Finish running the function - JS removes it from the call stack
+- Whatever is on top of the call stack 
+    - that's the function we're currently running.
+    - thats the key rule of a stack, only engaged with one thing at a time, that's the top-most thing.
+
+As soon as we finish running a function on the callstack, it 
+- The `return` keyword is the keyword responsible for telling us that function is "done", that its execution context is no longer need and it can be popped off the call stack.
+
+So once our `multyipleBy2` function finishes running, what will be the new "top" of the stack?
+- Well always, on the bottom of our stack is our global execution context
+    - all our globally labeled stuff
+    - global is always there, we always return back to the `global()`
+- Once we hit our next function, we add it to the top of the call stack. Once that's done, it just goes back to global.
+- If we had nested functions, or recursive functions, those would keep be adding to the top of our call stack. The function returns to where it started running that function in the first place.
+
+![](/callstack.png)
+
+### The Three Core Components of JavaScript
+1. Our memory to store data as we go through the code line by line
+1. Thread of Execution to go through the code line by line (sometimes storing data, but also, taking some of the stored functionality code and start running it, like functions that we then run, creating new execution contexts, local data stored until completion, only data that is saved is data saved outside of the function or data that is returned. Because everything inside the functional call goes away upon completion of the function)
+1. We keep track of the functions we're running, where our thread of exeuction is, by using our **call stack**.
 
 ## Summary Answers
 1. It's not assigned a value, it's kind of just in limbo, waiting for its assignment from the return of its function call. That's because if we were to say it were `undefined` prior to completion of `multipleBy2` we wouldn't be able to change it's value as its been declared as a constant.
-2. Thread of Execution (going through code line by line) and Memory (a place to store data).
+1. Thread of Execution (going through code line by line) and Memory (a place to store data).
+1. The way for JS to keep track of what functions it is and needs to run.
+1. The three core components of JS are:
+    1. Memory - a place to store data
+    2. Thread of Execution - going through data/code line by line
+    3. Call Stack - keeping track of the thread of execution we are on.
 
 ## Links
 - [two things: functions & data](/sicp-js-elements-of-programming)

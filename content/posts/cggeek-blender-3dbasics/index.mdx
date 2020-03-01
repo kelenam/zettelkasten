@@ -1,0 +1,132 @@
+---
+title: 3D Basics | CG Geeks
+date: 2020-02-29
+slug: cggeek-blender-3dbasics
+tags:
+    - Blender
+    - 3D
+    - Modeling
+    - Beginner
+---
+## Review Questions
+1. For positioning new objects on the scene
+1. `Shift + right-click`
+1. `MousewheelUp/Down`
+1. Hold `MouseKey3`
+1. What's a handy keyboard shortcut to get things back in view once you've lost them?
+1. What are the 3 core keyboard object manipulation shortcuts?
+1. What does `shift + s` do?
+1. What is the keyboard shortcut for adding an object? Where is this new object going to be placed?
+1. How do you jump to view presets? 
+1. How do you toggle between **Object Mode** and **Edit mode**?
+1. How do you create a box selection? What might be important to consider when trying to grab a 3d selction of verticies?
+1. When manipulating an object with either g,s,r what does hitting `ctrl` help with?
+1. What does `alt + left-click` help do with a row/ring of verticies or even faces?
+1. What are modifiers? Where can we find them on the viewpowrt?
+1. What's a good modifier for kind of smoothing our mesh?
+1. How do we add smooth shading as opposed to the default flat shading?
+1. How do we extrude things?
+1. How do we change the thickness of our model?
+
+## Intro
+- *General* is the most all-purpose type of scene.
+
+- Blender used to have object select be right click, it is not default to left click
+- Change this in Edit > Preferences settings > Keymap and Select With Right or Left.
+
+- [**3d cursor**] is `Shift + Right-Click` to move it, The 3d cursor is used for placing objects, wherevery the 3d cursor is placed is where the new object gets added will go.
+
+### Basic Navigation 
+- The "scene" or area you see in a new *General* project is called the **viewport**
+- `Scroll-Wheel+Up/Down` on your mouse to zoom in/out.
+- Holding `MiddleMouseButton/3` to pivot around *the center point of whatever is selected*.
+- Holding `Shift + MiddleMouseButton` allows "strafing" or shifting side to side and up and down  
+
+> If you're getting lost a little and need to recenter to your object, you can select the desired object and hit the period `.` on your numpad you can center around that object. (This is on Function Layer 1 `.`).
+
+### Basic Keyboard Shortcuts for moving objects
+- On the left of our viewport we have options for 
+    - moving
+    - transforming
+    - scaling 
+    - rotating 
+
+You can use the corresponding colored arrows once we've selected an action, e.g. like move, and moving on the desired axis.
+- **Move shortcut**: The keyboard shortcut here, is just selecting your object and hitting the `g` key to free-move.
+- **Rotate shortcut**: Select object then the `r` key.
+    - **rotate on x**: select object then hit `r` once, then `x` to rotate on x
+    - **rotate on y**: select object then hit `r` once, then `y` to rotate on y 
+    - **rotate on z**: select object then hit `z` once, then `z` to rotate on y 
+- **Scale shortcut**: `s` to scale with the following x/y/x appropariate scaling.
+
+### Modeling
+So whenever you are starting modeling you usually start off with a [**basic object**]().
+- Add at the secondary top nav bar (shortcut to add: `Shift + A`)
+- remember, going to be placed where 3d cursor is placed
+- Snapping our 3d cursor to a location we can use `Shift + S` to bring up a nifty nav-pie menu
+    - here we will select snap to world origin
+    - then use keyboard shortcut for adding an object (shift + a)
+    - The object we are starting with is going to be a cylinder
+
+### Jumping to a specific view
+- 1-9 on numpad will help us jump views
+- Use the "`" tilde key to bring up pie menu if you don't have a numbpad, 
+- lets start front viewport (1)
+- then start editing our cylinder to look more like an icecream cone.
+
+### Edit Mode
+- once selected, you can go up where it says `Object Mode` to change it to edit mode. or just hit `tab`on your keyboard.
+- double tap `a` to unselect all of our vertices (selected by default). Hitting `a` again once will reselect all of them.
+- `b` key on keyboard for [**box selection**]() everything visibile to the camera.
+    - If we want to select everything on the bottom , we can click the xray icon in top right to select things on both sides of our mesh.
+    - `s` to scale down/taper our cone bottom.
+    - now grab top vertices, then do `g + ctrl` this allows us to kind of snap our cone higher.
+>- ⭐ to create a new verticies-slice use `ctrl + r` in edit mode
+- `ctrl + r` allows you to add another cut of vertices within your mesh, yellow line will show where cuts will appear, if we use scrollwheel we can add even more. We only want one, so after clicking once we can now drag this cut up and down, we want it in top third of our cone.
+    - add 2 more cuts, 1 above and 1 below
+    - we use `alt + left click` to grab a whole ring of vertices,
+    - use `s` to scale out a little
+- then lets make the top of the cone a bit wider by adding another vertices/cut
+
+## Smooth our Mesh 
+Before moving on we are going to add a modifier to smooth our mesh over. We will use the **subdivision modifier**.
+This is going to be in the modifier tab (left midde-lower nav), its going to be in the little wrench. 
+- [**Modifiers**]() Allow you to do all kinds of cool edits to your mesh.
+- We will use the subdivision mesh which will smooth our mesh out, 
+    - change our viewport to be 2
+    - `tab` into edit mode then our face select mode, its set to vertex select (single vertex) but now if we use the face select (in the top left, 3 to the right of Edit Mode button, looks like stacked squares) (the first arrow) we can select the top of our cone and hit `x` this will allow us to delete different parts of our mesh, we want to do delete the face.
+    - Now we have an opening.
+- Address the bottom, its too rounded over.
+    - we can fix this by just adding another ring of vertices, it tighets  up the bottom 
+- lets tighten up the ridge, add another near the ridge, and shape/scale as needed, you might even want to alt scale up your ridge to make it more prominent.
+- just tab between modes as needed
+- In object mode if we want to scale the enterity of our mesh up/down a bit, we can just do s+z to scale up a bit.
+- `alt + right/left shift` to select multiple things.
+
+## Setting the Shading
+Shading is kind of flat right now. not smooth.
+- hit the `w` key (for me it's just the `right click`) which brings up the object context menu, from there we want to select `shade smooth` to smooth things out a bit (note you need to have your object selected).
+- The last thing we want to do is add some thickness to our mesh. 
+- We can do this with another modifier: let's add in the **solidify** modifier.
+- we can change the thickness in the right hand side to about 0.06m for a nice thickness.               
+
+## Finishing touches
+- The next thing we want to do is add a bit of a lip to the top of our cone, grab the top ring of vertices. Then hit `e` on the keyboard to allow us to **extrude** (pull out more mesh from our model).
+- If wanted to scale down our top ring, we can grab face select, then `alt left click` that face of vertices, then holding shift grab that bottom ring and pull it down or scale it if it was too large or even `s` and `z` to scale up.
+
+## Final Product
+Here is the final product: Whew! Not too bad!
+![](/hello-cone.png)
+
+## Review Answers
+1. What is the [**3D cursor**] for ?
+1. How do you change the position of the 3d cursor?
+1. How do you zoom in and out?
+1. How do you rotate around the selected object.
+1. You use the numpad `.` key, (or for me function layer + `.`)
+1. `g` for move, `r` for rotate, `s` for scale, with `x`, `y`, `z` ensuing for easy specific dimension.
+
+## Source
+- [Blender 2.9 Beginner Tutorial - Part 1: 3D Basics](https://www.youtube.com/watch?v=ppASl6yaguU&list=PLrjIgEdKLivgpCMmFC0_sV60Y_Ftp-WLD&index=1)
+
+## Links

@@ -29,8 +29,25 @@ The topmost tree nodes are available directly as `document` properties:
 `<html> = document.documentElement`
 The topmost document node is `document.documentElement`. That's the DOM node of the `<html>` tag.
 
+`<body> = document.body`
+Another widely used DOM node is the `<body>` element – `document.body`.
 
+`<head> = document.head`
+The `<head>` tag is available as `document.head.`
 
+⚠️ There’s a catch: document.body can be `null`
+A script cannot access an element that doesn’t exist at the moment of running.
+
+In particular, if a script is inside `<head>`, then document.body is unavailable, because the browser did not read it yet.
+
+In the DOM, the `null` value means "doesn't exist" or "no such node".
+
+## Children: `childNodes`, `firstChild`, `lastChild`
+
+## Siblings and the parentElement
+## Element-only navigation
+## More Links: tables
+ 
 ## Links
 - [Main]()
 - [Previous: DOM Tree](/jsinfo-domtree)

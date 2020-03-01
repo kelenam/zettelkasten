@@ -1,0 +1,120 @@
+---
+title: CSS Flexbox  
+date: 2020-02-29
+slug: nn-css-flexbox
+tags:
+  - web-dev
+  - CSS
+  - HTML 
+  - Flexbox
+  - NN
+  - Responsive
+  - Mobile-first
+---
+## Review Questions
+
+## Intro 
+### Pre-Flexbox
+- Use different positional properties, such as 'absolute'
+- floats and clear fixes
+- fixed heights for clumns
+
+### Enter flexbox...
+- flexbox is a ccss display type designed to help us craft CSS layouts much easier
+- control the position, size, and spacing of elements relative to their parent elements and each other
+- works great responsively
+
+### Flexbox Basics
+- Apply a display type of flex to the **parent container**, all the children then become **flex items**
+
+### benefits
+easy to create
+- nav bars and menus
+- grid layouts
+- bar charts
+- equal heights column
+
+Old verions of IE may not support flexbox, `Modernizr`js can help you coverage.
+
+## Flex Containers
+Default behavior is that flex children go from left to right in a row.
+Normally we would have to do some clear-fixes and float stuff.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        .flex-container {
+            display: flex;
+        }
+        .box {
+            height: 100px;
+            min-width: 100px;
+        }
+        .one {
+            background-color: red;
+        }
+        .two {
+            background-color: blue;
+        }
+        .three {
+            background-color: green;
+        }
+    </style>
+    <div class="wrapper">
+        <div class="flex-container">
+            <div class="box one"></div>
+            <div class="box two"></div>
+            <div class="box three"></div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+```
+
+## Flex Grow
+We will be taking a look at the flex grow property., 
+When there is available room left in the container, we want each one of these items to grow into that available room, we do that with, `flex-grow: ` property in the child component we want to grow.
+```css
+.box {
+    flex-grow: 1;
+}
+```
+- the number we pass into `flex-grow` is the "growth rate", how much we want this item to grow by, if we gave each of the children equal values, they would all equally fill the container.
+- we can mimic the 12 row grid, spacing by dividing up equal portions of that 12 unit container, doing a break down like:
+6,4,2 (which would be the same as saying 3,2,1)
+- flex-grow is always relative to the elements next to it.
+```css
+.one {
+    background-color: red;
+    flex-grow: 3;
+}
+.two {
+    background-color: blue;
+    flex-grow:2;
+}
+.three {
+    background-color: green;
+    flex-grow: 1;
+}
+```
+
+## Flex Shrink
+## Flex Wrap
+## Flex Basis
+## Creating a Menu with Flexbox
+## Creating Nested Menu's with Flexbox
+## Axis
+## Align items on the Cross Axis
+## Grid vs STacked Layout Example
+## Element Order
+
+## Key Insights
+
