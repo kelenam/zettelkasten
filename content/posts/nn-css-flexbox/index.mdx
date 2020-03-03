@@ -20,7 +20,7 @@ tags:
 - fixed heights for clumns
 
 ### Enter flexbox...
-- flexbox is a ccss display type designed to help us craft CSS layouts much easier
+- flexbox is a css display type designed to help us craft CSS layouts much easier
 - control the position, size, and spacing of elements relative to their parent elements and each other
 - works great responsively
 
@@ -355,16 +355,213 @@ nav {
 ```
 Let's style these icons now, instead to being images/icons instead of just text.
 ```css
-a.tw {
-    background: url(img/tw.png) no-repeat center;
-    background-size: 80%;
-}
+    * {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        margin: 0;
+    }
+    body {
+        background: none;
+    }
+    .wrapper {
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+    nav {
+        background: #333;
+    }
+    nav ul {
+        list-style-type: none;
+        padding: 0; 
+    }
+    nav a {
+        text-decoration: none;
+        text-align: center;
+        color: #ffffff;
+        display: block;
+        padding: 10px; 
+    }
+    nav a:hover{
+        background-color: #555555;
+    } 
+    nav li { 
+        flex: 1 1 0;
+    } 
+    a.tw {
+        background: url(img/tw.png) no-repeat center;
+        background-size: 80%;
+    }
+    a.fb {
+        background: url(img/fb.png) no-repeat center;
+        background-size: 80%;
+    }
+    .social a {
+        text-indent: -10000px;
+    }
+    .social {
+        max-width: 80px;
+        margin: 0 auto;
+    }
 
- 
+    /* flex styles */
+    nav ul.social {
+        flex: 1 1 0;
+        display: flex;
+    } 
+    @media screen and (min-width: 700px) {
+        nav ul {
+            display: flex;
+        }
+        nav li {
+            flex: 1 1 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+        }
+        .social {
+            margin: 0;
+        }
+    }
+```
+The reason we use the text-indent is to push that text off screen, so that we only get the icons. We can't keep the a blank bc the icons will appear top not centered. Aside: I'm not entirely sure why we can't just keep it blank or use a span tag within the a or something. I'll come back to this later. 
+
+We want to give our nav ul.social a flex property , flex: 1 1 0, and give social class themselves, a max-width.
+- Looks okay, for big screens but looks smashed and not centered for smaller screens.
+    - margin: 0 auto;
+
+- I'm still a bit unsure about, about `flex`, I'm not 100% confident in understanding how flex basis or the last param of `flex` has 0 and 1 values and what they correspond to.
+    I'm still not too too clear, but was helpful:
+
+> "0" and "auto" flex-basis will be different in most if not all situations: numeric values are interpreted as specific widths, so zero would be the same as specifying "width: 0" (and thus will collapse the element to its smallest possible width given the content, or to zero itself if its overflow is hidden.)
+
 ## Axis
+*The default behavior of flexbox is to stack items, horizontally, starting from left to right, in a row.*
+
+>- We can override the default behavior and have these items stack in a column; we do so by using the `flex-flow` property to the flex container, and that controls the flex flow of all the flex elements within it. This looks like, `flex-flow: column`.
+
+If we were to apply this to our example, this would stack our boxes but they would all be full width. The reason these boxes are all full width, is because they are block level elements and they take up 100% width of their parent element basis. Our `flex` basis of `100px` in `flex: 0 0 100px` doesn't work because they are no longer going in a row, this flex basis now controls the **height** of these elements because they are now going in a column downwards.
+
+![](/flex-row-v-column.png)
+
+When we change the value of `flex-flow` we are just changing the direction of the axis. When its set to `row` the main axis is going horizontally, in a row. The element always follow the main axis.
+
+The [***cross axis***]() is always perpendicular to the main axis.
+
+>* `justify-content` is only ever applied to the main axis.
+
+If we have items in a row, and we say `justify-content: center`, we will get all of those 3 boxes centered aligned in the top row.
+
+If we then went and said: `flex-flow: column`, the main axis changes from left-right to top-bottom. 
+- In order to see these things center aligned, we have to give the container a bigger height...
+```css
+.flex-container {
+    background: white;
+    height: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: 800px;
+}
+```
+
+### `column-reverse` and `row-reverse`
+So this switches the direction of the main axis, instead of the row moving from left to right as `row` (the default does), `row-reverse` will make the row move from right to left.
+
+
 ## Align items on the Cross Axis
 ## Grid vs Stacked Layout Example
 ## Element Order
 
 ## Key Insights
 - `flex-basis` v.s `min-width`.
+- Refresher: elements, according to how they are styled, can easily move beyond the bounds of their parent element so long as the parent element styling is less than/smaller than the styling of its children.
+
+## Thoughts
+So a bit of self-review:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>flex axis</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #999;
+        }
+        .flex-container {
+            background: white;
+            height: 100px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .box {
+            border: 1px solid black;
+            height: 100px;
+            width: 100px;
+        }
+        .one {
+            background-color: cornflowerblue;
+        }
+        .two {
+            background-color: cornsilk;
+        }
+        .three {
+            background-color: #ee9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="flex-container">
+            <div class="box one"></div>
+            <div class="box two"></div>
+            <div class="box three"></div>
+        </div>
+    </div>
+</body>
+</html>
+```
+If we added a `flex: 1` property to our `.box` classe, we would get the elements to spread out evenly across the top, likely because `flex` is a shorthand for `flex: 1 1 0`. Well... I guess this is kind of wrong:
+https://stackoverflow.com/questions/37386244/what-does-flex-1-mean
+
+Note, that the below is from 2017 so may no longer apply, however, it helped me clarify the absence of unit question I had about flex-basis, how and what a `0` and `1` value for `flex-basis` actually describes.
+
+"In some browsers:
+
+`flex:1`; does not equal `flex:1 1 0`;
+
+`flex:1`; = `flex:1 1 0n`; (where n is a length unit).
+
+    flex-grow: A number specifying how much the item will grow relative to the rest of the flexible items.
+    flex-shrink A number specifying how much the item will shrink relative to the rest of the flexible items
+    flex-basis The length of the item. Legal values: "auto", "inherit", or a number followed by "%", "px", "em" or any other length unit.
+
+The key point here is that `flex-basis` requires a length unit."
+ 
+In the code example above, if we said: `min-width:100px` instead of `width:100px` this would get us the same kind of result of 3x 100px boxes.
+Therefore if we said, `flex: 0 0 100px`, this should be the same thing.
+
+```css
+.box {
+    width: 100px; /* this would be loosely equivalent to...
+    min-width: 100px */
+}
+```
+In the above though, if we added a `flex: 1` attribute to `box` it would override both width and min width to flex grow/shrink the boxes (also because we are overriding the width and min width properties because of the implicit `0` for `flex-basis` in `flex`, at least I believe so)
+
+
+
+
+## Review Answers
+1. The default behavior of flexbox is to stack items, horizontally, starting from left to right, in a row.
+1. Flex elements always follow the direction of which axis?
+1. `justify-content` only works on the **main axis**. And what the main axis is depends on our `flex-flow` property.
+
+## Links

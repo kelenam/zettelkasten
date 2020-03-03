@@ -1,0 +1,99 @@
+---
+title: Particle Instancing | CG Geeks
+date: 2020-03-02
+slug: cggeek-blender-particle-instancing
+tags:
+    - Blender
+    - 3D
+    - Modeling
+    - Beginner
+---
+
+## Review Questions
+1. How do you bevel edges of shapes/meshes?
+1. What is something you should keep in mind in terms of adding a lot of verticies to things, especially repeated particles?
+1. How do you clone a mesh?
+1. Where is the particleSettings button/menu?
+1. What are the two types of particleSettings in Blender?
+
+
+## Intro
+Going to be adding some sprinkles. We aren't hand placing these sprinksles individually we are going to be using a particle system that allows us to add a lot of objects across a scene at once.
+
+### Creating our sprinkle
+Let's make our sprinkle 'prototype':
+- Create a new cylinder and set verticies count to 16.
+- Scale it down to sprinkle size.
+- hit tab, into edit mode and add a little bit of curve to it, `ctrl + r` to add a little cut in the center and move it a little bit, so we have a bit of curve
+- Then from here, you want to bevel the ends of the sprinkles by selecting the vertices at one end and hitting `ctrl + b`
+
+>* Use `ctrl + b` to bevel verticies into a nice beveled shape by then moving your cursor around. You can also, while doing so, use your `mousewheel` up or down to add more or less bevels to your bevel.
+
+You want to be cognizant of how many vertices you are adding, something too high poly will be more computationally expensive (longer render times) so let's only make 1-2 bevels.
+
+### Cloning our sprinkle
+Let's create another short little sprinkle. 
+>* `Shift + D` to "duplicate" an existing mesh.
+
+Let's make this one smaller, by scaling it down a little bit, and grab that middle and pull it in to make it a little less rounded. Then, `right click` and shade smooth on both of them.
+
+### Adding our sprinkles
+Remember the last video we talked about origin point, that little yellow dot. Well we want that point to the be at th edge of our sprinkle because the [**origin points**]() is going to be how the objects are placed on other objects, in our case, our icecream. We want the whole mesh (our sprinkle) to be visible so as to not clip inside our icecream so much.
+- You just move the mesh, with `g` to be at the edge of our origin point.
+
+### Particles
+- So now, go over and select our 'circle' our icecream mesh, and right right below the modifiers button is the particles button.
+- Hit that + key to add a new particle. 
+
+- In blender there are two different types of [**Particle Settings**]():  
+    1. An [**Emitter**]() (particles that bounce around a scene)
+    1. [**Hair**]() (allows particles to be more stagnant, like Hair)
+
+We want to use the Hair setting. If we click it, we will see it be a little wonky, and thats because we need to apply our modifers before we can assign our particles to our mesh.
+
+Also, you should make sure you are happy with the way that your icecream is looking because we can't really change it after we apply our particles.
+- What you can do is just duplicate our circle and our curve mesh and hide them so we have copies on hand if we ever want to change them again. 
+
+#### Applying our modifiers
+To actually control our particleSettings, we have to click the wrench above in our modifer settings, and apply which particleSettings we actually want...
+
+We aren't doing the subdiv surface but we will apply the array and the curve.
+    - Apply the array, the paricles go everywhere they want
+    - also apply the  curve: this allows the particles to be crazy all over the place.
+- Now jump back to our particle settings, and we can choose to have our objects, instanced to be our sprinkle instead of our hair.
+    - Scroll down to Render, and it's being rendered as **Path** which is essentially hair, we want to change that to be a **Collection**. Our collection is going to be these sprinkles, but first we need to make our sprinkles part of a collection.
+
+#### Collections
+[**Collections**]() are used to group parts or objects together or things just like this, where you can add a handful of groups to a collection and then access that whole group as we will be doing as we instance them across our icecream.
+
+>* To make a collection, it's really easy, you grab your desired objects and hit `ctrl + g`, this adds them to a new collection.
+
+We can then give this collection a name.
+
+#### Adding sprinkles
+Go back to our hair settings, check render as Collection is seleted, and from instance collection we can set to Sprinkles.
+
+### Changing the rotation/scale of our sprinkles
+So in our ParticleSettings, we can adjust: **Scale Randomness** and scale.
+- Rotation is going to help us out a bit here, so hit the **Advanced checkbox**, this will give us the Rotation option.
+- We want to change the rotation from *Velocity Hair* to normal, if we choose normal we can choose random option.
+
+A lot of the sprinkles falling in the crevice isn't very natural so what we can do is add a [**vertex group**]() which allows us to allow particles on a specific part of the mesh. To do this, it's very simple.
+
+We jump from Object Mode, to Weight Paint. From here we can paint on a "weight" to our object. To make these look naturally dispersed from the top, just switch to top view and then use the shortcut key to make your brush a different size: `f`, or hit `n` to bring up th tool options on the right-hand side where we can change it as well. `shift + f` to change the strength amount.
+
+This will help make sprinkle placement look more natural. If we want to see our sprinkles updated in realtime, go over in Vertex Groups in our particleSettings and go down to Density  and change to *Group*.
+
+If you want to remove some places there are sprinkles like on the overlap of the cone, we can use the tool options (`n`), we can click on the brush and click subtract to erase where we don't want sprinkles, clicking and dragging.
+
+### Preventing sprinkle overlap
+So you can see how some of the sprinkles are always overlapping one another, and that is happening becuase of how they are being emitted to our mesh. so we can change that in the particle settings, by clicking *Source*, and change *Jittered* to *Random*.
+
+### Finished Product
+![](/icecream-sprinkles.png)
+So I'm having a bit of issues with a lot of overlap between the sprinkles and the icecream itself, I changed the origin on the sprinkles to be on the outside of the bend instead of the inner-side of the bend and that seemed to help.
+Here 
+
+## Links
+- [3d Basics](/cggeek-blender-3dbasics)
+- [Prev | Modifiers](/cggeek-blender-modifiers)
