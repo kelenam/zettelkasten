@@ -1,0 +1,79 @@
+---
+title: Node Materials | CG Geeks
+date: 2020-03-02
+slug: cggeek-blender-node-materials
+tags:
+    - Blender
+    - 3D
+    - Modeling
+    - Beginner
+    - node materials
+---
+
+## Review Questions
+
+## Intro
+
+To render materials our scene we will be using Eevee on our icecream cone.
+
+By default you should already have Eevee set as youre *Render Engine*, you can check in the *Render Properties* tab over in the right hand side bar by clicking on the little icon that looks like the back of a DSLR camera or like a little TV.
+
+Once we check that Eevee is selected (again, it should already be so by default), if you go up to the little button in the top little nav in the scene window, and click the right-most button that looks like a little 3d bubble you will see our materials being rendered in Eevee (with no materials addeded yet of course).
+
+The first thing we are going to do to get materials on our scene is adding an HDR environment photo.
+
+## Adding an HDR Environment Photo 
+This will also us to handle all our *lighting* through a single 360° environment photo which will give us some pretty realistic results for any render engine.
+
+Click on the *World Properties* on the right, the little globe. We can give the environment a texture, we are going to add an HDR
+from [HDRIHaven](https://hdrihaven.com/) a website that has a bunch of nice HDR environments that is supported via voluntary donations.
+
+We will be using an outdoor image of an overpass, this will provide our scene with some lightning automatically. In addition to the HDRi added light we are also going to add a lamp.
+
+## Adding a lamp
+Adding a lamp, Eevee will allow us more control of our lightning and shadows and stuff by using a physical light in conjunction with the HDR. Somtimes, you can just use the light from the HDR but it depends on what you're going for.
+
+We also already have a light added by default anyways (in our scene view), so we can go ahead and select it as well as note the lamp settings on the *Properties* bar on the right.
+
+Go to the lamp settings on the bottom, the little light bulb. And change our lamp to be a *Sun*, way too strong, so let's change its strength to *8*
+
+Now let's place our lamp where the sun is in our HDR, using `g`.
+
+Aside: So I changed views to try and access the `Light` on the scene, and may background image kept appearing as a solid color:, 
+[the solution to fix that was changing out of orthographic view, using the numpad or ~ key](https://blender.stackexchange.com/questions/43235/why-is-this-environment-texture-image-showing-only-a-solid-color-in-the-3d-view)
+
+I'm having a bit of trouble with manipulating my Light.
+
+Aha! So *Show Overlays* is the button I was looking for that gives you that gridded world view, and it also provides you the direct your light is pointing. The button for *show overlays* is in the top left of the view port, with two overlapping circles, one tranparent the other solid.
+
+`Shift + t` will help you position the direction of the light.
+I turned my sun down to about a 6.0 since the 8.0 seemed a bit strong for my scene.
+ 
+Also you can add a tiny bit of yellow color to the light to make it more sun-like.
+
+Next we are going to edit our icecream a bit, so select that circle mesh, and split the window...
+
+>- You can split the window to add another view in by selecting an object on your scene, then using your cursor, go up in the top left, just to the left of the *Editor Type* button (it looks like a tic-tac-toe board with a bubbble on th etop right) of the screen and pulling across to duplicate a new view.
+
+In that new split window we want to click on the Editor type button, and select *Shader Editor*, It will look like a blank page, until we click *New*. 
+
+This Principled BSDF file node will be in reference to the circle object we've seleted. You could just change the base color, but lets build a swirled color. To do so, let's add a mix node...
+
+`shift + a`, then *Color* then *MixRGB*, this is going to be the two colors that we swirl together.
+- Pick your two colors, then link that mixnode back to the base color of our first node.
+- As you can see we just get the two colors blended, what we can do is just add another new node: `shift + a`
+    - this one is going to be an *input* geometry node, it will allow us to select different factors from our mesh to effect the colors. We will be using one called a *Normal* which will let us split our color half and half by creating another new node:
+    - This new node is a *Converter* > *ColorRamp*, we then drop the normal into the ColorRamp we can then select the ColorRamp,
+    - This is where we want to make sure we have another add on enabled called the *Node Wrangler* add-on. 
+        - To check if you have it enabled (I didn't), go to Edit > Preferences > Add-ons > type in Node Wrangler and make sure its checked.
+        - It's really handy as it allows us to preview our node results with `ctrl + shift + click(we are clicking on the node window we just created, the ColorRamp)` to see what our output is in our viewport.
+        - You can `ctrl + shift + click` any of the nodes to preview what they will look like (if you have your node-wrangler add-on on).     
+
+    
+
+### Adding Materials to our Object
+
+## Links
+- [3d Basics](/cggeek-blender-3dbasics)
+- [Modifiers](/cggeek-blender-modifiers)
+- [PREV | Particle Instancing](cggeek-blender-particle-instancing)

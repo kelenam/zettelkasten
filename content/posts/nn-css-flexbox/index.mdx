@@ -459,19 +459,89 @@ If we then went and said: `flex-flow: column`, the main axis changes from left-r
     background: white;
     height: 100px;
     display: flex;
+    flex-flow: row;
     flex-wrap: wrap;
     justify-content: center;
     height: 800px;
 }
 ```
+If we have the above: we will get 3 boxes, 100px in width, justified to the center in the first row of the page (at the top), if we simply changed `flex-flow: row` to `flex-flow: column` we would get 3 full width bars centered aligned vertically to the center of the page.
 
 ### `column-reverse` and `row-reverse`
-So this switches the direction of the main axis, instead of the row moving from left to right as `row` (the default does), `row-reverse` will make the row move from right to left.
-
-
+So this switches the direction of the main axis, instead of the row moving from left to right as `row` (the default does), `row-reverse` will make the row move from right to left same with vertically, instead of going from top bottom it goes bottom to top.
+ 
 ## Align items on the Cross Axis
-## Grid vs Stacked Layout Example
+So in the last video we talked about properties that only effect the main axis, one of those properties is `justify-content` We also have a property that just effects the cross-axis which is `align-items` a similar thing just going instead in the cross axis.
+
+So now if we take our example from above:
+```css
+.flex-container {
+    background: white;
+    height: 100px;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    /* align-items: center */
+    justify-content: center;
+    height: 800px;
+}
+```
+And instead of saying `justify-content` we said `align-items: center` we would get our 3 cubes, aligned vertically (or more specifically along their cross axis)
+
+- If we combine that with `justify-content`, we get those 3 boxes centered to the whole wrapper.
+- And just like center we can also use `flex-start` or end on our `align-items` property. 
+
+- If we went ahead and change the flex-flow to column instead (as well as changed the width property of the .box class to 100px) and said `justify-content` center, we would get 3 vertically stacks cubes (100x100) centered vertically, remember, because changing flex flow to column changes the directtion of the main axis.
+- and if we said `align-items: center` we can center that stack to the middle of page.
+
+The key takeaway here is knowing which direction your main and cross axis are going in .
+
 ## Element Order
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>element order </title>
+</head> 
+    <style>
+        #blocks {
+            display: flex;
+            margin: 10px;
+            justify-content: space-between;
+            border: 1px solid teal;
+        }
+        #blocks div {
+            flex: 0 0 100px;
+            padding: 40px 0;
+            text-align: center;
+            background-color: #ddd;
+        }
+        .one{order: 0;}
+        .two{order: 0;}
+        .three{order: 0;}
+        .four{order: 0;}
+    </style>
+<body>
+    <div class="wrapper">
+        <section id="blocks">
+            <div class="one">1</div>
+            <div class="two">2</div>
+            <div class="three">3</div>
+            <div class="four">4</div>
+        </section>
+    </div>
+</body>
+</html>
+```
+If we wanted to change the order of these blocks, how would we do this with just flexbox?
+
+>* We can do so with just one property and that property is the `order` property.
+
+The default `order` value for each property is set to 0. If they all default to 0 the webpage is just going to present them in *source order*, as they are written in the code. The way it works, is that the lowest number goes first, the highest number goes last.
+- You can also use minus/negative numbers as well.
 
 ## Key Insights
 - `flex-basis` v.s `min-width`.
@@ -555,9 +625,6 @@ Therefore if we said, `flex: 0 0 100px`, this should be the same thing.
 }
 ```
 In the above though, if we added a `flex: 1` attribute to `box` it would override both width and min width to flex grow/shrink the boxes (also because we are overriding the width and min width properties because of the implicit `0` for `flex-basis` in `flex`, at least I believe so)
-
-
-
 
 ## Review Answers
 1. The default behavior of flexbox is to stack items, horizontally, starting from left to right, in a row.
