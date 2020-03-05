@@ -1,0 +1,1326 @@
+---
+title: React Context & Hooks | NN
+date: 2019-12-20
+slug: nn-react-context-and-hooks
+tags:
+  - web-dev
+  - JS
+  - React
+  - Context
+  - Hooks
+  - NN
+  - state management
+---
+## Review Questions
+1. What is the Context API?
+1. What are React Hooks/What do they allow us to do?
+1. What is the power of using the Context API and hooks together?
+
+## React Context and Hooks
+What are they?
+
+[***Context API***]()
+Provides a clean and easy way to share state between components
+
+[***Hooks***]()
+Tap into the inner workings of React in functional components
+
+[***React Context and Hooks Together...***]()
+Context + Hooks = ... Redux-like, state management magic
+
+In our sample app we are just going to delete most of the boilerplate then create two new components...
+- Navbar
+
+## What is the Context API?
+It gives us a way share state within (up and down) a component tree. We can already do this with props, but it can get a bit messy as our app becomes bigger. The context API gives us a way out of that by providing a central place to store state and share it between components without having to pass it down as props.
+- Makes working with shared data much much easier
+- Similar to redux in the sense that its a central place to access state without needing to pass down props several components deep.
+- Context API is a different approach to this to redux.
+
+### State management via props
+![](https://user-images.githubusercontent.com/5563119/70869182-19878780-1f3d-11ea-9c4e-5d5214212273.png)
+So imagine we have like a darkUI theme that would need to trickle down the effects of this change from top down on the app level. We would traditionally need to pass down the changes as props through every single component to the the ones that use it.
+- That means we would be passing down props to components that may not necessarily use those props (e.g. `PageView` and `Navbar`).
+- `PageView` and `Navbar` are just used as carrier components for props/state.
+- This approach can get messy when you have a lot of components in the chain and the application gets bigger.
+
+### State management via context api
+![](https://user-images.githubusercontent.com/5563119/70869169-f8bf3200-1f3c-11ea-9a1b-bcb958f97217.png)
+What we could do now instead of this approach is create a new context in a new file somewhere which is basically us making a place with a shared state could be initially defined and setup.
+- <u>When we create a context we have to provide it to our component tree so that the components in that trees can access it, and we do that via the *context provider*...</u>
+- With the context provider we can now give access to that shared state to all the components, and now use of that state is optional depending on the needs of the component.
+- makes working with shared data a lot easier
+
+ 
+#### When to use context...
+*Context* is design to shared data that can be considered *"global"* for a tree of React components, such as the current authenticated user, theme, or preferred language.
+
+- Context is not a catchall for everything, just useful for global shared state shared between many different components within a tree.
+
+## Adding a Context & Provider
+
+Creating a new folder called `contexts`. You don't need to do this but it can help keep you organized.
+New file called `ThemeContext.js`
+First thing to do in this new file is import react and createContext.
+
+```js
+import React, { createContext } from 'react';
+
+
+export const ThemeContext = createContext();
+```
+So by itself, creating the context isn't going to do much. <u>We also need to create a class component that is going to have our state</u>.
+
+Now we are going to create a class compnent...
+
+We'll create some state which will represent our light and dark themes...
+
+Now that we have our state we need a way to provide this shared state to the components that need it... our Navbar and Booklist.
+Well remember we specified that to use context we also need to create a provider, a tag that will allow us to use our theme.
+The tag is provided by the ThemeContext itself when we wrote...
+`export const ThemeContext = createContext();`
+
+So we are given this tag that we can use to wrap our desired components with...
+`<ThemeContext.Provider></ThemeContext.Provider>`
+This context takes in a value property that is going to take in any data we want to provide to the components that this wraps...
+
+By saying...
+`<ThemeContext.Provider value={{...this.state}}>`
+We are essentially just wrapping out state and passing it to the components that we will wrap.
+We use the spread syntax to provide to all the wrapped children components..
+
+Back in `App.js` we have to import our `ThemeContext`, and wrap it aroudn the navbar and the booklist that we want to wrap.
+
+Back in the ThemeContext we between the `ThemeContext.Provider` we want to say this.props.children to refer to the children that this compnent wraps over in `App.js`...
+```js
+import React, { createContext, Component } from 'react';
+
+
+export const ThemeContext = createContext();
+
+class ThemeContextProvider extends Component {
+    state = {  
+        isLightTheme: true,
+        // ThemeContextProvider class, above our render() method let's create a
+        // toggleTheme function that will allow us to toggle our state
+        light: {
+            syntax: '#555',
+            ui: '#ddd',
+            bg: '#eee'
+        },
+        dark: {
+            syntax: '#ddd',
+            ui: '#333',
+            bg: '#555'            
+        }
+    }
+    render() { 
+        return ( 
+            <ThemeContext.Prover value={{...this.state}}>
+                {this.props.children}
+            </ThemeContext.Prover>
+        );
+    }
+}
+ 
+export default ThemeContextProvider;
+```
+
+## Accessing Context 
+**Context TypeThemeContextProvider class, above our render() method let's create a toggleTheme function that will allow us to toggle our state**
+
+### **Approach (part 1)**
+So how do we access the data from the context in these different child components?
+We can do this a few different ways inside of a class component. The way we will do here is using the context type which only works in class components and not functional ones.
+
+The way that we use this is by saying...
+`static contextType = ThemeContext`
+It needs to be called `contextType` and then set it equals to whatever context we want to consume, in this case our themecontext
+- Not that we want to set it equal to the ThemeContext itself, NOT the ThemeContextProvider (which we export) there is a difference. The Provider is the thing wrapping that provides the context.
+
+What this does is, is it looks up the component tree to find the provider for this` ThemeConThemeContextProvider` class, above our `render()` method let's create a `toggleTheme` function that will allow us to toggle our state
+
+text, it will go up one level and find the `ThemeContextProvider` tag that we've wrapped our child components in which will then have access to the value property that we've pass in as a prop to the provider.
+
+So what it does it, it takes `ThemeContextProvider` class, above our `render()` method let's create a toggleTheme function that will allow us to toggle our state
+
+
+all of our `this.state` data that we pass into the value property and it attaches it to a context property inside of this component so we can now have access to the the context in our component...
+In our Navbar (that we've included the static contextType) we can say something like `console.log(this.context)`
+
+What we can do now is use some destructuring on our `this.context` to get separate constants for each property on that object...
+`const { isLightTheme, light, dark } = this.context;`
+This will give us variables we can reference... We use a ternary operator to evaluate our themes.
+`const theme = isLightTheme ? light : dark;`
+
+From here we can style our nav style with the result of theme...
+`<nav style={{background: theme.ui, color: theme.syntax}} >`
+
+So we can go ahead and do the same thing for the BookList component.
+
+```js
+import React, { Component } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+
+class BookList extends Component {
+    static contextType = ThemeContext;
+    render() { 
+        const { isLightTheme, light, dark } = this.context;
+        const theme = isLightTheme ? light : dark;
+        return (  
+            <div className='book-list' style={{ color: theme.syntax, background: theme.bg }}>
+                <ul>
+                    <li style ={{ background: theme.ui }}>The Way of Kings</li>
+                    <li style ={{ background: theme.ui }}>The Name of The Wind</li>
+                    <li style ={{ background: theme.ui }}>The Final Empire</li>
+                </ul>
+            </div>
+        );
+    }
+}
+ 
+export default BookList;
+```
+This is just one way to consume context inside of a component, in the next section we will look at another.
+
+## Accessing Context - Context Consumer Approach (part 2)
+There is another way to consume context in React and that is through using a *context consumer*. Much like we have the `Provider` given to us on our ThemeContext when we created one using...
+`export const ThemeContext = createContext();`
+
+This approach differs in that we wrap our JSX output of the desired child with a tag: `<ThemeContext.Consumer></ThemeContext.Consumer>` However, this consumer expects us to pass in a function (that immediately follows the opening tag)
+- The parameter of this function is a context
+- This function returns JSX,...
+`<ThemeContext.Consumer>{(consumer) => { ... // our jsx }}`
+
+So all together it looks like this...
+```js
+import React, { Component } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+
+class Navbar extends Component {
+  render() {
+    const { isLightTheme, light, dark } = this.context;
+    const theme = isLightTheme ? light : dark;
+    return (
+        <ThemeContext.Consumer>{(context) => {
+            return (
+                <nav style={{background: theme.ui, color: theme.syntax }}>
+                    <h1>Context App</h1>
+                    <ul>
+                    <li>Home</li>
+                    <li>About</li>
+                    <li>Contact</li>
+                    </ul>
+                </nav>
+            )
+        }}
+        </ThemeContext.Consumer>
+    );
+  }
+}
+ 
+export default Navbar;
+```
+
+What this `<ThemeContext.Consumer>` is going to do is "consume" this context, so that we can get access to that context as our argument in the function we immediately pass it, the parameter called context is where we will be passing in that context to the component.
+- Inside of this function we will be returning some JSX, that will allow us to use any data presented in the context.
+- Similar to before but now we have things reference via context inside of `this.context`
+- The last thing we have to do is take the above code, our const declarations and paste it inside of our function immediately following the `.Consumer` tag...
+
+```js
+import React, { Component } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+
+class Navbar extends Component {
+  render() {
+    const { isLightTheme, light, dark } = context;
+    const theme = isLightTheme ? light : dark;
+    return (
+        <ThemeContext.Consumer>{(context) => {
+            return (
+                <nav style={{background: theme.ui, color: theme.syntax }}>
+                    <h1>Context App</h1>
+                    <ul>
+                    <li>Home</li>
+                    <li>About</li>
+                    <li>Contact</li>
+                    </ul>
+                </nav>
+            )
+        }}
+        </ThemeContext.Consumer>
+    );
+  }
+}
+ 
+export default Navbar;
+```
+We also need to change any references of `this.context` to just `context`.
+
+So all we are doing is using a "Consumer" of the theme context we've created and inside of that we are just using a function that takes in that context object as a parmeter, therefore giving us access to that context object.
+
+This is just another way of using context inside of a component. So now that we've seen both ways, which should you use?
+
+### Context: Type vs Consumer
+- Shaun prefers using the **contextType** approach when using class components. 
+- However, a benefit of the Consumer approach is that we can also use it in functional components.
+- Another good thing about the Consumer is that we can consume multiple contexts inside of one component this way. 
+
+## Updating Context Data
+
+Now that we've seen how to share this global state. What if we needed or wanted to change that data? That state? How would we  
+go about it?
+Let's sayin the instance of creating a toggle button that can change our theme (and therefore change the state of the isLightTheme boolean)
+
+Create a new file called ToggleTheme.js and in it we can say...
+```js
+import React, { Component } from 'react';
+
+class ThemeToggle extends Component {
+    render() { 
+        return (  
+            <button onClick={}>Toggle the Theme</button>
+        );
+    }
+}
+ 
+export default ThemeToggle;
+```
+We'll come back to this to handle the `onClick`.
+
+So this isLightTheme property in our state is the thing we want to be able to interact with and modify, to do so we need a function and that function will need to live inside this `ThemeContextProvider` class because we might want to pass that function down to different components that might want to interact with this state to change the theme.
+
+So... in our `ThemeContextProvider `class, above our `render()` method let's create a toggleTheme function that will allow us to toggle our state
+```js
+toggleTheme = () => {
+    this.setState({ isLightTheme: !this.state.isLightTheme });
+}
+```
+Now when this function toggles, it will change to whatever value it currently is not, and that value will be passed to our provider which will then update it in the components which will consume that updated data/context/state.
+So let's also pass down this function in our provider tag...
+`<ThemeContext.Provider value={{...this.state, toggleTheme: this.toggleTheme }}>`
+
+```js
+//ThemeContext.js
+import React, { Component, createContext } from 'react';
+
+export const ThemeContext = createContext();
+
+class ThemeContextProvider extends Component {
+  state = {
+    isLightTheme: true,
+    light: { syntax: '#555', ui: '#ddd', bg: '#eee' },
+    dark: { syntax: '#ddd', ui: '#333', bg: '#555'}
+  }
+  toggleTheme = () => {
+      this.setState({ isLightTheme: !this.state.isLightTheme });
+  }
+  render() { 
+    return (
+      <ThemeContext.Provider value={{...this.state, toggleTheme: this.toggleTheme }}>
+        {this.props.children}
+      </ThemeContext.Provider>
+    );
+  }
+}
+ 
+export default ThemeContextProvider;
+```
+
+```js
+//ThemeToggle.js
+import React, { Component } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+
+class ThemeToggle extends Component {
+    static contextType = ThemeContext;
+    render() { 
+        const { toggleTheme } = this.context;
+        return (  
+            <button onClick={toggleTheme}>Toggle the Theme</button>
+        );
+    }
+}
+ 
+export default ThemeToggle;
+```
+
+The last thing we need to do is include the component we created with ThemeToggle in App.js...
+`<ThemeToggle>` right below `<BookList>`
+
+Now we can toggle the theme!
+
+So the way we interact and modify our state is **define a function within the "state-managing" class which can edit the state** and we can pass that function into the value property of the Provider, therefore when we consume the context we can have accesss to that function and do something with it.
+
+## Creating Multiple Contexts
+
+So what if we want some different kind of data, what if we had some authentication data for the currently logged in user? Would we put it in the same context? Well, no, since this context is for the theme and it doesn't really make a lot of sense to put auth stuff inside of this context.
+
+What we can do is just create multiple different contexts. If we have some other kind of global used for some other part of the application we could just create a new context for that ...
+
+Let's create a new context called `AuthContext.js`...
+We also need to import the createContext function so that we can create a new context...
+
+So we just kind of follow the same pattern as we had for the ThemeContext
+```js
+import React, { Component, createContext } from 'react';
+
+export const AuthContext = createContext();
+
+class AuthContextProvider extends Component {
+    state = {  
+        isAuthenticated: false
+    }
+    toggleAuth = () => {
+        this.setState({ isAuthenticated: !this.state.isAuthenticated })
+    }
+    render() { 
+        return (  
+            <AuthContext.Provider value={{...this.state, toggleAuth: this.toggleAuth}}>
+                { this.props.children }
+            </AuthContext.Provider>
+
+        );
+    }
+}
+ 
+export default AuthContextProvider;
+```
+Then in our App.js we have to wrap it, doesn't matter if we wrap ThemeContext or are interior to it so long as we wrap the things we want as children...
+
+```js
+import React from 'react';
+import BookList from './components/BookList';
+import Navbar from './components/Navbar';
+import ThemeContextProvider from './contexts/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
+import AuthContextProvider from './contexts/AuthContext';
+
+function App() {
+  return (
+    <div className="App">
+      <ThemeContextProvider>
+        <AuthContextProvider>
+          <Navbar />
+          <BookList />
+          <ThemeToggle />
+        </AuthContextProvider>
+      </ThemeContextProvider>
+    </div>
+  );
+}
+
+export default App;
+```
+
+### Consuming Multiple Contexts
+
+So if we want to use two separate contexts inside of a component we have two choices, we can either use the context Type approach for one context and then use the Consumer Approach for the other OR we can use the Consumer approach for both contexts.
+
+We will look at the latter approach.
+
+
+```js
+//Navbar.js
+import React, { Component } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { AuthContext } from '../contexts/AuthContext';
+
+class Navbar extends Component {
+  render() {
+      return (
+          <AuthContext.Consumer>{(authContext) => (
+            <ThemeContext.Consumer>{(themeContext) => {
+                const { isAuthenticated, toggleAuth } = authContext;
+                const { isLightTheme, light, dark } = themeContext;
+                const theme = isLightTheme ? light : dark;
+                return (
+                    <nav style={{background: theme.ui, color: theme.syntax }}>
+                        <h1>Context App</h1>
+                        <div onClick={toggleAuth}>
+                            { isAuthenticated ? "Logged In": "Logged Out"}
+                        </div>
+                        <ul>
+                        <li>Home</li>
+                        <li>About</li>
+                        <li>Contact</li>
+                        </ul>
+                    </nav>
+                )
+            }}
+            </ThemeContext.Consumer>
+          )}
+  
+        </AuthContext.Consumer>
+    );
+  }
+}
+ 
+export default Navbar;
+```
+
+So when using multiple contexts, its easy to just wrap our contexts within each other. However. this all becomes much easier to do all of this when we use the context api in conjuction with React Hooks. 
+
+## Intro to Hooks 
+
+Hooks are pretty new to React and are quite hyped.
+
+[**React hooks**]() are just special functions. They allow us to do additional things inside functional components, for example using state. Normally we could only use state in a class component, but by using a hook we can now access state in functional components.
+- It doesn't mean that class components are never going to be used again, hooks are just a different approach we can now use.
+
+There are different hooks in React, but they are all just special functions...
+- `useState()`: Use state within a functional component
+- `useEffect()`: run code when a component renders (or re-renderss)
+- `useContext()`: consume context in a functional component
+
+
+Just create a new project with create-react-app
+
+## `useState` Hook
+
+```js
+import React from 'react';
+import SongList from './components/SongList';
+
+function App() {
+  return (
+    <div className="App">
+      <SongList />      
+    </div>
+  );
+}
+
+export default App;
+
+```
+FYI: `sfc` is the abbreviation for React snippets to generate a functional component
+
+So right, now we have our functional component that has our songs, we don't want hardcoded songs we want them kept in state and dyanmically displayed in a template.
+
+Normally to use state inside of a component it would have to be a class component, but now we can so in a functional component by using hooks, specifically, useState().
+
+So let's start by importing that hook..
+`import React, { useState } from 'react';`
+
+Then we call `useState()` right above our function. Invoking this function
+- this hook accepts an argument which is going to be the initial value for this piece of state that we want to use.
+- What we are doing is essnetially like defining a piece of state inside of this function, (kind of like how we would defined a state property in a class component)
+```js
+import React, { useState } from 'react';
+
+const SongList = () => {
+    const [ songs, setSongs ] = useState([
+        {title: 'this wild darkness', id: 1},
+        {title: 'memory gospel', id: 2},
+        {title: 'almost home', id: 3},
+    ]);
+    return (  
+        <div className="song-list">
+            {songs.map(song => {
+                return (<li key={song.id}>{song.title}</li>)
+            })}
+        </div>
+    );
+}
+ 
+export default SongList;
+```
+Let's just create an array of objects representing songs..
+This is going to be the intial values for our piece of state.
+
+This `useState()` function returns an array and inside of this array is two values. The first value is going to be the actual data, the piece of state itself, (the array of songs we just created) and the second value is going to be a function that we can use to edit that piece of state. 
+We can just array destructuring to get at these two values.
+`const [ songs, setSongs ] = useState([...])`
+
+So now we have the data itself stored in a variable called songs, as well as a function that can edits the state we've called setSongs. Now this is the state inside of this component that we can then use by referencing `songs`...
+```js
+{songs.map(song => {
+    return ( <li key={song.id}>{song.title}</li>)
+})}
+```
+Now we are cycling through this state and outputing a bit of template.
+Now we can use state inside of a functional component. Pretty cool.
+
+Say we want to add a button that when click could add a new song...
+We first need to create a new button, but secondly we need to use our setSongs function that we had named that gets returned to us from useState...
+
+The function (we've named setSongs) we get back from useState is used to change the data, so inside of it we pass in whatever value we want this data to be. We still want it to be an array, and this is going to completely replace whatever the current value of songs is inside our initial state. We can't just add something we have to output the whole thing because it's **going to completely replace it**. So for that reason we need to use spread syntax...
+`setSongs([...songs, {title: 'new song', id: 4}])`
+
+When we run the above we will get a warning because of the repeating key that we've hardcoded as 4.
+To get around this for now, we use a package called uuid. npm install uuid, Then invoke that function in the place of our id.
+
+So we've now used `useState()` hook to enable us to use state inside of our functional component. Just takes one hook now to do this inside of a functional component.
+- Remember that `useState()` returns two things:
+    1. The actual value of the state
+    2. A function to modify that value
+- `useState()` itself takes an initial value, which is the initiali piece of state.
+
+## `useState` with Forms
+
+We want to add a form to add a new song, that will be stored using useState.
+To do it, we need a brand new component called NewSongForm.js and we need to import react and useState and then create a stateless functional component...
+
+In this component we are going to be using useState to take in and store the value from the onchange event from the form.... 
+```js
+import React, { useState } from 'react';
+
+const NewSongForm = () => {
+    const [title, setTitle] = useState('');
+    return (  
+        <form onSubmit={}>
+            <label>Song name: </label>
+            <input type="text" value={title} required onChange={(e) => setTitle(e.target.value)} />
+            <input type="submit" value="add song" />
+        </form>
+    );
+}
+ 
+export default NewSongForm;
+```
+Let's work on the handleSubmit function...
+Now we need to add the title we just grabbed from the "local" state to add it to our songlist in the SongList.js output.
+
+```js
+import React, { useState } from 'react';
+
+const NewSongForm = ({ addSong }) => {
+    const [title, setTitle] = useState('');
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log(title);
+        addSong(title);
+    }
+    return (  
+        <form onSubmit={handleSubmit}>
+            <label>Song name: </label>
+            <input type="text" value={title} required onChange={(e) => setTitle(e.target.value)} />
+            <input type="submit" value="add song" />
+        </form>
+    );
+}
+ 
+export default NewSongForm;
+```
+
+So in order, to do this we need the add song function we created in SongList to be passed down as a prop to NewSongForm...
+```js
+import React, { useState } from 'react';
+import uuid from 'uuid/v1';
+import NewSongForm from './NewSongForm';
+
+const SongList = () => {
+    const [ songs, setSongs ] = useState([
+        {title: 'this wild darkness', id: 1},
+        {title: 'memory gospel', id: 2},
+        {title: 'almost home', id: 3},
+    ]);
+    const addSong = (title) => {
+        setSongs([...songs, { title, id: uuid() }])
+    }
+
+    return (  
+        <div className="song-list">
+            <ul>
+                {songs.map(song => {
+                    return (<li key={song.id}>{song.title}</li>)
+                })}
+            </ul>
+            <NewSongForm addSong={addSong}/>
+        </div>
+    );
+}
+ 
+export default SongList;
+```
+I think the biggest gotcha (for me) is rememebering that we need to destructur addSong when we pass it down as a prop into NewSongForm.
+`const NewSongForm = ({ addSong }) `
+You can't just pass in addSong by itself, it needs to be wrapped as an object as we get the right access to it.
+
+let's autoclear after submitting a new song, super easy by using setTitle, `setTitle('');` right after our `addSong(title)` in our handleSubmit function.
+
+## `useEffect` Hook
+Let's first import useEffect. You can think of useEffect as a sort of lifecycle method that we would normally use within a class component within React.
+When we use functional components we don't have access to those lifecycle methods and if we want to run some code when the component updates for example then we normally would need to use a class component and hook into a lifecycle method.
+However, now we can use the useEffect hook in a functional component to do just that...
+
+useEffect() takes a callback function as a parameter. That callback function is going to run every time that component renders or rerenders, every time the data inside changes and on the initial render.
+
+useEffect() could be used to update when we get a response from a database for example...
+
+In SongList.js after importing useEffect...
+```js
+  useEffect(() => {
+        console.log('useEffect hook ran', songs);
+    })
+```
+This is now running everytime the component renders or rerenders. This rerenders the data no matter what kind of state has changed it could be state from another object for intance. But we might not want to do rerender when external or other state updates we just want to rerender and fire that callback when our specific songs data changed, not just any datachange.
+
+We can do this by passing in a second parameter to useEffect that will be an array of the data that we want to watch, to pay attention to. It's going to be the data ...
+```js
+import React, { useState, useEffect } from 'react';
+import uuid from 'uuid/v1';
+import NewSongForm from './NewSongForm';
+
+const SongList = () => {
+    const [ songs, setSongs ] = useState([
+        {title: 'this wild darkness', id: 1},
+        {title: 'memory gospel', id: 2},
+        {title: 'almost home', id: 3},
+    ]);
+    const addSong = (title) => {
+        setSongs([...songs, { title, id: uuid() }])
+    }
+    const [age, setAge] = useState(20)
+    useEffect(() => {
+        console.log('useEffect hook ran', songs);
+    }, [songs])
+    return (  
+        <div className="song-list">
+            <ul>
+                {songs.map(song => {
+                    return (<li key={song.id}>{song.title}</li>)
+                })}
+            </ul>
+            <NewSongForm addSong={addSong}/>
+            <button onClick={() => setAge(age + 1)}>Add 1 to age: {age}</button>
+        </div>
+    );
+}
+ 
+export default SongList;
+```
+Cool. Now we are limiting when to use that callback function to only when the data of our songs updates.
+
+Something to note, we can use useEffect as many times as we'd like in our application one hook per 'data-set' to watch 
+```js
+    useEffect(() => {
+        console.log('useEffect hook ran', songs);
+    }, [songs])
+       useEffect(() => {
+        console.log('useEffect hook ran', age);
+    }, [age])
+```
+
+## Hooks with Context
+Let's now use react hooks with context...
+So let's start consuming context with React Hooks. Right now we have two contexts, auth and theme being consumed in two different components.
+
+So, in our BookList Class Component we are using the contextType. Remember we can't use contextType in functional components only class components. So what if we wanted to turn this into a fucnctional component and use the context? Well, we can do that with the help of the useContext hook. So first thing, let's import that: `useContext`
+and rewrite our component as a functional one.
+
+Using useContext is super easy....
+```js
+import React, { Component, useCallback, useContext } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+
+// Class Comopnent
+// class BookList extends Component {
+//     static contextType = ThemeContext;
+//     render() { 
+//         const { isLightTheme, light, dark } = this.context;
+//         const theme = isLightTheme ? light : dark;
+//         return (  
+//             <div className='book-list' style={{ color: theme.syntax, background: theme.bg }}>
+//                 <ul>
+//                     <li style ={{ background: theme.ui }}>The Way of Kings</li>
+//                     <li style ={{ background: theme.ui }}>The Name of The Wind</li>
+//                     <li style ={{ background: theme.ui }}>The Final Empire</li>
+//                 </ul>
+//             </div>
+//         );
+//     }
+// }
+
+// Functional component using useContext
+const BookList = () => {
+    const { isLightTheme, light, dark } = useContext(ThemeContext);
+    const theme = isLightTheme ? light : dark;
+    return (  
+        <div className='book-list' style={{ color: theme.syntax, background: theme.bg }}>
+            <ul>
+                <li style ={{ background: theme.ui }}>The Way of Kings</li>
+                <li style ={{ background: theme.ui }}>The Name of The Wind</li>
+                <li style ={{ background: theme.ui }}>The Final Empire</li>
+            </ul>
+        </div>
+    );
+}
+
+export default BookList;
+```
+
+## Multiple Contexts Using Hooks
+The cool things about useContext is that we can use it as many times as we want inside of our component for as many contexts as we would like.
+
+So let's do so with our messy looking navbar with multiple nested contexts by first importing useContext and turning it into a SFC.
+```js
+import React, { useContext } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { AuthContext } from '../contexts/AuthContext';
+
+// class Navbar extends Component {
+//   render() {
+//       return (
+//           <AuthContext.Consumer>{(authContext) => (
+//             <ThemeContext.Consumer>{(themeContext) => {
+//                 const { isAuthenticated, toggleAuth } = authContext;
+//                 const { isLightTheme, light, dark } = themeContext;
+//                 const theme = isLightTheme ? light : dark;
+//                 return (
+//                     <nav style={{background: theme.ui, color: theme.syntax }}>
+//                         <h1>Context App</h1>
+//                         <div onClick={toggleAuth}>
+//                             { isAuthenticated ? "Logged In": "Logged Out"}
+//                         </div>
+//                         <ul>
+//                         <li>Home</li>
+//                         <li>About</li>
+//                         <li>Contact</li>
+//                         </ul>
+//                     </nav>
+//                 )
+//             }}
+//             </ThemeContext.Consumer>
+//           )}
+  
+//         </AuthContext.Consumer>
+//     );
+//   }
+// }
+ 
+const Navbar = () => {
+  const { isLightTheme, light, dark } = useContext(ThemeContext);
+  const { isAuthenticated, toggleAuth } = useContext(AuthContext);
+  const theme = isLightTheme ? light : dark;
+  return (  
+    <nav style={{background: theme.ui, color: theme.syntax }}>
+        <h1>Context App</h1>
+        <div onClick={toggleAuth}>
+            { isAuthenticated ? "Logged In": "Logged Out"}
+        </div>
+        <ul>
+            <li>Home</li>
+            <li>About</li>
+            <li>Contact</li>
+        </ul>
+    </nav>
+  );
+}
+ 
+export default Navbar;
+```
+
+Wow. Consuming multiple contexts is super clean and easy using `useContext`. 
+
+Now for good measure we can convert ThemeToggle into an SFC as well...
+
+```js
+import React, { useContext } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
+
+// class ThemeToggle extends Component {
+//     static contextType = ThemeContext;
+//     render() { 
+//         const { toggleTheme } = this.context;
+//         return (  
+//             <button onClick={toggleTheme}>Toggle the Theme</button>
+//         );
+//     }
+// }
+
+const ThemeToggle = () => {
+    const { toggleTheme } = useContext(ThemeContext);
+    return (  
+        <button onClick={toggleTheme}>Toggle the Theme</button>
+    );
+}
+ 
+export default ThemeToggle;
+
+```
+
+So in conclusion, using useContext allows:
+- the ability to use state in functional components
+- Use of multiple contexts quite cleanly within a single component.
+
+## Creating Context with Functional Components
+So we've been using class components in order to use state for our contexts, but now that we've seen the useState hook we can use a functional component if we wanted to to define our state.
+
+Class components are perfectly fine being the state managers (it might make it easier to distinguish) however, Shaun just wants to show that we can do this is if we wanted to.
+
+Let's create a new context for the book data...
+
+```js
+import React, { createContext, useState } from 'react';
+
+export const BookContext = createContext();
+
+const BookContextProvider = (props) => {
+    return (  
+
+    );
+}
+ 
+export default BookContextProvider;
+```
+Inside of our functional component, we want to take in the props because remember, when we want to output something like `{this.props.children}` we use the props, but in a class component the props are attached to `this` but in a functional component we take them in as a paramter.
+
+Now we want the state in this to define some data and that data is going to be an array of books...
+
+```js
+import React, { createContext, useState } from 'react';
+
+export const BookContext = createContext();
+
+const BookContextProvider = (props) => {
+    const [ books, setBooks ] = useState([
+        {title: 'name of the wind', id: 1},
+        {title: 'the way of kings', id: 2},
+        {title: 'the final empire', id: 3},
+        {title: 'the hero of ages', id: 4},
+    ]);
+    return (  
+        <BookContext.Provider value={{books}}>
+            {props.children}
+        </BookContext.Provider>
+    );
+}
+ 
+export default BookContextProvider;
+```
+- Where I got tripped up, was I was using object destructuring for the books, instead of array destructuring. A small thing, but a huge difference. books in the BookList.js were coming in as undefined.
+
+## Reading List Project (part 1)
+
+Let's go ahead and create a brand new project,
+`npx create-react-app booklist`
+
+First thing, let's create a context folder, and in that folder in a new file called `BookContext.js`
+`import React, { createContext, useState } from 'react';`
+
+Then export a constant called `BookContext`....
+
+```js
+import React, { createContext, useState } from 'react';
+import uuid from 'uuid/v1';
+
+export const BookContext = createContext();
+
+const BookContextProvider = (props) => {
+    const [books, setBooks] = useState([
+        {title: 'name of the wind', author: 'patrick rothfuss', id: 1 },
+        {title: 'the final empire', author: 'brandon sanderson', id: 2 }
+    ]);
+    const addBook = (title, author) => {
+        setBooks([...books, {title: title, author: author, id: uuid() }])
+    };
+    const removeBook = (id) => {
+        setBooks([books.filter(book => book.id !== id)]);
+    };
+    return (
+        <BookContext.Provider value={{books, addBook, removeBook}}>
+            { props.children }
+        </BookContext.Provider>
+    )
+}
+
+export default BookContextProvider;
+```
+We also end up creating a few new components... BookDetails, BookForm, BookList and then we update the index.css styles.
+
+## Reading List App (part 2)
+So in the last video we created a new context and surrounded our Navbar with that context provider. So now we need to write our other components, starting with our Booklist.
+
+*Reminder: The name of the prop being passing down to a component must match whatever reference to it you use within the child component, for instance...  
+`<BookDetails book={book} key={book.id} />`
+Within the `BookDetails` component, if you want reference to the book within the child component (if you're destructuring within the child) must reference that piece of data with it's prop name, the alias you've specified, which in this case is `book`. If you gave the erronous prop name, books instead, you'd have to call it books within the child.
+
+Over in App.js don't forget to nest `BookList`
+
+So remember, we want to be able to click each book title and remove if from the list. So we need to add a click even to the li tag within BookDetails
+
+Here is the styling we add:
+```css
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #553055;
+}
+.App{
+  background: #4c2a4c;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 700px;
+  color: #eee;
+}
+.navbar{
+  padding: 10px 20px;
+  text-align: center;
+  background: #6d3d6d
+}
+.navbar h1{
+  margin: 10px 0;
+}
+
+.book-list{
+  margin: 20px;
+}
+.book-list ul{
+  padding: 0;
+  list-style-type: none;
+}
+.book-list li{
+  background: #6d3d6d;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  margin: 10px 0;
+}
+.book-list li:hover{
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+.book-list .title{
+  font-weight: bold;
+  color: #fff;
+  font-size: 1.2em;
+}
+.book-list .author{
+  font-size: 0.9em;
+  color: #ddd;
+}
+.empty{
+  margin: 20px;
+  text-align: center;
+}
+```
+
+# Reading List App (part 3)
+This is going to be adding a form that adds books to our list...
+
+** Also remember that useState, we destructure to as arrays not objects. 
+
+```js
+import React, { useContext, useState } from 'react';
+import { BookContext } from '../contexts/BookContext';
+
+const BookForm = () => {
+  const { addBook } = useContext(BookContext);
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    //console.log(title, author);
+    addBook(title, author);
+    setTitle('');
+    setAuthor('');
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" placeholder="book title" value={title}
+        onChange={(e) => setTitle(e.target.value)} />
+      <input type="text" placeholder="author name" value={author}
+        onChange={(e) => setAuthor(e.target.value)} />
+      <input type="submit" value="add book" />
+    </form>
+  );
+}
+
+ 
+export default BookForm;
+```
+
+# Reducers, Actions & State
+Reducers are essentially a pattern of code that centrAalizes all of our methods of changing our state into a single function. It's approach might be familiar if you've used Redux.
+Reducers are just a coding pattern, they may or may not make your program more readable/manageable.
+
+## Reducers
+```
+                                            ----------------------
+        Action                              |   Reducer Function | 
+dispatch({type:'ADD_BOOK'}) ----------->    | interactions  with |
+                                            | the state / data   |
+                                            ----------------------
+```
+1. The first thing we would do is create an action object, and it would describe the type of change we would like to make. We can also pass in a payload, an argument that is going to be the actual new data we would like to add/remove
+2. Then next thing would be to dipatch the action to the reducer.
+3. The reducer takes in the action as a parameter as well as the state of whatever data we are manipulating.
+
+```
+dispatch({type:'ADD_BOOK', book: {}})
+            |
+            |
+            V
+reducer(action, state)
+```
+4. When it runs the reducer it looks at the action and does a few things...
+- check the action.type
+- update the state object
+- return the state
+    - Provider value (child components gets the updated value)
+
+Here is a dummy example:
+```js
+import react, { createContext, useState } from 'react';
+
+const AgeContext = createContext();
+
+const AgeContextProvider = (props) => {
+    const [ age, setAge ] = useState(20);
+
+    const addOneToAge = () => setAge(age + 1 );
+    const addFiveToAge = () => setAge(age + 5 );
+    const addNumToAge = (num) => setAge(age + num );
+
+    return (
+        <AgeContext.Provider value={age, addOneToAge, addFiveToAge, addNumToAge}>
+            {props.children}
+        </AgeContext.Provider>
+    )
+}
+```
+1. So the first thing we would want do is import `useReducer` 
+2. Define the thing to be reduced (or have our functions apply to), in this case its the age const, so instead of defining the state of age and its setAge method...  
+`const [ age, dispatch ]  = useReducer(ageReducer, 20)`
+- We still set an initial value of 20 but we also pass in another parameter before this which is the name of our reducer, we will call it, `ageReducer`, we haven't defined it yet, but we want this function `ageReducer` to control this piece of state,
+- We are passing back the stage of age, but also this dispatch method
+- Our useReducer method gives us back this `dispatch` method much in the same way that setState comes from useState.
+    - This `dispatch` method is going to be the one we use to send our action to the reducer (ageReducer)
+3. Let's define our `ageReducer`, it looks like this....
+```js
+const ageReducer = (state, action) => {
+    switch(action.type) {
+        case 'ADD_ONE':
+            return state + 1;
+        case 'ADD_FIVE':
+            return state + 5;
+        case 'ADD_NUM':
+            return state + action.num;
+        default:
+            return state;
+    }
+}
+```
+This reducer takes in a `state` and an `action`.  
+Inside this reducer we have this switch statement that just defines the action type, remember on an action we have a type property, and if that type is ADD_ONE for example, then we would `return state + 1`.
+4. Now instead of defining the functions as we did with our const addOneToAge, etc and passing them down. Instead we would pass down a dispatch, the function that we call to dispatch to a reducer.
+
+```js
+import react, { createContext, useState } from 'react';
+
+const AgeContext = createContext();
+
+const ageReducer = (state, action) => {
+    switch(action.type) {
+        case 'ADD_ONE':
+            return state + 1;
+        case 'ADD_FIVE':
+            return state + 5;
+        case 'ADD_NUM':
+            return state + action.num;
+        default:
+            return state;
+    }
+}
+
+dipsath({type: 'ADD_ONE' });
+
+const AgeContextProvider = (props) => {
+    // const [ age, setAge ] = useState(20);
+    const [ age, dispatch ]  = useReducer(ageReducer, 20);
+    // const addOneToAge = () => setAge(age + 1 );
+    // const addFiveToAge = () => setAge(age + 5 );
+    // const addNumToAge = (num) => setAge(age + num );
+
+    return (
+        <AgeContext.Provider value={age, dispatch} >
+            {props.children}
+        </AgeContext.Provider>
+    )
+}
+```
+When we say something like `dispatch({type: 'ADD_ONE' });` and we pass in the action, there is type property and that type could be any of our numerous switch cases, like ADD_ONE for examople. It's essentially saying, I want to "dispatch" this action, to this reducer in like 1120 aboove, useReducer(ageReducer, 20) and when it gets to the the reducer, it looks at the type which is ADD_ONE and so it adds 1 to the state, therefore age gets 1 added to it and gets updated in line 1126 when we say `value={age, dispatch}`
+
+We are passing this `dispatch` function down into a component which is where we could be calling it from, then we are passing that action into the reducer.
+If we wanted to use ADD_NUM, we would have to provide an additional property of num to the dispatcher...
+`dispatch({type: 'ADD_NUM', num: 7});`.
+
+The benefit here of using a reducer is that we are only ever passing down one function, not all of the different functions. And we are passing in different objects to that dispatch function. We are also keeping all of our logic into just one reducer function.
+
+## Adding a Reducer
+Let's apply what we learned about reducers by first creating a new folder called `reducers`. Not necessary but might help with organization.
+New file `bookReducer.js`
+We want this to export something, that is what a reducer is at the end of the day, it reduces all of our different function to manipulate the state and reduces it to a single function, so let's say....
+```js
+export const bookReducer = (state, action) => {
+    
+}
+```
+So inside is where the magic is going to happen, we know that we need to check what the action type is because whenever we dispatch an action its going to go straight to this reducer we need to check the type of that reducer before we manipulate the state ...
+So lets lead with a switch statement.
+So we would need to be spreading out the books currently in the list, in our reducer this is represented by `state` so we can destructure ...state to spread out our existing books that represent the state. Then we want to add a new one to this array....
+
+Previously we were using uuid in the BookContext file, let's instead add that library to our reducer instead...
+```js
+import uuid from 'uuid/v1';
+
+
+export const bookReducer = (state, action) => {
+    switch(action.type) {
+        case 'ADD_BOOK':
+            return [ ...state, {
+                title: action.book.title,
+                author: action.book.author,
+                id: uuid()
+            }]
+    }
+}
+```
+So now we are using uuid directly in our reducer to generate our unique id. 
+
+We now just completed our first action. Now if we want to add a book to our list, we call the ADD_BOOK action it will see that case in our switch statement and return this new state data, so that when we pass it down as a value in our BookContext.js, in...
+`<BookContext.Provider value={{books}}>`  
+Now all the coponents consuming this context will see that updated state.
+
+The second cases is going to be removing books.
+```js
+import uuid from 'uuid/v1';
+
+export const bookReducer = (state, action) => {
+    switch(action.type) {
+        case 'ADD_BOOK':
+            return [ ...state, {
+                title: action.book.title,
+                author: action.book.author,
+                id: uuid()
+            }]
+        case 'REMOVE_BOOK':
+            return state.filter(book => book.id !== action.id)
+        default:
+            return state;
+    }
+}
+```
+Here is our completed reducer. It's not hooked up at the moment, so we can head over to our BookContext, and make sure we use our newly created reducer.
+
+```js
+import React, { createContext, useReducer } from 'react';
+import { bookReducer } from '../reducers/bookReducer';
+
+export const BookContext = createContext();
+
+const BookContextProvider = (props) => {
+  const [books, dispatch] = useReducer(bookReducer, []);
+  return (
+    <BookContext.Provider value={{ books, dispatch }}>
+      {props.children}
+    </BookContext.Provider>
+  );
+}
+ 
+export default BookContextProvider;
+```
+Then in `BookForm.js` we need to update our use of adding books to use dispatch instead of the addBook Method....
+```js
+import React, { useContext, useState } from 'react';
+import { BookContext } from '../contexts/BookContext';
+
+const NewBookForm = () => {
+  const { dispatch } = useContext(BookContext);
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch({ type: 'ADD_BOOK', book: { title, author }});
+    setTitle('');
+    setAuthor('');
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" placeholder="book title" value={title}
+        onChange={(e) => setTitle(e.target.value)} />
+      <input type="text" placeholder="author name" value={author}
+        onChange={(e) => setAuthor(e.target.value)} />
+      <input type="submit" value="add book" />
+    </form>
+  );
+}
+ 
+export default NewBookForm;
+```
+
+Then in `BookDetails.js` we need to update how we handle removal of books using dispatch instead of the removeBook method...
+```js
+import React, { useContext } from 'react';
+import { BookContext } from '../contexts/BookContext';
+
+const BookDetails = ({ book }) => {
+  const { dispatch } = useContext(BookContext);
+  return (
+    <li onClick={() => dispatch({ type: 'REMOVE_BOOK', id: book.id })}>
+      <div className="title">{book.title}</div>
+      <div className="author">{book.author}</div>
+    </li>
+  );
+}
+
+export default BookDetails;
+```
+
+Now you should find that this apporoach is easier to manage as you expand your application because all your state logic is in one place, this book reducer, is all in one place.
+
+## Adding Local Storage
+This is the last piece to the puzzle which is local storage. Which is a way to store data locally in the browser.
+All local storage is , is key value pairs. Much like JS objects, however this object must be string.
+
+To acess localStorage in a browser, we can open the browser console and type in `localStorage` to see the current local storage.
+We will be using getItem and setItem... Here would be an example...
+`localStorage.setItem('name, 'shaun')`
+Now in local storage is this pair.
+
+We'll need to use JSON stringify to parse our data...
+`const book = {title: 'blah', author: 'blah'};`
+`localStorage.setItem('myBook', JSON.stringifiy(book))`
+
+So now, we can store an object as the value of this key value pair because we will be stringifying the object containing the book data.
+
+So the first thing we want to do is save that book data when input into our form in localStorage.
+Well remember we have this hook called `useEffect` and that hook is going to run every time the data updates, 
+
+In BookContext.js....
+
+We can use useEffect() which will take a callback and run with every update... (the second parameter remember is the thing to monitor, in our case, our books, const in our reducer)
+```js
+useEffect(() => {
+    localStorage.setItem('books', JSON.stringify(books))
+}, [books]);
+```
+
+This now lets us store things in local storage, however when we refresh that data is gone because remember we are setting it equal to an empty array bc thats what it begins as.   
+What  we need to do is let this begin as something else and that what we want it to begin as is, whats already in local storage.
+
+**We can actually pass in a third argument to `useReduce` and that's a function, a function that should return a default value**
+It will ignore the `[]` and use whatever is returned from the function instead...
+```js
+const [ books, dispatch ] = useReducer(bookReducer, [], () => {
+    const localData = localStorage.getItem('books');
+    return localData ? JSON.parse(localData) : []
+});
+```
+
+## Some Questions
+- When we are using `useEffect()` and we are passing in the second parameter to it, like ,[books);. What is happening with [books]? It simply looks like we are wrapping the variable of books, isn't it already an array? Wouldn't it just be nested books array in another array? in an array but not spreading it out into a new array. 
+
+- I don't really understand why we need the two exports of a Context, the first we must do for the context itself the second is for the Context.Provider that we create. -
+
+
+## Links
