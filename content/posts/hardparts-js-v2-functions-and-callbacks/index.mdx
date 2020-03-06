@@ -1,0 +1,95 @@
+---
+title: Functions & Callback | JS Hard Parts, v2
+date: 2020-03-05
+slug: hardparts-js-v2-functions-and-callbacks
+tags:
+  - JS
+  - FEM
+  - Will Sentence
+  - Hard Parts
+  - thread of execution
+  - functions
+  - callbacks
+---
+
+## Summary Questions
+
+## Generalized Functions
+Let's start off with, why do we even have functions?
+
+### Why do we even have functions?
+Let's see why....  
+Create a function 10 squared
+    - takes no input
+    - returns 10*10
+What is the syntax (the exact code we type?)
+
+```js
+function tenSquared() {
+    returns 10*10;
+}
+```
+Let's go over the exact wording of creating this function using the traditional function declaration style...
+1. Using the keyword `function` called `tenSquared` with empty parens.
+2. Body of the function `returns 10*10;`;
+3. Close function body with `}`
+
+Running the function, `tenSquared()` gets us the returned value `1001. Well what about `9` squared, writing the same function essentially. We don't want to keep writing this functionality, we want to keep things DRY (Don't Repeat Yourself).
+
+Instead of repeating and rewriting similar versions of what amounts to the same function, what we could we do instead? 
+
+>* We can generalize the function to make it more reusable.
+```js
+function squareNum(num) {
+    return num * num;
+}
+squareNum(10); //-->100
+squareNum(9); //--> 81
+squareNum(8); //--> 64
+```
+
+We save the code of it, but we leave a little bit of that code TBD, specifically we leave exactly what data, what thing we're gonna multiply by itself. 
+
+This is our core premise of functions: making code we can write once and then reuse again and again with different values/data, that is what a *parameter* is for.
+
+### Generalizing Functions
+-*parameters* (placeholders) mean we don't need to decide what data to run our functionality on until we run the function.
+    - Then provide an actual value ('*argument*') when we run the function.
+
+What if it wasn't just the data we could leave TBD? What if we could also leave a little bit of our code TBD? A little bit of functionality TBD, only to be determined once we actually run the function? Leaving a little bit of of functionality left blank, and when we run that function fill that functionality in?
+
+That would make our functions super reusable, super general.
+
+### Higher Order Functions
+- *Higher order functions* follow this same principle.
+    - We may not want to decide exactly what some of our functionality is until we run our function.
+
+## Repeating Functionality
+So we are giong to be building out this function here, that's going to take in an array...
+
+### Now suppose we have a function `copyArrayAndMultiplyBy2`
+```js
+function copyArrayAndMultiplyBy2(array) {
+    const output = [];
+    for (let i = 0; i < array.length; i++) {
+        output.push(array[i] * 2);
+    }
+    return output;
+}
+const myArray = [1,2,3];
+const result = copyArrayAndMultiplyBy2(myArray);
+```
+
+
+
+## Higher Order Functions
+
+## Higher Order Functions Example
+
+
+## Highter ORder Functions Q&A
+
+## Arrow Functions
+
+
+

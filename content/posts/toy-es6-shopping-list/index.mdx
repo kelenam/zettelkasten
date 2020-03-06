@@ -1,0 +1,56 @@
+---
+title: Toy ES6 Shopping List
+date: 2020-03-05
+slug: toy-es6-shopping-list
+tags:
+  - JS
+  - ES6
+  - HTML
+  - Tailwind
+  - TP 
+  - toy
+---
+
+Here is the basic html template for this project:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES6 Shopping List</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="form">
+            <input type="text" name="itemToAdd" id="itemToAdd" placeholder="Add an item to your shopping list...">
+            <button class="btn" id="addButton">+</button>
+        </div>
+
+        <div class="list" id="list">
+            <div class="list-item">
+                <input type="text" value="MILK" class="item-name" disabled />
+                <div class="item-actions">
+                    <button class="update">Update</button>
+                    <button class="remove">Remove</button>
+                </div>
+            </div>
+            <div class="list-item">
+                <input type="text" value="Carrots" class="item-name" disabled />
+                <div class="item-actions">
+                    <button class="update">Update</button>
+                    <button class="remove">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
+
+```
+
+## Styles
+For this project, I'm also going to be using [TailwindCSS](https://tailwindcss.com/).
+ 
+## Links

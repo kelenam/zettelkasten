@@ -7,6 +7,14 @@ tags:
     - Tailwind
     - web
 ---
+
+## Summary Questions
+1. What is TailwindCSS?
+1. How does Tailwind offer an improvement over something like Bootstrap?
+1. How do you install Tailwind?
+1. How do you add Tailwind to your CSS?
+1. What does adding the tailwind build script to your app look like?
+
 ## What is TailwindCSS?
 [**tailwind**] is a utility-first, utility-based low level css framework.
 
@@ -41,6 +49,8 @@ we can make a new folder, `src` that holds `styles.css` where we add the above, 
 In this way we are using the `-o` flag to mark the output name of the file which is going to be the `style.css` file in our `/dist` dir.
 
 Now we can go, in terminal and run the command `npm run build:css`
+
+>* **If you keep getting 'volume label syntax is incorrect' remember you need to run either 'npm run bulid:css' or 'yarn build:css' not just 'build:css'**
 
 Basically, that the `@tailwind` line are doing are importing base functionality as our styles, its kind of like a normalize css. A ton of utilities 
 
@@ -91,7 +101,7 @@ module.exports = {
 Now, we can get rid of the `mx-auto` and the `px-2` in our `container` because this is the default we just set in the config file. To see this applied, we do have to rerun the build, using `yarn build:css`
 
 ### Extending Utility classes with CSS
-If you wanted traditional styles like you wanted to add classic, button styles to a a `.btn` class you could, right beneat your `@tailwind imports in your src/style.css file.
+If you wanted traditional styles like you wanted to add classic, button styles to a a `.btn` class you could, right beneath your `@tailwind imports in your src/style.css file.
 
 #### `@apply` directive
 There is even an `@apply` directive that allows us to use those same utilites right in our css..

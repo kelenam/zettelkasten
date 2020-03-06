@@ -1,0 +1,33 @@
+---
+title: average | JS Helper Function
+date: 2020-03-05
+slug: 30sec-js-average
+tags:
+  - 30soc
+  - JS
+  - Array
+  - Math
+  - Beginner
+---
+
+## `average`
+`average` returns the average of two or more numbers.
+
+Use `Array.prototype.reduce()` to add each value to an *accumulator*, initialized with a value of `0` , divide by the `length` array.
+
+```js
+const average = (...nums) => nums.reduce((acc, val) => acc + val, 0) / nums.length;
+
+//Examples
+average(...[1,2,3]); //-> 2
+average(1,2,3); // -> 2
+```
+
+## Thoughts
+- on the function call of `average`, we are using the [spread syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) into the params of a function that takes any number of arguments, and in that function declaration using [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
+
+- Because we are gathering items into an array with the given identifier `nums` we can then perform operations on that array, things like calling the `.reduce` function as well as the `.length` property to manipulate the data given to us in the form of an array.
+
+## Refreshers
+- The [**rest parameter**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax allows us to represent an indefinite number of arguments as an array.
+- The [**spead syntax**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) allows an iterable such as an array expression or string to be expanded in places where zero or more arguments (for function calls) or elements (for array literals) are expected, or an object expression to be expanded in places where zero or more key-value pairs (for object literals) are expected.
