@@ -31,8 +31,13 @@ tags:
 ----
 1. How do you go about positioning/aligning all items within a grid wrapper?
 1. How do you go about it positioning just one targeted grid element?
+----
+1. What are *grid areas*?
+1. What is the true power of *grid areas*?
+1. What is the syntax for specifying the names of the grid area names? What is the syntax for using those grid area names?
 
-## Why Use CSS Grid?
+
+## [Why Use CSS Grid?](https://www.youtube.com/watch?v=x7tLPhnA06w&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=1)
   
 To improve upon this was Flexbox, but now without its drawbacks. Flexbox is really only good in one direction, either row direction or column direction. You can't really use it in the same direction at once.
 - We would also have to use extra markup if we wanted to nest these flex items.
@@ -68,7 +73,7 @@ Here is the html to accomplish the layout below. It's simple without the need of
     - ![](/grid-layout.png)
 - Easy to create grid based systems and mosiac style layouts.
 
-## Columns
+## [Columns](https://www.youtube.com/watch?v=d-MHl_Q_hp8&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=2)
 - Grids have *rows* going across and *columns* going down.
 - This video is going to focus on columns.
     - You don't have to use the same width for every single column, it can be mixed.
@@ -163,7 +168,7 @@ If we change the middle column to `2fr` it would be twice as big as the others.
 ``` 
 - The reason this is cool is because say we want 8 or 12 columns, this makes writing it out much easier.
 
-## Rows
+## [Rows](https://www.youtube.com/watch?v=MDQG6LSS8l8&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=3)
 - So from our previous example, we have 3 rows in our grid, and the reason we have 3 rows is because we wanted 3 columns, and because we have 9 elements, what happens is that when ever we get to the next column it gets moved to the second row.
 - Rows are created by the content if we have it, automatically.
 - The height of these rows, is governed by the content and also because we gave it the padding. If we had no padding, it would just be the height of the content (the numbers).
@@ -217,7 +222,7 @@ Instead we can use a property on the grid itself called `grid-column-gap` and `g
 
 >- `grid-gap` is the property that puts a gap between both columns and rows.
 
-## Grid Lines
+## [Grid Lines](https://www.youtube.com/watch?v=J5GWyiWU2H8&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=4)
 - The default behavior is to assign the first element to the first row and first column, in *source order*. This is where grid lines come in...
 
 >- [**Grid lines**]() help you define positions on a grid, which will help us place elements in whatever section of the grid we want regardless of their html order.
@@ -349,7 +354,7 @@ So this offers us a lot of flexibility...
 - Specifying one value for `grid-column` will place that item starting at the place in the column, but that element takes up the 
 only one fractional unit, but pushes everything else off that row. 
  
-## Nested Grids
+## [Nested Grids](https://www.youtube.com/watch?v=211A79O_jX8&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=5)
 You can also nest another grid inside an item that itself is within a grid. It's very simple to do this, we just make the item itself a wrapper.
 ```html
 <div id="content">
@@ -376,7 +381,7 @@ We are just turning our 4th div into its own grid container. Given it's class, `
 
 The above would work the same as saying something like: `grid-column: 1/3`, it simply says we want to span this item a across 3 columns, so we aren't specifiying *grid lines* but instead we are specifying # of columns or rows to occupy.
 
-## Aligning & Justifying Items
+## [Aligning & Justifying Items](https://www.youtube.com/watch?v=X2-x-4wA9V4&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=6)
 What if we want to align each of our items differently inside of their little grid item box? Well we can do this using a few different properties.
 - We can modify all our grid items at once if we modify the styling of the container itself. For instance...
 ```html
@@ -448,7 +453,7 @@ If we just want to align (vertically or horizontally) a specific grid item, we c
 }
 ```
 
-## Create a 12-Column Grid
+## [Create a 12-Column Grid](https://www.youtube.com/watch?v=WmwGpjg580o&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=7)
 Here is our boilerplate:
 ```html
 <!DOCTYPE html>
@@ -692,10 +697,10 @@ input:checked + #content #div{
 </html>
 ```
 
-## Mosaic Layout
+## [Mosaic Layout](https://www.youtube.com/watch?v=WZOZUCHo1OM&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=8)
 Try and recreate a 6 column grid, with things in a mosiac like pattern.
 
-## Grid Areas 
+## [Grid Areas](https://www.youtube.com/watch?v=tPosqmwIx0w&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=9) 
 - One of the coolest things about CSSGrids.
 
 Note: When we are saying `grid-auto-rows: minmax(100px, auto)`, it's typically just so that the rows are big enough that you can see them, there is no particular reason that we are giving them a min height of 100px.
@@ -740,20 +745,141 @@ You can leave columns vacant using a `.`, a period will just leave that portion 
     "footer footer footer footer";
 }
 ```
-## Reponsive Grid Example
+## [Reponsive Grid Example](https://www.youtube.com/watch?v=TrLN2YId-5M&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=10)
 Well last section we went over *grid areas* to ditribute based on this text-based layout. The real power of this of course comes when we want to make a responsive design.
 
 You can see where we are going with this... we can start wrinting media queries for our different screen sizes and having different layouts according to those screens.
 
+So if you've tried to just have your grid items duplicated in other layers/rows, you'll get a really funky result, that's because the grid is trying to stretch to like two different places, so you need to make sure you have it mentioned only once, and within range of stretching.
+- It's okay when it's spread across two different rows/columns, as we have below. It's okay when the grid items are next to each other, it just breaks down when they are apart.
+```css
+#content{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(100px, auto);
+    grid-gap: 10px;
+    max-width: 960px;
+    margin: 0 auto;
+    grid-template-areas:
+        "header header header header"
+        "aside aside main main"
+        "nav nav main main"
+        "section section section section"
+    }
+```
+- `main` still works because it is creating  a kind of two row, two column little block.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Using CSS Grid</title>
+	<style>
+		body{
+			color: #fff;
+			font-family: 'Nunito Semibold';
+			text-align: center;
+		}
+        #content{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(100px, auto);
+            grid-gap: 10px;
+            max-width: 960px;
+            margin: 0 auto;
+            grid-template-areas:
+                "header header header header"
+                "footer footer footer footer"
+                "main main main main"
+                "main main main main"
+                "aside aside nav nav"
+                "main main section section"
+                "section section section section"
+        }
+        @media screen and (min-width: 760px) {
+            #content{
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                grid-auto-rows: minmax(100px, auto);
+                grid-gap: 10px;
+                max-width: 960px;
+                margin: 0 auto;
+                grid-template-areas:
+                    "header header header header"
+                    "aside . main main"
+                    "nav . main main"
+                    "section section section section"
+                    "section section section section"
+                    "footer footer footer footer";
+            }
+        }
+		#content > *{
+			background: #3bbced;
+			padding: 30px;
+		}
+        header{
+            grid-area: header;
+        }
+        main{
+            grid-area: main;
+        }
+        aside{
+            grid-area: aside;
+        }
+        nav{
+            grid-area: nav;
+        }
+        section{
+            grid-area: section;
+        }
+        footer{
+            grid-area: footer;
+        }
+	</style>
+</head>
+<body>
+
+	<div id="content">
+
+		<header>Header</header>
+        <main>Main</main>
+        <section>Section</section>
+        <aside>Aside</aside>
+        <nav>Nav</nav>
+        <footer>Footer</footer>
+
+	</div>
+
+</body>
+</html>
+```
 
 ## Summary Answers   
 1. It allows us to more easily control the placement of objects in a grid-like fashion. Flexbox is kind of limited to working well across either of its axis (main or cross).
 1. By setting the parent element to have a `display` property of `grid`
 1. By using the property: `grid-template-columns:` then specifying the number of columns you want with their corresponding width.
 1. The most commonly used units in grid are `fr` or fractional units.
-1. The repeat function, repeats things. It looks like this `repeat(#ofTimesToRepeat, theValueToRepeat)`. For example, if you wanted 12 columns to repeat and each column takes up 1fr, you would say: `repeat(12, 1fr);`. The benefit to this function is that it makes writing out your grid columns/rows more succinct and readable.
 ----
-
+1. The repeat function, repeats things. It looks like this `repeat(#ofTimesToRepeat, theValueToRepeat)`. For example, if you wanted 12 columns to repeat and each column takes up 1fr, you would say: `repeat(12, 1fr);`. The benefit to this function is that it makes writing out your grid columns/rows more succinct and readable.
+1. You can specify the number of rows, just as you might with columns: `grid-template-rows: repeat(4, 1fr)`;
+1. What does the repeat function do, and what does it look like? What are the benefits of this function?
+1. How do you specify the number of rows? How often are you going to be doing so?
+1. What is the `minmax` function, what does it do? How do you use it?
+1. How do you set a gap between columns? Between rows? Between both?
+---- 
+1. What are grid lines? How many grid lines will you have if you want a 3-column, 3-row container?
+1. What is the long-hand syntax for specifying which column the grid item should start on? How about for where it should end?
+1. What is the short-hand syntax for specifying a grid items column placement? What about grid rows?   
+----
+1. How would you go about creating a nested grid item?
+1. What is the `span` value? How is it used?
+----
+1. How do you go about positioning/aligning all items within a grid wrapper?
+1. How do you go about it positioning just one targeted grid element?
+----
+1. What are *grid areas*?
+1. What is the true power of *grid areas*?
+1. What is the syntax for specifying the names of the grid area names? What is the syntax for using those grid area names?
 
 ## Key Insights
 - CSS Grid simply allows us to treat a webpages layout as a grid, controlling where we want our elements to fit in respect to that grid structure.

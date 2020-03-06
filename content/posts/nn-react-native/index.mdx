@@ -17,7 +17,7 @@ tags:
     - RN makes use of different semantic "tags' components like `<View>` and `<Text>`  
     - Styles look more like the styled component approach.
 
-## What is React Native?
+## [What is React Native?](https://www.youtube.com/watch?v=ur6I5m2nTvk&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=1)
 - Use React to create mobile apps (Android & iOS)
 - Great choice for developers already familiar with React for Web
 - You should already be familiar with React before this playlist.
@@ -34,7 +34,7 @@ Works quite similarly to React...
 ```
 - React Native provides us with a bunch of components right out of the box that we can use to make our own layouts (text/views/etc). When we test our app , RN takes that code and compiles it into Native components.
 
-## Creating a React Native App
+## [Creating a React Native App](https://www.youtube.com/watch?v=pflXnUNMsNk&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=2)
  
 We can either use the *Expo CLI* and the *RN CLI*.
 
@@ -49,7 +49,7 @@ To create a new project.
 
 You'll need to download Android Studio to get the virtual device manager.
 
-## Views, Text, and Styles
+## [Views, Text, and Styles](https://www.youtube.com/watch?v=_YydVvnjNFE&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=3)
 
 Just going to be talking about some of the components we get out of the box with React Native. Particularly the view and text components.
 
@@ -94,7 +94,7 @@ So you will notice a difference between the naming, in CSS background color woul
 If we add some kind of style to a 'wrapped/parent' component like on our view, we don't automatically inherent in the nested components. **Styles are not automatically inherited from their parent as they are in CSS**. There is one exception to this rule and that is text widgets within text widgets. So like `<Text style={styles.boldTExt}><Text>This will be Bold</Text></Text>`
 But we don't inherit from anything else. Only text within text.
 
-## Using State
+## [Using State](https://www.youtube.com/watch?v=1FiIYaRr148&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=4)
 
 So lets add state to the mix to output dynamic data. For this we are going to be using react **hooks**, again hooks are just functions that let us tap into certain features in the React library.    
 In our case we are going to be using the `useState` hook which is going to allow us to use state in a functional component (which App is).
@@ -115,13 +115,13 @@ Now we should see. My name is Shaun.
 
 ### Buttons
 Let's create a button that is going to allow us to change the state.
-Let's wrap this button in a <View> so we can style the button a little bit...
+Let's wrap this button in a `<View>` so we can style the button a little bit...
 ```js
 <View style={styles.buttonContainer}> 
 </View>
 ```
 
-RN comes with a button component built into the library (<Button/>). `<Button>` in RN is a self closing tag (it's unlike HTML which is a wrapped tag).
+RN comes with a button component built into the library (`<Button/>`). `<Button>` in RN is a self closing tag (it's unlike HTML which is a wrapped tag).
 Instead we pass props to the `<Button>` to specify which is going to be on the button itself. To set the name of the button we use the prop `title`, which is just going to be a string...
 
 ```js
@@ -130,7 +130,7 @@ Instead we pass props to the `<Button>` to specify which is going to be on the b
 </View>
 ```
 Now the reason we placed this in View is because we want to style the button.  
-> **React Native doesn't let us style the <Button> component directly by adding a `style` prop. It must be wrapped in a <View> to be styled.**
+> **React Native doesn't let us style the `<Button>` component directly by adding a `style` prop. It must be wrapped in a `<View>` to be styled.**
 
 The way that we add functionality to a button in RN, is to give it the `onPress` prop. You can add the functionality inline, but overtime it may be harder to reason about your app so let's go to the top and create the functionality...
 ```js
@@ -142,7 +142,6 @@ So again, the naming convention for the function we use to change the state is t
 
 Once we have our function we need to put in into our onPress so once onPress is pressed it fires that function.
 * We can add as many pieces of state as we want in our app.
-
 
 ```js
 import React, { useState } from 'react';
@@ -197,8 +196,7 @@ const styles = StyleSheet.create({
   }
 });
 ```
-
-## Text Inputs
+## [Text Inputs](https://www.youtube.com/watch?v=c9Sg9jDitm8&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=5)
 
 So now that we've seen how to use state, we now want to look at input fields that a user can type in so that we can update state with the provided value..
 
@@ -209,6 +207,7 @@ First thing we are going to do is add a text label...
 <Text>Enter name: </Text>
 <TextInput style={styles.input} />
 ```
+
 You can't really see the input so let's add a style.
 ```js
 input: {
@@ -231,7 +230,7 @@ We can add a placeholder prop to the input by saying
 Now, what we want to do is take whatever the current value of the input is as the output for the state. 
 - To do this we are going to need some kind of event listener. On an input field we can have `onChangeText` as a prop that takes a function to fire upon the change of the text.
 `onChangeText={(val) => setName(val)} />`
-So this `onChangeText` gets passed an "event" or a value of whatever text value is of the input so in our callback, we can just say val as the parameter, the input from the <TextInput> and pass that right into our setName function to update the state.
+So this `onChangeText` gets passed an "event" or a value of whatever text value is of the input so in our callback, we can just say val as the parameter, the input from the `<TextInput>` and pass that right into our setName function to update the state.
 
 So that's the name. Let's copy that for a field for the name...
 ```js
@@ -242,7 +241,7 @@ So that's the name. Let's copy that for a field for the name...
 />
 ```
 
-###  A few more props that <TextInput> takes
+###  A few more props that `<TextInput>` takes
 - `multiline` is a prop that when added to TextInput allows for multiline (or newlines if you hit enter) within the field. Useful for blog posts and things.
 
 - `keyboardType='numeric'`: This would specify what kind of keyboard should popup, like on a mobile device, something specific for number inputs.
@@ -310,7 +309,7 @@ const styles = StyleSheet.create({
 });
 ```
 
-## Lists & ScrollView
+## [Lists & ScrollView](https://www.youtube.com/watch?v=W-pg1r6-T0g&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=6)
 
 What if we want to display a list of content in RN?
 
@@ -350,13 +349,12 @@ item: {
     fontSize: 24
 }
 ```
-
 Now if you notice some of our items go off the screen that we can't scroll to (by default)
 
 ### Handling Overflow/Scroll Content
-If we have content that needs to be scrollable we need to surround it with ScrollView component.
+- If we have content that needs to be scrollable we need to surround it with `ScrollView` component.  
 1. First let's import it : `ScrollView`
-2. Wrap the listed content with the ScrollView:
+2. Wrap the listed content with the `ScrollView`:
 ```js
 <View style={style.container} >
     <ScrollView>
@@ -372,7 +370,7 @@ If we have content that needs to be scrollable we need to surround it with Scrol
 
 This was just one way of displaying listed content, in the next video we will look an approach that could be better called, **Flat List Component.**
 
-## Flat List Component
+## [Flat List Component](https://www.youtube.com/watch?v=iMCM1NceGJY&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=7)
 
 * A Flat list doesn't require us to import ScrollView: it automatically comes with the ability to scroll, instead we have to import `FlatList`
 * `FlatList` is a self-closing component
@@ -381,15 +379,14 @@ This was just one way of displaying listed content, in the next video we will lo
     - `renderItem`: is going to be equal to a function. Its this function that is going to return the JSX
         - We are going to return the JSX in parens. As a param we can destructure the item in the list, we need to do so because we want to output just the name, and to do so we are destructuring individual items in the list to let us say something like `item.name`
         - Note: In our JSX we don't need to return the key, FlatList automatically looks at the data for a key property (meaning it must have one).
-        ```
+        ```js
         <FlatList
             data={people}
             renderItem={({ item }) => {
                 <Text style={styles.item}>{item.name}</Text>
-            )}
+            }
         />
         ```
-
 ###  Reasons you might want to use FlatList:
 1. Tends to be Less code
 2. Can be better for performance (loads only things at top of list, more load on scroll, versus ScrollList which will load all items in the list)
@@ -404,7 +401,7 @@ This was just one way of displaying listed content, in the next video we will lo
 ```
 
 * Another benefit of using a FlatList is we can use the prop, `numColumns={2}` that will let us split up our list into two columns 
-- To make this better we can style it by giving it a `marginHorizontal` (10) and `marginTop` (24)
+- To make this better we can style it by giving it a `marginHorizontal` (`10`) and `marginTop` (`24`)
 ```js
 <FlatList
     numColumns={2}
@@ -415,17 +412,17 @@ This was just one way of displaying listed content, in the next video we will lo
     )}
 />
 ```
+## [Touchable Components](https://www.youtube.com/watch?v=QhX25YGf8qg&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ&index=8)
 
-## Touchable Components 
-
-We want to add an onPress event to each our items. We've seen how to do this with buttons, but that approach doesn't work on regular Text components. We could technically turn them into buttons (but they will look like buttons and remember we can't style buttons without wrapping them in Views)
+We want to add an `onPress` event to each our items. We've seen how to do this with buttons, but that approach doesn't work on regular Text components. We could technically turn them into buttons (but they will look like buttons and remember we can't style buttons without wrapping them in Views)
 
 * Instead, we can use something called a Touchable component.
     * There a few different options for touchable components, for now we will use, `TouchableOpacity`, so import it.
     * `TouchableOpacity` just means that when a user touches it, it will go a little opaque to show touch occured.
 
-* To use TouchableOpacity, wrap it around the thing we want to be able to press, in our case it's the <Text> components.
+* To use TouchableOpacity, wrap it around the thing we want to be able to press, in our case it's the `<Text>` components.
 * Now we are able to add the onPress prop to this TouchableOpacity component, We can also add a style property to this touchable component...
+
 ```js
 <TouchableOpacity style={} onPress={pressHandler(item.id)}>
     <Text style={styles.item}> {item.name} </Text>
