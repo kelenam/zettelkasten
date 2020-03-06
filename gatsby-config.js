@@ -5,9 +5,9 @@ require(`dotenv`).config({
 module.exports = {
   siteMetadata: {
     siteTitle: `Kelena Mori`,
-    siteTitleAlt: `Minimal Blog - @lekoarts/gatsby-theme-minimal-blog`,
-    siteHeadline: `Minimal Blog - Gatsby Theme from @lekoarts`,
-    siteUrl: `https://minimal-blog.lekoarts.de`,
+    siteTitleAlt: `Kelena Mori - Zettelkasten`,
+    siteHeadline: `Kelena Mori - Tech Blog & Note Repository`,
+    siteUrl: `https://kelena-mori.netlify.com/`,
     siteDescription: `Typography driven, feature-rich blogging theme with minimal aesthetics. Includes tags/categories support and extensive features for code blocks such as live preview, line numbers, and line highlighting.`,
     siteLanguage: `en`,
     siteImage: `/banner.jpg`,

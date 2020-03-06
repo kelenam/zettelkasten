@@ -377,9 +377,9 @@ We are just turning our 4th div into its own grid container. Given it's class, `
 ```
 ### `span` value 
 -`grid-column` and `grid-row` also take a `span` value that looks like this:   
-`grid-column: span 3` 
+`grid-column: span 2` 
 
-The above would work the same as saying something like: `grid-column: 1/3`, it simply says we want to span this item a across 3 columns, so we aren't specifiying *grid lines* but instead we are specifying # of columns or rows to occupy.
+The above would work the same as saying something like: `grid-column: 1/3`, it simply says we want to span this item a across 2 columns, so we aren't specifiying *grid lines* but instead we are specifying # of columns or rows to occupy.
 
 ## [Aligning & Justifying Items](https://www.youtube.com/watch?v=X2-x-4wA9V4&list=PL4cUxeGkcC9itC4TxYMzFCfveyutyPOCY&index=6)
 What if we want to align each of our items differently inside of their little grid item box? Well we can do this using a few different properties.
@@ -853,7 +853,6 @@ So if you've tried to just have your grid items duplicated in other layers/rows,
 </body>
 </html>
 ```
-
 ## Summary Answers   
 1. It allows us to more easily control the placement of objects in a grid-like fashion. Flexbox is kind of limited to working well across either of its axis (main or cross).
 1. By setting the parent element to have a `display` property of `grid`
@@ -861,25 +860,23 @@ So if you've tried to just have your grid items duplicated in other layers/rows,
 1. The most commonly used units in grid are `fr` or fractional units.
 ----
 1. The repeat function, repeats things. It looks like this `repeat(#ofTimesToRepeat, theValueToRepeat)`. For example, if you wanted 12 columns to repeat and each column takes up 1fr, you would say: `repeat(12, 1fr);`. The benefit to this function is that it makes writing out your grid columns/rows more succinct and readable.
-1. You can specify the number of rows, just as you might with columns: `grid-template-rows: repeat(4, 1fr)`;
-1. What does the repeat function do, and what does it look like? What are the benefits of this function?
-1. How do you specify the number of rows? How often are you going to be doing so?
-1. What is the `minmax` function, what does it do? How do you use it?
-1. How do you set a gap between columns? Between rows? Between both?
----- 
-1. What are grid lines? How many grid lines will you have if you want a 3-column, 3-row container?
-1. What is the long-hand syntax for specifying which column the grid item should start on? How about for where it should end?
-1. What is the short-hand syntax for specifying a grid items column placement? What about grid rows?   
+1. You can specify the number of rows, just as you might with columns: `grid-template-rows: repeat(4, minmax(100px, auto))`. Note that nothing will show up if we don't have the content to populate those rows or columns. A lot of the time, we just want our grid to be based on the content we actually have and not to create explicit numbers of rows for content that we don't, so typically we would just be explicit about our # of columns, and use `grid-auto-rows` with it instead.
+1. The `minmax` function is a function that takes two inputs the first is the minimum value, the second is the maximum value. It's typically used with setting row height, where we can specify the minimum height of a row, and the maximum height of row, typically `auto` which is simply based automatically around the height of the content. That would look like `minmax(100px, auto)`, where the min height is going to be 100px tall and the max is set to whatever the height the content may be.
+1. You set a gap between columns using: `grid-column-gap: {value}`. For rows it's `grid-row-gap: {valeu}`, for the same gap between both columns and rows, the shorthand is: `grid-gap: {value}`;
 ----
-1. How would you go about creating a nested grid item?
-1. What is the `span` value? How is it used?
+1. [**Grid lines**]() help you define positions on a grid, which will help us place elements in whatever section of the grid we want regardless of their html order. They go both up/down (column direction), and across (row direction). There is always +1 line for every column or row you want. E.g. 3-column grid will have 4 column grid lines. WIth 3-rows it will have 4 row grid lines.
+1. The long hand way of specifying column placement is using `grid-column-start: {gridLinetoStartOn}` and `grid-column-end: {gridLinetoEndOn}`. So if you wanted something to take up two columns it would look like: `.item { grid-column-start: 1; grid-column-end: 3 }`
+1. The easier way to specify grid placement is using: `grid-column: {startVal/endVal}`. Where the start and end value are separated by a forward slash. For grid rows it's the same: `grid-row: {startVal/endVal}`
 ----
-1. How do you go about positioning/aligning all items within a grid wrapper?
-1. How do you go about it positioning just one targeted grid element?
+1. If you want to create a nested grid, you simply make the nested grid item itself have a diplay of grid, and style that child's elements as you want to be displayed in your sub-grid. 
+1. The span value looks like this, `grid-column: span 2` and would be equivalent to `grid-column: 1/3`. It simply says we want to span this item a across 3 column-lines, so we aren't specifiying *grid lines* but instead we are specifying # of columns or rows to occupy.
 ----
-1. What are *grid areas*?
-1. What is the true power of *grid areas*?
-1. What is the syntax for specifying the names of the grid area names? What is the syntax for using those grid area names?
+1. By targeting the parent/wrapper and using the `justify-items: {position}` (horizontally) and the `align-items: {position}` (vertical) properties to set all the items in a start, center, end, etc. position.
+1. By using `justify-self: {position}` on the targeted grid item.
+----
+1. **Grid areas** are a kind of semantic way to define your grid. By associating labels/names with sections, you can create a minimap of your grid by textually defining what that grid should look like within the parent element.
+1. The true power of grid areas is that you can easily handle different screen sizes with various different layouts without hacky css floats or the use of jquery/js.
+1. The syntax is `grid-template-areas: {"gridItemName gridItemName2"}`. Each row is wrapped in a string. Each item is separted by commas. The item's name comes from whatever you assign them within the css of the child item using `grid-area: {desiredName}`. The value of `grid-area` is just a name without strings, e.g. `grid-area: header;`.
 
 ## Key Insights
 - CSS Grid simply allows us to treat a webpages layout as a grid, controlling where we want our elements to fit in respect to that grid structure.
