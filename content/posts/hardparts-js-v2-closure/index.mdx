@@ -1,0 +1,250 @@
+---
+title: Closure | JS Hard Parts, v2
+date: 2020-03-07
+slug: hardparts-js-v2-closure
+tags:
+  - JS
+  - FEM
+  - Will Sentence
+  - Hard Parts
+  - functions
+  - callbacks
+  - closure
+---
+
+## Summary Questions
+1. Recall how functions get called, they always create a brand new what? Well because of this, wouldn't it be strange if we could somehow our functions could hold on to live data between executions?
+
+## Closure Introduction
+Going to involve *lexical scoping*.
+
+### Closure
+- *Closure* is the most esoteric of JavaScript concepts.
+- Enables powerful pro-level functions like `once` and `memoize`.  
+    -`once` is a function that can turn other functions that can only be run once. If you try running them again, they won't work. You might be thinking, 'well, I know how functions work and they don't remember anything from their previous running, they are brand new everty time, we want that'. And yet, somehow, they are going to remember they have somehow been run before.
+    - We can achieve `memomization` a core performance optimizer in allowing us to not repeat tasks calculations that take a long time if we've done them before.
+- Many JavaScript design patterns including the module pattern use closure
+- Build iterators, handle partial application and maintain state in an asynchornous world.
+
+It all starts with us reminding ourselves of these principles we saw earler on, about every time a function is run it creates a brand new execution context and a temporary store of memory, well that all goes away when the function ends, as its supposed to, we wouldn't want it to have ghosts in the shell.
+
+However, what if we could somehow imbue a permenant memory, somewhat attached to it? 
+
+### Functions with Memories
+- When our functions get called, we create a live store of data (local memory/variable environment/state) for that function's execution context.
+- When the function finishes executing, its local memory is deleted (except the returned value)
+- But what if our functions could hold on to live data between executions?
+- This would let our function definitions have an associated cache/persistent memory
+- But it all starts with us **returning a function from another function.**
+
+When we create a function and it has its own little memory store, thaat local memory is its **variable environment**, it can also be referred to as **state**, the live data at the particular moment in my application thats being stored.
+
+When the function finishes running, everything is deleted except for any returned values, but what if somehow we could retain a remembrance of state by returning a function from another function? 
+
+## Returning functions
+The magic all starts from us returning a function from the invocation, from the running of another function. This is the bit, if it clicks, makes closures and everything else that follows, easy.
+
+### Functions can be returned from other functions in JavaScript
+```js
+function createFunction() {
+    function multiplyBy2 (num) {
+        return num*2;
+    }
+    return multiplyBy2;
+}
+
+const generatedFunc = createFunction();
+const result = generatedFunc(3); //-->6
+```
+So let's walk through this line by line:  
+
+1. We are defining the function `createFunction` and storing it in global memory.
+2. The next line we encounter is going to be defining the const `generatedFunc` and we here is where it gets interesting, the value is going to be, well we don't know yet, it's uninitialized (*Temporal Dead Zone*), we have to first call `createFunction()` and whatever it returns out. 
+    - We are calling this function without arguments, no problem for now, b/c its parens that make a function run.
+3. Once `createFunction` is called, we are going to create a new *execution context* and into it we go. First, whatever is returned out of this function, could be a number or an array, could be the definition, the code of a function.
+4. Inside of `createFunction` we are declaring a new function in local memory called `multiplyBy2`
+5. We aren't going to run it just yet, instead we just simply return that local-memory function body of `multiplyBy2` out into the global constant, `generatedFunc`. Remember, function definitions are values(objects), the code of a function is a thing can be stored, if you define value as a thing that can be stored. It does not get returned out with it's label/identifier, `multiplyBy2`, just the function definition.
+6. that `createFunction()` call essentially just gets relaced with the output of the returned function, formally known as `multiplyBy2` and the rest of the execution context disappears/deleted.
+
+![](/function-returning-function.png)
+
+Now we are back into globlal. Where we hit the line....  
+
+7. Definine a constant, `result`, and set it equal to what?
+    - set `result` to the function call / invocation of the function `generatedFunc` with the argument `3`. It's a command to run this function that we have stored the body of.
+    - So what is `generatedFunc`? It was the definition of `multiplyBy2`, more generally its relationship to `createFunction`, was the result of running it. It WAs the result, of the one time running of `createFunction`.
+    - `generatedFunc` has zero relationship from that line on, to `createFunction`, and when we see it we might think that `generatedFunc` is the kind of running of `createFunction` or even `generatedFunc` is even, `createFunction`. NO. That would be wrong.
+    * JavaScript is a synchronous language, do the line and move on, never touch it again. `generatedFunc` is purely and simply only the result of the one time running of the create function. That is to say, it is saved, `multiplyBy2`s code in `generatedFunc`.
+    - When we are reading it we might be prone to thinking it still has a relationsip to `createFunction`. It has ZERO relationship.
+
+>* There is ZERO relationship between a function and any internal function that might get returned from it's invocation once that outer function is called. It's a one and done type of thing.
+
+So if we are `generatedFunc(3)` we need to create a brand new: **execution context**.
+
+Here is where it might get a little confusing...  
+
+8. Our argument is `3`, but what is our placeholder? What is the parameter, that's waiting for `3`? It's `num`. But here is why this is doubly confusing, where did we have to go to figure out what the placeholder was? We had to visually, go back into `createFunction` as a developer to see that, and is JavaScript doing that? 100% NO.
+    - The thread of execution never goes back up, it didn't have to bc when it saved `createFunction` to start, it saved that code in memory, that's where it grabbed the code from to start running it. And then inside of `createFunction` it created `multiplyBy2`, and it literally saves the code of `multiplyBy2` INCLUDING the parameter name, `num`, into that exeuction context, local memory and then it grabbed it and returned it into global under the label, `generatedFunc`.
+    - It's into MEMORY, where we grab that code of that function that we had when we run `generatedFunc`.
+    - The problem is that we don't, as developers/humans, get to see that `multiplyBy2` function body stored, so we instead visually have to go back up and look for what that paramter name is. BUT JS is not doing that.
+    - It's only in terms of our perspective as developers that we have to do that.
+9. The rest is... `num` with the value 3 gets multiplied by 2 and returned out into `result`.
+
+>* By better understanding how it can seem confusing, about the visual lookup for finding how things are defined in code as developer vs what JS is actually doing, is actually really helpful.
+
+So, why did we save a nicely, semantically named function inside of another function only then to return it out and give it a really bad name out, and use it globally?
+
+Why not just define it globally? It's going to turn outhat, saving a function, saving, declaring, storing a function inside the execution context of another function, when that function gets returned out it gets the most powerful property, bonus feature of JavaScript.
+
+## Nested Function Scope
+
+### Calling a function in the same function call as it was defined
+```js
+function outer() {
+    let counter = 0;
+    function incrementCounter() {
+        counter++;
+    }
+    incrementCounter();
+}
+outer();
+//Where you define your functions determines what
+// data it has access to when you call it.
+```
+Let's walk through this...  
+1. Defining the function, `outer` whose function defintion is stored in the label, `outer` in global memory.
+2. Execute the `outer()` function and create a brand new **execution context**. Our call stack has `outer` added to it.
+3. In local memory of our `outer()` call context, we are storing the variable `counter` with the value 0.
+4. Next we define the function `incrementCounter` inside of local memory of `outer`.
+5. Next you are going to execute that function we just stored, `incrementCounter`. Thus creating a brand new **execution context**, and adding `incrementCounter` to the callstack on top of `outer`.
+6. We create local memory in `incrementCounter`, but we don't store in anything yet. In the body of `incrementCounter`, we encounter `counter++`, counter plus plus, but we don't know what `counter` is so its first going to check the local memory of `incrementCounter` for the definition of `counter`. We don't find it there, so it goes up and looks in the local memory of `outer`, it finds `counter` there, and it increments `counter` to `1`.
+    - It somehow  seems, that we first looked at the top of our call stack and didn't find what we are looking for (`counter`) so what happens, is it goes down one layer, down our **call stack** and looks into `outer`. Or is it rather because our function `incrementCounter` body was saved adjacent to the `counter` variable that we have access to it?
+
+## Retaining Function Memory
+
+### Calling a function outside of the function call in which it was defined
+```js
+function outer () {
+    let counter = 0;
+    function incrementCounter() {
+        counter++;
+    }
+    return incrementCounter;
+}
+
+const myNewFunction = outer();
+myNewFunction();
+myNewFunction();
+```
+1. Declaring the function `outer` in global memory.
+2. Declaring the constant `myNewFunction` and storing, we don't know because we have to call `outer()`, create a new execution context and `outer()` gets added to the *call stack*
+3. We jump into `outer`, and in our local memory we save a variable called `counter` and set its value to 0.
+4. Next line we are declaring the function `incrementCounter`
+5. Next line we are returning the body/value of the function we just created out to the global label, `myNewFunction`
+    - This execution context and everything within it gets deleted
+    - It gets popped off the call stack
+6. We then call `myNewFunction()`, which adds it to the call stack and creates a new execution context.
+7. So we encounter `myNewFunction`, which was born as `incrementCounter`, our eyes are going to creeep back up the code, JS isn't going to do that, JS has that code already saved over in the body of `myNewFunction`, but the code it encounters is `counter++`. `counter` is looked for first in local memory, it doesn't find it there, but where is this function being run? its on the call stack on top of global, so if we were to try and look at global memory of `counter` will we find it? No.
+    - So how silly, what a disaster, what a strange language that lets us save functions return them out and try to use data that is seemingly gone.
+
+There is something we didn't say here. It turns out that when we took `incrementCounter` and all the function definition and code and returned it out as the output of running `outer()` into `myNewFunction`, we got more than jsut the code of the `function() { counter++ }`. 
+- We got more than just that saved code, the function definition. We got something very very powerful in addition. **As that function left, it took with it all (with caveats) the surrounding data from where that function was saved**, where it was born, where it was stored, it grabbed its surrounding data and brought it out along the back of the function definition.
+- So we just didn't get the `myNewFunction` definition of `incrementCounter` but we got with it a "backpack" from when that function was born of *live data*, and there `counter` is 0.
+
+## Function Closure
+So now, if we re-examine what is happening when we are calling `myNewFunction` on line 10, or step 7, above, what happens is, before we look out into global in full, we first look into the "backpack" that came with the body of the returned function. It's in that backpack where we find the `counter` and we increment it to 1.
+8. After `myNewFunction()` finishes, that execution context gets deleted, and popped off that callstack, but that little "backpack", stuck on the function definintion, that isn't going anywhere.
+9. We call `myNewFunction()` again, and the same as above happens, but we instead find `counter` at 1 instead of 0 and increment it to 2.
+
+So reviewing, we not only have the temporary local memory, that if we don't return something out and store in global, is gone forever, we also have the very definition, the label, the function stored itself, has attached to it a permanent memory. That is to say, no longer is this a label for just a function from code saved, its a label for function, some code saved, it's a label for a function and some permanent stored data attached.
+
+### Caveats around closures
+How do this function get to grab onto all its surrounding data and return it out with the function definition?
+So under the hood when we are storing that function body that contains `counter++` when it is storing that function body, under the hood gets a hidden property (ES spec uses two squaare brackets to denote hidden properties `[[]]`):  
+- `[[scope]]` - this is the hidden property that links to wher all this surrounding data is stored. Meaning... when we return that function out, into `myNewFunction` it brings along with it that hidden property `[[scope]]`, and pulls that data with it.
+- that `[[scope]]`, "backpack" is still attached when we give it its new global label, `myNewFunction`. 
+- And when we run `myNewFunction()` it kind of intercedes, as a first stop to check, before looking at global.
+- And that "backpack" isn't going anywhere, its not like an execution context, temporary memory, as long as that function definition is there, they're not overwritten.
+    - NOTE: We can't get access to it though in any other way besides running this function (`myNewFunction`) and hoping the code was written in such a way when it was defined, when it was born, was initially saved that it looks for something within that `[[scope]]` property.
+    - We can't do anytihng like `myNewFunction.[[scope]].counter` to access it. It's a hidden property only accessible when we are calling the function that contains it and that function must have been written to internally reference its use describing its initial "birth place".
+    - We not have permenant data, but also *private data*, no one else can access it besides by running the function that we created to get access to it in our application.
+
+## Closure Q&A
+*Q:* If in `outer` you created another variable, that `incrementCounter` doesn't call, does it still have a reference to it? 
+Well, the link is made to the entire local memory, and its just a link to where that data is stored, instead anything that the function ever makes reference to when it would get run eventually, however, if the thing we are pulling out is never used by the function, JS can look into this linked state, check if it has any references and then decide theres no point to put it into this backpack because then it would be a **memory leak**, where we are using space in computer's memory to store something with a label where we can't access that label anymore.
+
+## Closure Technical Definition & Review
+So let's talk about what this "backpack" is called. Will doesn't like it because he feels its vague and imprecise for the reason that the community refers to the thing that results in the backpack existing and the backpack itself the same umbrella term.
+
+Let's give this term more specific names, the first will refer to the variable environment for which the "backpack" derives its contents, its `[[scope]]`, that data, as the "**closed over**", that is to say we close a lid on this data hewre, closed over variable environment. Then the backpack itself will the "**closed over variable environment**" or "*cove*".
+
+The second name we might give "COVE" is persistent, it's Data, it's referenced/linked by a scoped property.
+
+What is Scope? **Scope** is the rules in any programming language for any given line of code, what data do I have available to me? Scope is the fancy word for what data and what are the rules for accessing that data. Different languages have different scoping rules.
+
+The language of JS has a particular scope rule: it has what is called [**lexical (or static) scoping**](), that is to say, *where* I save my function determines for the rest of that life, for the life of that function, whenever it gets run, under whatever new label it gets, what data it will have access to when that function runs.
+- It's not where I run it, that would be called **dynamic scoping**, it changed depending on where I run the function. If it were a dynamically scoped language, it could look directly down into global and not find it and thats it. 
+- JS is a statically scope, or lexically, *lexical just means the physical positioning on the page*. That means even if I returned my function out, and theoretically all this data should have been deleted, nope, because we have this fundamental rule of lexically scoped language, we can grab all that data and behind the scenes pull it out into the backpack.
+    - such that when we run the function, we still have all the data from when I last was born. NOT becuase I got back into the earlier execution context, NU-UH, or going into `outer`, we didn't have to, we pulled the data from when the function `incrementCounter` was born out with me on my lexical `[[scope]]` property, left now attached to my `myNewFunction`.
+    - So there it is, Persistent, Lexical, Static Scope, Reference Data, or what we refer to as the "backpack", but as its colloquially known as, putting the data in the function's **closure**.
+    - Will's big complaint with the word **closure** is that the act of lexically scoping is also referred to as being **closure** as well as the backpack itself as being **closure**.
+    - Will prefers to say that the backpack is a result of JS being a lexically scoped language, one that brings the data with the fuction wherever that function goes, hidden on the `[[scope]]` property.
+
+Q: What if you said something like `const peter = myNewFunction;`? Well it's just giving new label to all that same stuff attached to it so it still has that same "backpack".
+
+What if we returned out from the same outer execution, three functions? Which we can only return out one thing btw, so how would we do this? In array of functions or an object full of methods, they would all be linking to the same backpack, so all three functions would all have access to that shared backpack.
+
+The "backpack" or (or 'closure') of live data is attached `incrementCounter` (then to `myNewFunction`) through a hidden property known as `[[scope]]` which persists when the inner function is returned out.
+
+![](/backpack-aka-closure.png)
+
+## Multiple Closure Instances
+
+### Let's run `outer` again
+```js
+function outer () {
+    let counter = 0;
+    function incrementCounter() {
+        counter++;
+    }
+    return incrementCounter;
+}
+
+const myNewFunction = outer();
+myNewFunction();
+myNewFunction();
+
+const anotherFunction = outer();
+anotherFunction();
+anotherFunction();
+```
+So here we see another running of `outer`, whose return value gets labeled as `anotherFunction`.   
+This has the result of creating its own bound scope property on the function returned to `anotherFunction`, a separate closure then exists for this returned function, with the variable `counter` storing `0`, so when we run `anotherFunction()` we are operating on the backpack included in the returned function body of `anotherFunction`.
+
+If we were to console log after all these function calls, the value of counter would be 1,2 for `myNewFunction` and then 1,2 fgor `anotherFunction` calls.
+
+Two separate backapacks for two seperate execution contexts, each individual function gets one from our running of `outer`.
+
+If we never had declared `counter` inside our `outer` function and it was instead declared in global, if you were to run this, and console log it, you'd instead see 1,2,3,4.
+
+### Individual backpacks
+If we run `outer` again, and store the returned `incrementCounter` function definition in `anotherFunction`, this new `incrementCounter` function was created in a new execution context and therefore has a brand new independent backpack.
+
+## Practical Applications
+
+### Closure gives our functions persistent memories and entirely new toolkit for writing professional 
+- [**Helper functions**](): Everyday professional functions like `once` and `memoization`.
+- [**Iterators and Generators**](): Which use lexical scoping and closure to achieve the most contemporary patterns for handling data in JavaScript.
+- [**Module Pattern**](): Preserve state for the life of an application without polluting the global namespace.
+- [**Asynchronous JavaScript**](): Callbacks and Promises rely on closure to persist state in an asynchronous environment.
+
+An example of a handy use case for like a `once` function could be you made an app, a game, that once the game is finished, you don't want to rerun that function you want to lock all that done, upon completion.
+
+Memoization, standard cs practice of effectively computing a value once and then caching it so you don't have to rerun the calculation, with one lookup, you can grab that value.
+
+IIFE, acheive the same thing as modules, what are they both doing? They are just protecting state inside backpacks. It saying, that you can maintain state for the life of an application, and thats by having data that is protected can be interfaced with but only through a very clean interface of running that function.
+
+The Node Module pattern is all just using closure and the backpack.
+
+## Closure Exercises
+http://csbin.io/closures
