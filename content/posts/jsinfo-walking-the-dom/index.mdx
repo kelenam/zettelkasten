@@ -49,13 +49,32 @@ In the DOM, the `null` value means "doesn't exist" or "no such node".
 
 [**Descendants**]() – all elements that are nested in the given one, including children, their children and so on.
 
+For instance, here `<body>` has children `<div>` and `<ul>` (and few blank text nodes):
+```html
+<html>
+<body>
+  <div>Begin</div>
+
+  <ul>
+    <li>
+      <b>Information</b>
+    </li>
+  </ul>
+</body>
+</html>
+```
+…And *descendants* of `<body>` are not only direct children `<div>`, `<ul>` but also more deeply nested elements, such as `<li>` (a child of `<ul>`) and `<b>` (a child of `<li>`) – the entire subtree.
+
 **The `childNodes` collection lists all child nodes, including text nodes.**
 
 
 ## Siblings and the parentElement
 ## Element-only navigation
 ## More Links: tables
- 
+
+## Summary Answers
+1. What makes *Child Nodes* or *children* different from *descendant* nodes?
+
 ## Links
 - [Main]()
 - [Previous: DOM Tree](/jsinfo-domtree)

@@ -13,6 +13,13 @@ tags:
 ---
 
 ## Summary Questions
+1. Why do we have functions?
+2. What are **higher order functions**? 
+3. What are **callback functions**?
+4. What is the magic of callbacks and higher order functions?
+5. How are higher order functions even possible in the JavaScript language?
+6. What are some tradeoffs for using arrow functions?
+
 
 ## Generalized Functions
 Let's start off with, why do we even have functions?
@@ -65,8 +72,9 @@ That would make our functions super reusable, super general.
     - We may not want to decide exactly what some of our functionality is until we run our function.
 
 ## Repeating Functionality
-So we are giong to be building out this function here, that's going to take in an array...
+So we are going to be building out this function here, that's going to take in an array...
 
+## Higher Order Fuctions
 ### Now suppose we have a function `copyArrayAndMultiplyBy2`
 ```js
 function copyArrayAndMultiplyBy2(array) {
@@ -79,17 +87,188 @@ function copyArrayAndMultiplyBy2(array) {
 const myArray = [1,2,3];
 const result = copyArrayAndMultiplyBy2(myArray);
 ```
+1. Defining function `copyArrayAndMultiplyBy2`
+1. Defining consant myArray and assign the values in the array 
+1. Defining the constant result which will evaluate to a function call to copyArrayAndMultiplyBy2 passing in the argment of 1,2,3.
 
+We go into a new execution context, and that function gets added to the call stack, to keep track of it being executed.
 
+Inside of the execution context of `copyArrayAndMultiplyBy2`, in local memory we...
+1. define the argument `array` with the values 1,2,3 passed in.
+1. define the constant output to be an empty array.
+1. enter the body of the for loop, `i` has the initial value of `0`
+    1. we look up index of array at position 0 which gives us the value 1 
+    1. we divide 1 by 2, we get `0.5`
+    1. We push that evaluated value into the array labled output.
+    1. We start back up the loop and repeat until i is no longer less than `array.length`.
+1. Then we return the value assigned to the label `output` (`[0.5,1,1.5]`) 
+1. That output gets stored in the global under the constant, `result`.
+1. Then `copyArrayAndMultiplyBy2` gets popped off the call stack.
 
-## Higher Order Functions
+Did we have to rebuild this function? I guess we did, because we can't edit functions, right? Not once we've saved them.
+
+Like suppose we wanted to take in a brand new array and instead fill it with 3 added to it?
+
+This wouldn't be DRY.
+
+We saw this with our `squared` function, we did something in the end to make sure we didn't have to rewrite it, we were able to adjust for new data each time. What could we do here instead, to save us from having to rewrite this function?
+
+Well we can pass functionality in as an argument. We can leave part of our functionality a bit blank so that we can fill it in with the bit that changes. We can leave a little functionality blank so that we can fill it in once we run the function.
+
+Can we just like, do a `+3` almost as a string added as a parameter to this function? No. Not in JS at least.
+
+Instead we can *wrap up functionality, bundle up functionality, such that it can be passed through and executed and run inside another function*. How can we wrap up functionality, code, to be passed around in JS? **Functions**!
+
+>* **We could generalize our function - so we pass in our specific instruction only when we run `copyArrayAndManipulate`!**
+```js
+function copyArrayAndManipulate(array, instructions) {
+    const output = [];
+    for (let i = 0; i < array.length; i++) {
+        output.push(instructions(array[i]));
+    }
+    return output;
+}
+function multipyBy2(input) { return input * 2 };
+const result = copyArrayAndManipulate([1,2,3], multipyBy2);
+```
+- Just as `array` was swapped out with the values [1,2,3], so too will our `instructions` be swapped out for the bit of code we wrote in the `multiplyBy2` function.
 
 ## Higher Order Functions Example
+Let's walk through this line by line:
+```js
+function copyArrayAndManipulate(array, instructions) {
+    const output = [];
+    for (let i = 0; i < array.length; i++) {
+        output.push(instructions(array[i]));
+    }
+    return output;
+}
+function multipyBy2(input) { return input * 2 };
+const result = copyArrayAndManipulate([1,2,3], multipyBy2);
+```
+1. Defining the function `copyArrayAndManipulate` and storing its definintion.
+    - Notice now it takes two inputs when it gets run, both an array and some actual code 
+2. Defining in global memory a `multiplyBy2` function and storing its definintion
+3. Defining the const `result` which is storing the result of a function (`copyArrayAndManipulate`) call.
+    - That function call takes two inputs, the first being the array, `[1,2,3]`, the second thing we are passing in is the entire function definition that has the label `multiplyBy2`. The whole thing, that whole function definition is being grabbed and inserted in.
+        - That means, whenever you see the label `instructions` its going to be fully replaced by `multiplyBy2`.
+    - Meanwhile, in the call stack we are adding a brand new *execution context* and adding `copyArrayAndManipulate` to the call stack.
 
+##### *New Execution Context for `copyArrayAndManipulate([1,2,3], multiplyBy1)`*
+1. In local memory of this new execution context, the first thing we put in is the the parameter `array` with the assigned argument, `[1,2,3]`.
+2. In local memory, we are assigning the entire function body of `multiplyBy2` (as the argument) to the parameter, `instructions`.
+    - If we now want to run that `multiplyBy2` function inside of this execution context, what label are we using? `instructions`. To run it we would say `instructions()`
+3. First thing in the body of the function is defining the const `output` and assigning it to an empty array.
+4. Then we enter the body of the `for` loop. `i` is 0, or position 1 of our array.
+    - `instructions` is just a substitute for `multiplyBy2`, and `array[0]` just holds the value 1.
+    - This funcion looks like we'll need to create a brand new *execution context*.
+    - This simultaneously essentially `multiplyBy2(1)` to our call stack  
+        1. Inside of this execution context, we create a label, our paramter, called `input` and assign it the value 1.
+        1. we 1 * 2, it evaluates to 2 then we return it out. THat whole function execution evaluates to `2` and with that 2 we....
+        1. We push that `2` into the `output` array.
+        1. That exeuction context goes away and it gets popped off the callstack, all is deleted except the returned out value, 2.
+5. The `for` loop continues looping doing the above until it meets its condition and our `output` array has the values `[2,4,6]`.
+6. Finished our for loop we then return the value of `output` when then gets stored in the globally declared const, `result`.
 
-## Highter ORder Functions Q&A
+We just built a function that doesn't have to in any way predetermine what we're gonna do to each element of the array. We left it blank for our instructions, and just as we had with our parameter for passing in our array, so too, have we left a placeholder for what we are going to do to that array.
+
+## Higher Order Functions Q&A
+
+Q: You say when we're passing a function or passing a function definition is that also just a function reference? Because you can't change it and it's already in memory?
+
+A: Let's just keep it as simple as this: the array we have here in global, the thing we pass in as the first argument to `copyArrayAndManipulate` is saved in global memory, it is then passed in as a link back to where it was saved in *global*. Now, it was saved in global without a label, but we actually pass in a link to it (passing it by reference), we are not copying it in.
+- We are passing in a reference to where it was initially saved in global memory.
+- In the previous example, where we passed in, `myArray`, we save that `[1,2,3]` in global and then pass a link back to it, which is why we don't want to change inside of `copyArrayAndManipulate` the data we pass in because that would be changing the global data which is hard to predict what's going to happen with our function. We are producing **side effects**.
+- In our example we are creating a brand new array, and our input array stays unmutated, it stays unchanged.
+
+- Any function, array, or object, when it's saved, if we ever use it anywhere else, we're actually referring back to its original saved version.
+
+- When the `for` loop is running it gets its own protected namespace, not its own execution context, a little protected space in memeory for those labeld names, like `i`.
+
+## Callbacks and Higher Order Functions
+
+### How is this even possible?
+Functions in JavaScript = *first class objects*, that is to say, they have all of the features of objects. First class just means everything that objects, have functions have too. **They have the full features of objects, meaning they can be treated just like objects.**  
+
+- They can co-exist with and be treated like any other javascript object:
+1. Assigned to variables and properties of other objects
+2. Passed as arguments into functions
+3. Returned as values from functions 
+
+>* First class just means everything that objects, have functions have too. **They have the full features of objects, meaning they can be treated just like objects.**
+
+Just as we have no issue passing in an array object to a function, so too can we pass in another function which itself, is treated just as an object.
+
+### Which is our Highter Order Function?
+The outer function that takes in a function is our [**higher order function**](). e.g. `copyArrayAndManipulate`
+
+### Why is our Callback Function?
+The function we insert is our [**callback function**](). e.g. `multiplyBy2`
+
+### Higher-order functions
+Takes in a function or passes out a function.[^1]
+
+Just a term to describe these functions -- any function that does it we call it a higher-order function -- but there's nothing different about them inherently.
+
+### Callbacks and Higher Order Functions simplify our code and keep it DRY
+**Declarative readable code**: `map`, `filter`, `reduce`-- the most readable way to write code to work with data.
+
+**Asynchronous JavaScript**: Callbacks are a core aspect of async JavaScript, and are under-the-hood of promises, async/await.
+
+>* **That's really powerful, that kind of ability to edit a function after we've written it, because we left a little bit of it blank. And not just edit it with the data we are going to have in there, but literally edit its code. That makes our code saved profoundly more reusable.**
 
 ## Arrow Functions
 
+### Introducing Arrow functions 
+They are a shorthand way to save functions.
 
+```js
+function multiplyBy2(input) { return input * 2 };
 
+// Pretend these aren't all redeclarations of 
+// the existing function, but separate files.
+const multiplyBy2 = (input) => { return input * 2 };
+
+const multiplyBy2 = (input) => input*2;
+
+const multiplyBy2 = input => input*2;
+
+const output = multiplyBy2(3)
+//--> 6
+```
+- Introduced in ES6. 
+- Remember, function definitions casn be stored, assigned to labels, because they are just objects behind the scenes.
+- Might be more legible (in the sense that there is less to read) but may not be more readable.
+- If your function only does one thing that is return an output, you can skip the curly braces and the `return` keyword
+- If you only have one input, you can get rid of the parens around the paramter.
+- Functionally, between the two these are pretty much the same. (There are differences between `this` binding).
+
+You can even do something like....
+```js {9}
+function copyArrayAndManipulate(array, instructions) {
+    const output = [];
+    for (let i = 0; i < array.length; i++) {
+        output.push(instructions(array[i]));
+    }
+    return output;
+}
+// function multipyBy2(input) { return input * 2 };
+const result = copyArrayAndManipulate([1,2,3], input => input*2 );
+```
+- Might make it a little bit less clear as to what that is doing, is it executing there, like, it might compromise readability for brevity.
+
+### Anonymous and arrow functions
+- Improve immediate legibility of our 
+- But at least for our purposes here they are 'syntactic sugar' - we'll see their full effects later
+- Understanding how they're working under-the-hood is vital to avoid confusion
+- really nice for legibility when you're passing little mini functions as input to other functions that don't need to be reused.
+- We are going to default to our keyword function definition style.
+
+## Pair Programming
+Pair programming: The most effective way to grow as a software engineer.
+- **Researcher**: Avoids blocks by reading everything they can find on their block/bug.
+- ***Stackoverflower**: Uses code snippets to fix bug without knowing how they work.
+ - **Pair Programming**: tackle blocks with a partner, stay focused on the problem, refine technical communicastion, collaborate to solve problem
+    
+## Key Insights
+**By having higher order functions, and callbacks, we are given this incredibly powerful ability, the ability to edit a function after we've written it, because we left a little bit of it blank. And not just edit it with the data we are going to have in there, but literally edit its code. That makes our code saved profoundly more reusable.**

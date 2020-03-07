@@ -19,17 +19,20 @@ Here is the basic html template for this project:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ES6 Shopping List</title>
+    <link rel="stylesheet" href="dist/styles.css" type="text/css">
 </head>
-<body>
+<body class="w-100 h-100 bg-gray-200">
     <div class="wrapper">
-        <div class="form">
-            <input type="text" name="itemToAdd" id="itemToAdd" placeholder="Add an item to your shopping list...">
-            <button class="btn" id="addButton">+</button>
+        <div class="form w-auto bg-gray-900 flex">
+            <input type="text" class="bg-gray-900 w-11/12 p-1" 
+            name="itemToAdd" id="itemToAdd" placeholder="Add an item to your shopping list...">
+            <button class="btn w-1/12 bg-green-400 p-2 font-bold 
+            text-xl text-white" id="addButton">+</button>
         </div>
 
         <div class="list" id="list">
             <div class="list-item">
-                <input type="text" value="MILK" class="item-name" disabled />
+                <input type="text" value="Milk" class="item-name" disabled />
                 <div class="item-actions">
                     <button class="update">Update</button>
                     <button class="remove">Remove</button>
@@ -44,11 +47,80 @@ Here is the basic html template for this project:
             </div>
         </div>
     </div>
-    <script src="index.js"></script>
+    <script src="src/index.js"></script>
 </body>
 </html>
-
 ```
+
+And in our styles, we have the tailwind styles in the `src` directory, don't forget to compile your styles with your build:css script.
+
+```css:title=/src/styles.css
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+.remove {
+    @apply bg-red-400 text-white rounded ml-2 p-1;
+}
+.update {
+    @apply bg-green-400 text-white rounded ml-2 p-1;
+}
+.list {
+    @apply p-2 m-2 flex flex-1 flex-wrap;
+}
+.list-item {
+    @apply p-3 flex w-full m-3 bg-white ;
+}
+.item-name {
+    @apply bg-white w-10/12;
+}
+.item-actions {
+    @apply flex justify-end;
+}
+```
+The list items are technically just examples of what we are going to be adding via our JS, so you can comment them out for now. We can jump into the JS now...
+
+So what we are ultimately looking to do is create elements to do the DOM that will represent our editable list items. For this we are going to use an ES6 class.
+```js
+class Item {
+}
+```
+- Within this class we add something called a `constructor` which this does it allows us to kind of populate our newly created instance with data. It helps us "construct" a new instance of this class. e.g. `let item = new Item("itemName")` means that in our constructor we might have the itemName paramter pass into the constructor.
+
+### `constructor` 
+From [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/constructor). The `constructor` method is a special method for creating and initializing an object created within a class.
+```js
+class Polygon {
+  constructor() {
+    this.name = "Polygon";
+  }
+}
+
+const poly1 = new Polygon();
+
+console.log(poly1.name);
+// expected output: "Polygon"
+```
+
+### Creating a div
+So we want our class to create a div, that is going to serve as a our new list item. We are going to give this class a function called `create` to do so.
+```js
+class Item {
+    constructor(itemName) {
+        this.item = itemName;
+    }
+    create() {
+        let listItem = document.createElemen("div");
+        listItem.classList.add("list-item");
+    }
+}
+```
+
+
+### JavaScript
+Create a new file called `index.js`.
 
 ## Styles
 For this project, I'm also going to be using [TailwindCSS](https://tailwindcss.com/).
