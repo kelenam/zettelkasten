@@ -14,19 +14,236 @@ tags:
 ---
 
 ## Summary Questions
+1. What is JavaScript, in regards to its thread of execution?
+2. By itself, is JavaScript enough to support dealing with the backbone of modern web development, *asynchronicity*?
+3. So if things like `document` and `setTimout` aren't a part of the JavaScript language itself, where do they come from? What are they?
+4. How does JS then manage how these external, browswer features, like `setTimeout`, execute with regards to the call stack?
 
 ## Single Threaded Execution Review
+Let's talk about where this async stuff is going to take us....
+
+### Promises, Async, & the Event Loop
+- [**Promises**](): the most significant ES6 Feature
+- [**Asynchronicity**](): the feature that makes dynamic web applications possible
+- [**The event loop**](): JavaScript's triage
+- [**Microstask queue**](): Callback queue and Web Browswer features (API)
+
+### A reminder of how JavaScript Executes 
+```js
+const num = 3;
+function multiplyBy2(inputNumber) {
+    const result = inputNumber * 2;
+    return result;
+}
+
+const output = multiplyBy2(num);
+const newOutput = multiplyBy2(10);
+```
+
+Remember two parts to processing code: going through things line by line (you can visualize this as the left hand side of the whiteboard) and saving stuff in memory (you can visualize this as the right hand side of the whiteboard).
+
+The green arrow will represent out **thread of execution**...
+![](/thread-of-execution.png)
+
+So when we are in the body of of `multiplyBy2`, our *thread of execution*, (the thing that controls the ability to run code).
+
+Our thread of execution had to be used to run this function, into it we went, and until we finish this function, are we allowed to move on to the next line in global? No.
+- That is because JS is a **synchronous lanugage**, we do each line, finish it, then go to the next line.
+- So until we finished all the code in our function we didn't exit out to the next line, until we close that execution context and moved on.
+
+You could image a language, where you have another thread that runs each function separate from the global thread. Not in JS. If we encounter a line of code we must finish it before we move on to the next line.
 
 ## Asynchronous Browswer Features
 
+## Asynchronicity is the backbone of modern web development in JavaScript yet...
+- JavaScript is:
+    - Singe threaded (one command runs at a time)
+    - Synchronously executed (each line is run in order the code appears)
+
+- So what if we have a task:
+    - Accessing Twitter's servers to get new tweets that takes a long time
+    - Code we want to run using those tweets
+
+>* **JavaScript is single-threaded, mneaning it can only run one command at a time, and its synchronous, meaning it must run in the order in which the code appears.**[^1]
+
+**Challenge**: We want to wait for the tweets to be stored so that they're there to run `displayTweets` on - but no code can run in the meantime.
+
+### Slow function blocks further code running
+```js
+const tweets = getTweets("http://twitter.com/will/1");
+
+// 350ms wait while a request is sent to Twitter HQ
+
+displayTweets(tweets);
+
+// more code to run
+console.log("I want to run!")
+```
+
+### What if we try to delay a function directly using `setTimeout`?
+`setTimeout` is a built in function - its first argument is the function to delay followed by milliseconds to delay by.
+```js
+function printHello() {
+    console.log("Hello");
+}
+
+setTimeout(printHello, 1000);
+console.log("Me first!");
+
+//-> "Me first!"
+// Wait 1 second
+//-> "Hello"
+```
+
+### So what about a delay of 0ms
+Now in, what order will our console logs occur?
+```js
+function printHello() {
+    console.log("Hello");
+}
+
+setTimeout(printHello, 0);
+console.log("Me first!");
+
+//-> "Me first!"
+// Waits 0ms second
+//-> "Hello"
+```
+### ⭐ JavaScript is not enough - We need new pieces (some which aren't JavaScript at all)
+
+- **Our core JavaScript engine has 3 main parts:**  
+    1. Thread of Execution
+    2. Memory/variable environment
+    3. Call stack
+
+- **We need to add some new components**
+    - Web Browser APIs/Node background APIs
+    - Promises
+    - Event loop, Callback/Task queue and micro task queue
+
+>* **JS is not enough, we need to add some new pieces, things like: web browser APIs/Node background APIs, promises, event loop, callback/task queue and micro task queue.[^2]**
+
 ## Web API Example
+Where is JS typically running? Typicall in the browser.
+
+### Well what is the browser? 
+The browser is this incredibly tool that within it there are a suite of other tools. Right, amongst those things is JS, by *JavaScript doesn't run in isolation in the browswer environement*, it has a ton of other features next to it in the browser...
+- network requests
+- HTML DOM 
+- devtools/console
+- sockets
+
+JavaScript lets us use these features, but we aren't going to actually find any of these features in JS itself. So how do we interface with these other features?
+
+In JS we get a bunch of facade functions, functions that look like they're JS but are actually fronts/facades for web browser features.
+
+One of those features it's a a timer, that's in the web browser. We merely get labels for each of these features. In JavaScript, we merely get the label `setTimeout` to refer to the timer feature of the browser. Another would be, if we want to reference the DOM, we don't say DOM, we instead have the JS label, `document`.
+
+So whenever you see `document` in JS, it's not doing anything in JS, it's a a command to go and use a feature of the web browser.
+
+That mean's a big part of what we are doing in JS, isn't even JS at all, we are going to be taking our core 3 pieces in JS (thread of execution, memory, callstack) + all the stuff from the web browser.
+
+>* **In JS, we get labels (facade functions or aliases) for features of the web browswer in order to interface with those features. The often aren't a 1-to-1 match, e.g. `document` --> DOM or `setTimeout` --> timer.**[^3]
 
 ## Callback Queue & Event Loop Q & A
 
+### ES5 solution: Introducting 'callback functions', and Web Browser APIs
+```js
+function printHello(){ console.log("Hello")}
+
+setTimeout(printHello, 1000);
+
+console.log("Me first!");
+```
+1. We are defining a function called `printHello` in global memory.
+2. The next line, what are we doing? This line `setTimeout` is just going to be a command, a message down to the web browser features. It's not even gonna do anything in JS.
+    - We have set up a timer, in the web-browser, nothing to do with JS.
+    - What info does this timer need to be effective? Duration (and the function to run when the timer is done)
+        - That is to say setTimeouts is setting a timer of 1,000ms in the browser
+        - We aren't just setting a timer for no reason, we want it to run the `printHello` function upon completion. (We are passing a link back to the function we want to run in JavaScript).
+        - Now is it complete? If we set it off at 0ms (green) we can see that the timer is not complete. But, has the JS facade function done its job? It has. It's only job was to set the timer up in the browswer.
+
+![](/settimeout.png)
+
+3. After setting up that timer, at roughly 1ms, we can move onto `console.log("Me first!");`
+4. At the point all of our regular JS code is done, however, in the web browswer, time is passing... and finally at 1000ms what happens?
+5. That timer hits completion, and heads back into JS, with the `printHello` and puts it right on the *call stack*. JS, with the help of the web-browswer is somehow automatically, start executing `printHello`, which is going to console.log "Hello" at 1000ms.
+
+That's pretty much it, `setTimeout`, ain't really doing anything in JS at all, well technically it does have a return value in JS (an ID for timer), but the real Timer is operating donw here in the web browser, that's its real purpose.
+
+![](/settimeout2.png)
+
+## Web API Rules
+
+So how this even allowed? How is the browser able to come in and add something to the call stack? It seems unpredictable if something can kind of just reinsert itself into execution.... well...
+
+### We're interacting with a world outside of JavaScript now - so we need some strict rules  
+```js
+function printHello(){ console.log("Hello")}
+function blockFor1sec() {
+    // blocks in the JS thread for 1 sec
+}
+
+setTimeout(printHello, 1000);
+
+blockFor1sec()
+console.log("Me first!");
+```
+- How might you write blocking code in JS? a `for` loop, maybe like processing an array with 3 million elements, takes one second, or something, just treat that above as a black box. Remember JS doesn't have a timer, thats all a feature of the browswer.
+
+## Callback Queue & Event Loop
+Is `setTimeout` doing anything in JS? Nope. Let's see what's going on here...
+
+```js
+function printHello(){ console.log("Hello")}
+function blockFor1sec() {
+    // blocks in the JS thread for 1 sec
+}
+
+setTimeout(printHello, 1000);
+
+blockFor1sec()
+console.log("Me first!");
+```
+So in the example, at 0ms is this `setTimeout` complete? Yes. But it is then going to immediately throw `printHello` on the call stack? Well, no.
+
+There is something we haven't yet talked about, it's a **queue**. It's a queue of callbacks. Don't confuse these queue of callbacks with the callbacks run inside of the higher order functions. This, `setTimeout(printHello, 1000);`, at no point is `printHello` run inside of `setTimeout`, they just grab that functoin set it and threw into the web browswer and a link of it is stored in the "web browswer features".
+
+At 0ms, `printHello` isn't going on the call stack already. It's gonna have to queue itself up here into the *callback queue*, ready to run, however, our thread keeps running, where `blockFor1sec` is then run, this is a JS defined function so it executes as normal with a new execution context. 
+
+Finally, after 1001ms, it finishes, so what happens next? `console.log("Me first!")` is run, before `printHello` who has been waiting gets a chance to do anything. Finally, after 1002ms and we log Me first, we can finally get to the queue and run `printHello` and add it to the call stack.
+ 
+### The Event Loop
+Everything on the call stack has to be processed first, as well as all synchronous code, all regular execution.
+All synchronous code has to finish executing before anything in the queue gets processed. 
+
+We may not know exactly when something may run, but we at least know the order in which it will be. So how does JS manage this checking of synchronous code completion? With a feature called the *event loop*.
+
+The [**event loop**](), simply just checks before every single line of code is run: "is the callstack empty?" + "is there something in the queue?". If the call stack is not empty, we don't even look at the queue. But if the call stack is empty, off we head on down to the queue, I grab the function, I put it on the call stack, puts the parens on for us, and executes that function.
+
+![](/event-loop.png)
+
+>* **The **event loop** is the feature that helps us check to make sure that all synchronously running code is executed prior to anything in the **callback queue** being executed and is what makes the order of execution of running of these external browswer features, like `setTimout` more deterministic.**[^4]
+
+And that, all the above, was the entire model for ES5, of Asynchronous JavaScript.
+
 ## Callback Hell & Async Exercises
 
+### ES5 Web Browswer APIs with callback functions
+**Problems:**  
+- Our response data is only available in the callback function - **Callback hell**
+    - A lot of the time these background features, the function that is automatically called with some returned data to it, but that data is kind of trapped in, its only available in the execution context of that callback function.
+    - This lead to only being able to use that data inside of that function, we can't run that function, so therefore, we can't return anything out, because we can't assign the return value of it anywhere, so instead all of that data is going to be used inside of that callback function, creating callback hell. We would be forced to do all our work on that data inside of one function.
+- Maybe it feels a little odd to think of passing a function into another function only for it run to run much later
+    
+**Benefits:**
+- Super explicit once you understand how it works under-the-hood.
+
+## Exercises
+http://csbin.io/async
 
 ## Links
 - [MAIN](/hardparts-js-v2-main)
 ----
 - [PREV | Closure](/hardparts-js-v2-closure)
+- [NEXT | Promises](/hardparts-js-v2-promises)
