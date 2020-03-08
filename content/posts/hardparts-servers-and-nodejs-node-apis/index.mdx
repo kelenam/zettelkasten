@@ -1,0 +1,170 @@
+---
+title: Using Node APIs | Servers & Node.js
+date: 2019-09-10
+slug: hardparts-servers-and-nodejs-node-apis
+tags:
+  - JS
+  - Node.js
+  - FEM
+  - Will Sentence
+  - Servers
+---
+
+## Summary Questions
+
+1. What is libuv? What does it allow Node to do?
+2. What are th entry points into a server called, what is the default?
+3. What two things does Node automatically do for us with our incoming request?
+
+
+## Calling Node with JavaScript
+- Ideally we want to be opening a network channel, a socket, they call it, an open channel to be able to receive messages from webclients/browser so we can have access to it via setting up a Node/C++ feature.
+    - How by a built in label; `http.createServer()`
+
+*So where is this label going to operate/have effect?*  
+In server internals? In the JS environment? Somewhat, but primarily. It's instead going to be a command for Node internal features. To do what?
+- To set up a net feature of node specializing in HTTP to receive HTTP messages.
+- The magic happens in the Node/c++ features context 
+    - With the help of **libuv** (Libuv is a bunch of pre-written C++ code technically built separtely from Node, written to ensure we can run node on any machine any OS). Libuv links up effectively between Node/C++ feature with any computer internal structure.
+    - So, with the help of Libuv, going to setup, in the computer's internals and open socket, an open channel to the internet.
+
+In one line, in one label, the server is now ready to receive messages.
+
+Let's talk about the 64,000 available entry points in our computer, or ports. Well that's a bit of an issue, bc when a request is being made to our server, which entry point is it coming in at?
+What is the default entry port for HTTP messages coming into a server? 
+- The default entry port is port 80.
+
+Well darn, we already set up our server with `http.createServer()`. But Node realizes we aren't going to do all of the underlying C++ feature manipulations in one line so what does it do?
+
+⭐ The other thing that `http.createServer()` does is immediately, (in JS), returns out a functions (a pseudo-function bc really its triggering C++ code in Node/C++). It immediately returns out, into, whatever is on the left hand side of http.createServer... `const server = http.createServer()`. which is the label `server`.
+- It immediately returns out into it, an object full of functions, methods including ones like `listen` all of which when run will allow us to edit the instance of the http feature in Node we've set up
+- it gives us edit ability over it which we'll need to setup our socket at port 80...
+- `server.listen(80)`
+
+So comes the issue of. How/when are we going to execute the code to handle the request? 
+We don't know. But who knows? Node knows. Perhaps we're going to rely on Node to autmatically run the code (written in JS) that is going to handle our incoming requests for us (beyond our control)
+
+So how can we then bundle up our code so that it can be auto triggered by Node?
+In a function. That's what we are going to do is bundle the code we want to run bundled in a function so that it can be automatically by Node.
+
+
+## Calling Methods in Node
+
+### Node auto-runs the code (function), for us when a request arrives from a user
+```js
+function doOnInComing(incomingData, functionsToSetOutgoingData) {
+    functionsToSetOutgoingData.end("Welcome to Twitter!")
+};
+
+const server = http.createServer(doOnIncoming)
+server.listen(80);
+```
+1. We don't know when the inbound request would come - we have to rely on Node to trigger JS code to run
+2. JavaScript is single-threaded & synchronous. All slow work (e.g. speaking to a database) is done by Node in the backgroun (more on this later)
+
+### Walkthrough Code
+1. First line we are declaring a function doOnIncoming. Saved in memory
+2. declare server. we then run http.createServer() triggers opening the port.  
+    - it returns the function into server that allows us to edit the instance of server
+3. Now, we need some JS code to run when a message comes in (when node gets the inbound message) we need to trigger some code to go and run up in our 'JS envrionment', We insert the function that is going to be saved in node that's going to autorun when node gets an inbound message. 
+    - We pass it in as an argument, the whole function definition to the createServer function call.
+    - The function we pass in as an argument is going to be the thing that auto-runs when Node receives in inbound message
+    - that function is `doOnIncoming`
+
+Why? Becuse we don't know when an inboudn message would come in, we have to rely on Node to trigger running our JS code.
+
+JavaScript is single-threaded and synchronous. Any task that will take a long time will be set up in node that will have a function attached to it that will be automatically triggered to run when the background task either completes or has activity.
+ 
+## Calling a Function Under the Hood 
+
+![](https://user-images.githubusercontent.com/5563119/70100873-12c94e00-15e8-11ea-8337-7ad0375e3acf.png)
+
+### Two Parts to calling a function - executing its code and inserting input (arguments)
+In `multiplyBy2(3)` the argument is 3 and we, the developer, inserted it
+
+⭐ **Node not only will auto-run our function at the right moment, it will also automatically insert whatever the relevant data is as the argument**(input)
+
+⭐ Sometimes it will additionally, even insert a set of functions in an object (as an argument) which give us direct access to the message (in Node) being sent back to the user and allows us to add data to that message.
+
+## Creating a Server Under the Hood 
+
+So now we have an incoming mesage, from the client. What happens? Well we want to autorun the function that we passed createServer... doOnIncoming.
+Well that function is JS so we are going to auto-run/execute it in JS-land. Its going to be execute code so its going to need parens, and execute that function, we are going to see this again and again because its all that node does.
+
+Well what do we want that function to do? Ideally send a message back to Node to then send back to the client, a response message.
+
+So if we want to repond to this message, in our function we better have acess to this message. Do we actually get the stream of characters from Node( only if we use the .net label ) but we don't. Node wants to make our lives easier. So instead, the next thing it does down here in Node, as soon as the message comes in,...(**it's immediately going to set up a HTTP message ready to send back** by the way) is going to automatically package up two JavaScript Objects for us (because we don't want to have to deal with parsing strings/characters ourselves)
+
+So its going to automatically created when the inbound message comes in, it's going to create two objects, these are the two most important objects in all of Node.
+The first packaged object is going to contain all the important information from the inbound message. It's going to give us the URL path as a property on this object.
+
+This packaged object comes into our auto-run function (inour JS enviornment) as the first argument but it has no label, so how are we supposed to reference it?
+
+We have to call it something, which we do we give it a placeholder, when we say the `doOnIncoming` function, we know that when it gets run it will have automatically by Node inserted two objects. The two placeholder names we have given them in our example is `incomingData` and `functionsToSetOutgoingData`.
+
+Well we didn't bring all that data in from the rquest to not send some data back....
+So our little mesesage, that Node automatically made for us to send back. How do we get access to it? Well, wouldn't it be nice, if the second object, maybe had a property on it called `data` or something that we could pass into our JS environment that we could then modify and send back... Well, that's not how it does it...
+
+### Differences between how Request and Response arguments are handleded
+Instead, it does give us an auto created object automatically created by Node that is automatically inserted in the second input/parameter. But that object does not have a property on it that we could add data to it.
+⭐ Instead that object has a ton of methods on it. We are just going to use one called `.end`. These are JS functions(labels) for when we run this function (it gets thrown back into JS) we are gonna grab the `end` function, run it and whatever we pass to it as input till be used to add data to this our response message.
+
+⭐ **Our request object has all the data and we can grab it directly**
+⭐ **Our response object has functions that when run from JS will be labels to update label on the data that gets sent back**
+ 
+So once we have access to those response methods we can call..
+`functionsToSetOutGoingData.end("Welcome to Twitter!");`
+It's going to send that end response back to node to be sent back down to the client
+
+## Creating a Server Summary
+Node handles a lot of things for us:
+- Auto inserts arguments and calls functions
+- parsses and handles incomign and outgoing messages
+
+This is the essenece of Node. 
+Whenever we use a backgroung computer internal feature, it could be the filesystem it be the Open Network Socket, it could be other features of the computer itself. Every time we are going to...
+1. Use a built in label that sets up the Node/C++ feature that has access to the background feature
+2. We add a function that node will auto-run whenever the background feature gets activity (or getting a file)
+3. We're then going to design that function such that it is ready to receive incoming data and do something with it
+4. Then use our access to the response objects methods that will let us access a way to respond to that request.
+
+## Node Under the Hood Q&A
+So long as we have this mental model of how Node works under the hood. Just refer to the Node docs to see the specifics it can operate on (like the end method etc). We use end in our example, because end essentially just tells Node, I finished editing this message you could send it back now.
+
+
+## Request and Response with Node
+
+⭐ The magic of Node is the autobundling of the two JS objects we get automatically created for us, the request object and the response object.
+
+### Messages are sent in HTTP format - The 'Protocol' for browser-server interaction
+HTTP message: Request line (url, method), Headers, Body (optional)
+```js
+const tweets = ["hi", "crying  emoji", "hello", "wave emoji", "ghost"];
+function doOnIncoming(incomingData, functionsToSetOutgoingData) {
+    const tweetNeeded = incomingData.url.slice(9) -1
+    funtionsToSetOutgoingData.end(tweets[tweetNeeded])
+};
+
+const server = https.createServer(doOnIncoming);
+server.listen(80);
+```
+
+So say, Michael was making a GET request to a server. HTTP will have it formatted..
+He is visiting twitter.com/tweets/3
+This is the how it's structured...
+1. Request line GET /tweets/3
+2. Headers: metadata, things about Michaels Mac, browser type, if he's logged in, etc.
+
+### Let's get more personalized with what we send back to our user from our server
+By writing code to investigate the inbound message to see exactly what she's asked for
+
+Our user, needs a specific tweet (tweet 3) back. How does their browser tell us that?...
+
+### Express Q&A
+- Express makes very common Node patterns prewritten for us so we dont have to, by handling things like routing.
+- It modularizes the functionality of Node
+- It exists as Middleware that simplifies a lot of common web-framework needs
+
+## Links 
+- [PREV ← | Intro to Servers & Node.js](/hardparts-servers-and-nodejs-intro)
+- [NEXT → | Node with HTTP](/hardparts-servers-and-nodejs-node-with-http)

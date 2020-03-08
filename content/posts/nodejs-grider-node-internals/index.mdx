@@ -1,0 +1,24 @@
+---
+title: Starting with Node Internals | Stephen Grider
+date: 2020-03-08
+slug: nodejs-grider-node-internals
+tags:
+  - JS
+  - Node.js
+  - Stephen Grider
+  - Udemy
+---
+
+We are starting with a very simple diagram
+![](/our-code.png)
+
+Over time we will be adding a lot more detail to it, to show how Node is internally structured.
+
+- JavaScript Code We write is the stuff in our js files
+
+When we run `node` at the command line, we are invoking a Node.js project, now node, just like any other JS project out there, Node internally has a collection of dependencies that it uses to actually execute your code.
+
+Two of the most important dependencies, are the *V8* project and the *libuv* project.
+
+- **V8**: Open source JavaScript engine created by Google. The purpose of this project is to be able to execute JS code outside of the browswer. (That's what we are doing when we run our JS code in the terminal).
+- **libuv**: Is a C++ open source

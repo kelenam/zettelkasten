@@ -1,0 +1,82 @@
+---
+title: Node with HTTP | Servers & Node.js
+date: 2019-09-10
+slug: hardparts-servers-and-nodejs-node-with-http
+tags:
+  - JS
+  - Node.js
+  - FEM
+  - Will Sentence
+  - Servers
+---
+
+## Preparing for `HTTPRequestObject`
+
+```js
+const tweets = ["hi", "crying  emoji", "hello", "wave emoji", "ghost"];
+function doOnIncoming(incomingData, functionsToSetOutgoingData) {
+    const tweetNeeded = incomingData.url.slice(9) -1
+    funtionsToSetOutgoingData.end(tweets[tweetNeeded])
+};
+
+const server = https.createServer(doOnIncoming);
+server.listen(80);
+```
+
+Node will do the same process/paradigm for all it's request, web or filesystem its all handled the same way...
+
+What Node does:
+1. Set up our background feature http feature that sets of the socket( etc, connection, etc)
+2. Store the function to be auto-run in Node/C++ space
+3. Does this in JS, It returns a an object with a bunch of functions on it, including listen, and all the functions that get automatically returned from `http.createServer() `are edit functions, to be able to edit this background Node/C++ feature.
+
+## Response Headers
+
+We can addd content types and headers and other things for our response where we are specifying information about the header response. 
+
+
+## Intro to Require to Node
+
+### Getting access to Node's built in features with require
+
+WE have to tell Node we want to have access to each of its C++ features independently - we get a built-in function do this require....
+`const http = require('http');`
+
+The reason all these modules are independently held is so we don't bring anything in unnecessarily to our environment.
+- require is one of those modules that does come pre-bundled.
+
+## JavaScript Node Environment
+
+### How do we staert JS off to do all this?
+1. Write the code and save it in a file. (like server.js)
+2. Load it into Node and run it (have to load in using the terminal interface)
+3. Need to reload our code with Node every time we make a change so nodemon. 
+
+Any time you make changes to our main file, we have to turn off node and turn it back on. We can delegate to this to a wrapper/software like nodemon
+
+## Cloud Node Development
+So we used to have it be someone else's computer, some server that we would maintain or even just our own computer serving up these files/handling requests, but now, we just delegate it to the cloud... AWS, MS, that we can use for this.
+
+### Do we need an always-on computer in our house to run a server?
+1. Write code on computer
+2. SSH into someone else computer (VPS; AWS)
+3. Set up DNS to match domain name to right IP
+
+
+### Local Node Development
+
+### What about testing our server?
+Do you need to load the code to be run on an AWS computer?
+
+OS devleopers included the loopback features with localhost as the pseudo-domain
+
+We load up Node on our local machine, set up open channel, socket and use localhost that loops straight back in to our own machine.
+- However we dont want the default port 80 here, we usually say 3000 -> localhost:3000. That means sending out a message to our own computer listening at port 3000
+
+bit.ly/femnode
+for code exercises.
+
+
+## Links
+- [PREV ← | Using Node APIs](/hardparts-servers-and-nodejs-node-apis)
+- [NEXT → | Error Handling in Node](/hardparts-servers-and-nodejs-error-handling)

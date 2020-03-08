@@ -1,0 +1,63 @@
+---
+title: Events and Error Handling in Node | Servers & Node.js
+date: 2019-09-10
+slug: /hardparts-servers-and-nodejs-error-handling
+tags:
+  - JS
+  - Node.js
+  - FEM
+  - Will Sentence
+  - Servers
+---
+
+### In server-side developmwent we get errors
+Understable - we're interacting with others computers over the internet - there's lots of things that could go wrong.
+
+How can we handle this? We need to understand our background Node http server better
+
+So. That auto-run function that we had described earlier in the Node environment, technically doesn't auto-run, what it first does is send out a loud shout within Node, a message/an event that is emitted in Node and that that word that gets shouted out (that we don't get to choose is) when a message arrives is, request.
+
+So how did we get out auto-run function to run when we heard that "request" shout, well we did so implcitly with passing doOnIncoming to createServer 
+
+### Node will automatically send out the appropriate event depending on what it gets from the computer internals (http message or error)
+```js
+function doOnIncoming(incomingData, functionsToSetOutgoingData){
+ functionsToSetOutgoingData.end("Welcome to Twitter")
+}
+
+function doOnError(infoOnError){
+ console.error(infoOnError)
+}
+
+const server = http.createServer();;
+server.listen(80);
+
+server.on('request', doOnIncoming);
+server.on('clientError', doOnError);
+```
+
+## Event Handling in Node
+
+So understand, that when we are doing server, we from that moment forth will be referring to server as that instance of the open socket we've created.
+`on` is another 'edit' function we get returned to us from the httpCreateCreate. 
+
+So remember, the things that get shouted into the Node environment autoamatically are just built in handlers in Node.
+Those things being shouted out are events. Those events have "keyword" reserved word like names, e.g. `request` and `clientError`.
+
+When we are using `.on` we are passing into that first arguments that string that matches the event keyword `clientError` or `request`.
+
+The event system, just gives is a little more control over how are auto-run functions end up running.
+
+## Node Event Handling in Action
+
+- Many ways that could leave to a corrupted client request, like misformated data, weird headers, or url, or dns issues, etc.
+
+So Node sees this correupted data and wants to handle that, so it flashes the message, clientError which will trigger a way to handle the data. Error type data object is what gets passed back to our doOnError function.
+We have a `infoOnError` label we've passed that will now let us reference that returned from Node error Object.
+
+clientError's actually pass back two arguments, the first is the error object, the second is raw access to the data that will be sent back over the HTTP socket. It's not in HTTP format. It's just raw, we can appned to a status code or something like 400.
+
+## Links 
+- [PREV ← | Node with HTTP](/hardparts-servers-and-nodejs-node-with-http)
+- [NEXT → | File System](/hardparts-servers-and-nodejs-file-system)
+

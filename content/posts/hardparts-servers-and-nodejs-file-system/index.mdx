@@ -1,0 +1,124 @@
+---
+title: File System | Servers & Node.js
+date: 2019-09-10
+slug: /hardparts-servers-and-nodejs-file-system
+tags:
+  - JS
+  - Node.js
+  - FEM
+  - Will Sentence
+  - Servers
+---
+## Introducting the File System API
+
+### We have much of our twitter app set up now - handling, inspecting and responding to these messages (‘requests’) is the core of our app, of Node, and of servers
+— But, Node can do even more. We have an archive of tweets stored in a huge file (1.5GB)
+— Unfortunately they’re saved on our computer, not in our little JavaScript-specific data store (JavaScript memory)
+— Could we load them into JavaScript to run a function that removes bad tweets?
+— We can use fs to do so but there might be some issues with a file that large
+
+## Importing with `fs`
+
+### Importing our tweets with `fs` 
+```js
+function cleanTweets (tweetsToClean){
+ // code that removes bad tweets
+}
+function useImportedtweets(errorData, data){
+    const cleanedTweetsJson = cleanTweets(data);
+    const tweetsObj = JSON.parse(cleanedTweetsJson);
+    console.log(tweetsObj.tweet2);
+}
+
+fs.readFile('./tweets.json', useImportedtweets)
+```
+- Every file has a ‘path’ (a link - like a domestic url)
+- JSON is a javascript-ready data format
+- `fs` is the JS label for managing the NodeC++ features of the filesystem.
+
+So that string we pass as the first arg to `.readFile` of `./tweet.json`. Is just a string of characters, to JS taht string of letters means nothing to it. But we have a feeling that it's going to be passed to Node's background file system accesss feature that has the ability to parse, interpret that string of characters into something meaningful (like a path).
+- That string of characters can be used to resolve to an actual file position in the internal computer system.
+
+Every file in your computer has a path.
+
+So what is this JSON thing? JavaScript Object notation. An object full of tweets in our example.
+A javascript object that is essentially converted into a string of characters in the format of a JS object.
+Json is just a string of text.
+
+Once we have a JSON file we can use `JSON.parse()` to turn that stringified object back into a JS object we can use. It allows for better transporatablity of data across different domains.
+
+## Reading from the File System with fs
+
+So here we want, like we networking access, we want to write JS labels, for NodeC++ features that give's us access to our filesystem. 
+
+The JS label we use to give us access to our NodeC++ built feature that gives us access to the filesystem. 
+
+Remember we have to require it it first.
+
+```js
+function cleanTweets (tweetsToClean){
+ // code that removes bad tweets
+}
+function useImportedtweets(errorData, data){
+    const cleanedTweetsJson = cleanTweets(data);
+    const tweetsObj = JSON.parse(cleanedTweetsJson);
+    console.log(tweetsObj.tweet2);
+}
+
+fs.readFile('./tweets.json', useImportedtweets)
+```
+Again, JS doesn't know that we pass a path to .readFile, it's Node that handles that as a path.
+The second parameter is the function that we want to have autorun.
+
+When do we think this function is going to autorun?
+When it completes fetching the json data into JS.
+
+So once we have FS in the Node env, we need to reference the string that will specify the path where to look.
+Once in Node, with the help of libuv.
+
+B/c there is too much variety in how different computer architectures handle file fetching, libuv and node decided to handle setting up a dedicated thread for its I/O. FS access sets up a thread. Networking will allow the computer to focus on thread management. 
+
+So b/c our file is 1.5gs its going to take as awhile. Like 15 seconds (we might want to break this up later) However, once the file completes loading we useImportedTweets.
+
+### Error first pattern
+⭐ **Error-first pattern** is when the first argument of our functons are going to be any error data we get back, the second one will be any data we actually care about.
+ 
+ A lot of Node features, their auto triggered function, the auto run function will take two inputs, the first one will represent any error data, the second is the data we care about.
+
+ If the data encounter no errors, it will return `null` for that first value.
+
+## Call Stack Introduction
+
+The JS call stack is JS's behind the scenes way of tracking what line of code is currenly running. Whatever is one top of the call stack, whatever function is on top is the function currently running.
+Something is always running, because the file itself is kind of like the global function. So always on there is your global(), as soon as a function starts running it gets added to the top and is the function currently running.
+
+**Whatever is on top of the callstack is the function that is already running.** When we finish running that function it is popped off the top.
+
+JS always knows where we are and what to go back to when the call stack starts and finishes. Its JS' way of knowing whats happening.
+ 
+```js
+function cleanTweets (tweetsToClean){
+ // code that removes bad tweets
+}
+function useImportedtweets(errorData, data){
+    const cleanedTweetsJson = cleanTweets(data);
+    const tweetsObj = JSON.parse(cleanedTweetsJson);
+    console.log(tweetsObj.tweet2);
+}
+
+fs.readFile('./tweets.json', useImportedtweets)
+```
+
+### File System Q & A
+
+So, the raw JSON data we have coming in from the file system is actaully stored in a **buffer**, a very flexible way of storing data, more info here: https://nodejs.org/api/buffer.html#buffer_buffer a series of zeros and ones. Technically the returned data from Node isn't json stringified, it gets passed into node as a series of zeros and ones known as a buffer format.
+So it isn't converted until we actually run, JSON.parse() on it which stringifies and formats to JSON in one go.
+
+Remember we have to require any kind of like node module.
+
+Everything autocreated by Node doesn't have a label we have to set parameters in order to be able to hold references to the things returned to us.
+
+
+## Links
+- [PREV ← | Events and Error Handling](/hardparts-servers-and-nodejs-error-handling)
+- [NEXT → | Streams](/hardparts-servers-and-nodejs-streams)
