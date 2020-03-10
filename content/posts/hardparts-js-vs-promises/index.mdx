@@ -152,9 +152,6 @@ So, after that 270ms, we are going to put on the callstack, `display()` which cr
 
 >* So our promise, setup in JS, has two properties: `value`, and `[[onFufilled]]` which is as kind of hidden property that holds an empty array. We use `.then` to essentially push functions onto the array held at `[[onFufilled]]` in order to be run. It's an array so we can add as many functions as we'd like to be processed as soon as the `value` of the promise is filled with a value. The value/response object held at `value` is automatically inserted as an argument to the parameter of every function then we added to `[[onFufilled]`. That fucnction execution isn't something we do manually, but instead something handled by JS to apply those `()` to have that function execute.[^3]
 
-
-
-
 ![](promises3.png)
 
 ## Web APIs & Promises Example: `fetch`
@@ -163,20 +160,112 @@ So what are the rules for that deferred function being run? First let's review `
 ### `then` method and functionality to call on completion
 Any code we want to run on the retruend data must also be saved on the promise object.
 
-Added using `.thn` method to the hidden property `[[onFufiillment]]`
+Added using `.then` method to the hidden property `[[onFufiillment]]`
 
 Promise objects will automatically trigger the attached function to run (with its input being the returned data).
 
 ### But we need to know how our promise-deferred functionality gets back on to the call stack to be executed
-[**Asynchronous**](), *as we use it essentially just means: doing code out of order from when you saw it.*
+[**Asynchronous**](), *as we use it essentially just means: doing code out of order from when you saw it.* 
 
+So when JS sees normal JS code, if a line says do the code, it does it right then. Asynchronous says, no no, JS is going to handle when that functionality comes back in and its going to be out of order frm when you trigger the browswer features to start its work.
 
+The associated functionality is going to come back in when that background work is done. No longer do we have our, we cannot leave this line of code until we've finished on it. *Now we can actually ahve code that's gonna be run after all our regular code is run.*
 
+```js
+function display(data){console.log(data)};
+function printHello(){console.log("Hello")};
+function blockFor3000ms(){ /* block js thread for 300ms */};
 
+setTimeout(PrintHello, 0);
+
+const futureData = fetch('htts://twitter.com/will/tweets/1');
+futureData.then(display);
+
+blockFor3000ms();
+console.log("Me first!");
+```
+1. Store the function `display` in global memory
+2. Store the functoin `printHello` in global memory
+3. Store the function `blockFor3000ms` in global memory.
+4. We get to `setTimeout`, not doing anything in JS, but it is in the browser.
+  - it's consequence occurs in the browser for the web timer feature, it's going to send it the duration of 0, and the function body associated of the callback (`printHello`) with it as well so that it can add it to the *callback queue* on completion of the timer.
+  - Timer set for 0ms, it completes, instantly, and then on completion if adds `printHello` onto the *callback queue*.
+5. At [1ms], we are declaring the const `futureData` it is going to have stored the result of the two pronged facade function, `fetch`, because `fetch` as it has consequences both in JS and the web.
+  - In JS, it's consequence is, it creates and returns out immediately a new promise to the left hand side, in that 1ms an object, a special object, a promise object. That promise object gets stored over in `futureData`.
+    - `value` and `onFufilled`, are the properties of that promise.
+  - In Web browswer features- we are activating the networking request, and down it comes, we need two parts, for this request, the domain (twitter) to find the info at and the path where it lives (will/1)
+  - Defaults to GET, then at 1ms we send off that request which isn't yet complete, but when it it is, it has the intimate connection with the JS portion and will provide a value to `futureData.value = ____`
+     
 ## Web APIs & Promises Example: `then`
+We still need to make use of that data that we've requested, thats where `.then` comes in.
+6.  We have `futureData` and use `.then` to kind of push our function onto the hidden `[[onFufilled]]` array of functionality to be executed on assignment of `futureData.value`
+7. At [2ms], we are going to run `blockFor3000ms`, it gets added to the call stack and creates a brand new *execution context*, and.
+9. But say at [270ms] our tweet data comes back and updates the `value` property in `futureData`, while we are still being blocked by `blockFor3000ms`. Does it get added to the *callback queue*? That would make sense but we'll see further down what atually happens.
+10. At [300ms] we get `console.log("Me first!")`
+
 ## Web APIs & Promises Example: Microtask Queue
+So Now that we've finished our synchronous code we can finally get to our *callback queue* that pressumably has both `printHello()` and `display('hi')`
+
+But wait, a minute, what actually runs? `printHello` has been waiting a long time, but it isn't what runs. That's because we haven't talked about something. 
+
+In our **event loop** there are actually two queues, and one of these gets precedence. The standard *callback queuue* is also referred to as the *task queue* and another one called the [**microtask queue**](). The **microtask queue** is where our `display('hi')` function was added to, not the standard *callback queue/task queue* (at around 270ms when it completed).
+
+So at [303ms], which queue do you think we head to first? The microtask queue, it dequees, it puts it on the callstack with the argument automatically inserted and JS auto-adds the parens to control its execution, not us. So then we console.log 'hi' at 303ms.
+
+The *microtask queue* is now empty so the event loop finally gets down to the *callback queue* where it finds the `printHello`, and at [304ms], finally gets to throw it on the call stack, and gets to execute the `printHello` function.
+
+>* **There are two queues, the microtask queue which takes priority over the standard task queue. Fufillment of promises pushes the added functions (from `.then`) calls onto the microtask queue. Standard setTimeout and old school facade functions, when the background work is complete add their functions to the standard task queue.**
+
 ## Promises and Asynchronous Q&A 
+In reality, the fufillment of value on our promise object, happens at the very last minute, since we techncally don't want access to it until its ready, but it has no consequences because we don't run this functions until they are filled in and global code is done anyways.
+
+So on the auto-invoked functions that get added to the callstack when they are ready. Since JS is adding those parens, how do we insert the arguments? *We have to rely on knowing how the API works*. For instance, in the data that comes back, can we have two arguments? No. We have to look at the documenatation for how its specified it will work, it was designed to pass back in automatically one argument (it could be an array or an object, but still one thing).
+
+MDN has a list of all these fetaures. They don't call these "facade functions" they call them **APIs**, application programming interfaces.
+
+A bit on promises. So it turns out with promise objects, we can just create one directly, we don't have to have one automatically created by fetch, we can just create one, if we say `.resolve` that promise explicity, to have it automatically complete, and have its function ( we cant do this with fetch because its handling the relationship). But if we make our own prmise, we can that function automatically get added to the microtask queue.
+
+Something interesting you can do, if you had a function that is processing in the microtask queue, you can, within that function be adding more functions to be executed to the end of the microtask queue.
+
+The event loop is intersting in how it interacts with the microtask queue, we can theoretically never leave the microtask queue. The event loop will always execute anything on the microtask queue before it moves onto the callback queue.
+
+*That is a distinction between the callback queue and the microtask queue, the standard callback queue does all the stuff in there and moves around again. The microtask queue however, once it enter, and youre filling in the back won't leave the microtask queue. You can "starve" the callback queue, but with some implications.
+
 ## Promises Review
+### Promises
+**Problems**
+- 99% of developers have no idea how they're working under the hood
+- debugging becomes super-hard as a result
+- developers fail technical interviews
+
+**Benefits**
+- Cleaner readable style with pseudo-synchronous style code 
+- nice error handling process
+
+Will has an opinion on the name `then`, he feels it should instead be called, "store me to run me later automatically when the background task that came out of the fetch call previousl completes and the value property gets updated".
+
+The benefit of it appearing pseudo-synchronous is that it makes it easier to reason about.
+
+There is actually another hidden property on our promises called `[[onRejection]]` and its also an array in which we put functions. If you are interacting with network stuff, there are bound to be errors, you ideally want to setup error handling appropriately. This property lets you handle any of the rejections with functions.
+
+- There are two ways to access the rejections to add functions, the first is `futureData.catch`, the second way is to pass to `.then`, as the second argument, the function to add on error.
+
+### WE have rules for the execution of our asynchronously delayed code 
+Hold promise-deferred functions in a *microtask queue* and callback functions in a task queue (*callback queue*) when the Web Browser Feature (API) finishes...
+
+Add the function to the *Call stack* (i.e. fun the function) when:
+- call stack is empty & all global code run (Have the event loop check this condition)
+
+Prioritize functions in the microtask queue over the *Callback queue*.
+
+### Promises, Web APIs, the Callback & Microtask Queues and Event loop enable:
+**Non-blocking applications**:This means we don't have to wait in the single thread and don't block further code from running.
+
+**However long it takes**: We cannot predict when our Browswer feature's work will finish so we let JS handle automatically running the function on its completion.
+
+**Web applications**: Asynchronous JavaScript is the backbone of the modern-web -- letting us build fast 'non-blocking' applicaitions.
+
+All this is what makes JS really special.
 
 ## Links
 - [MAIN](/hardparts-js-v2-main)
