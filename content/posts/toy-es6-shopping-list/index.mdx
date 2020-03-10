@@ -104,25 +104,79 @@ console.log(poly1.name);
 // expected output: "Polygon"
 ```
 
+## JavaScript
+Create a new file called `index.js`.
+
 ### Creating a div
 So we want our class to create a div, that is going to serve as a our new list item. We are going to give this class a function called `create` to do so.
 ```js
+const list = document.getElementById("list");
+const itemToAdd = document.getElementById("itemToAdd");
+const addButton = document.getElementById("addButton");
+
 class Item {
     constructor(itemName) {
         this.item = itemName;
+        this.create()
     }
     create() {
-        let listItem = document.createElemen("div");
-        listItem.classList.add("list-item");
+        create() {
+        const listItem = document.createElement("div");
+        listItem.classList.add("list-item")
+
+        const input = document.createElement("input");
+        input.setAttribute("disabled", true)
+        input.classList.add("item-name")
+        input.value = this.item;
+
+        const actions = document.createElement("div");
+        actions.classList.add("item-actions");
+
+        const updateButton = document.createElement("button");
+        updateButton.textContent = "Update";
+        updateButton.classList.add("update");
+        updateButton.addEventListener("click", () => this.update(input));
+
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Remove";
+        removeButton.classList.add("remove");
+        removeButton.addEventListener("click", () => this.remove(listItem));
+
+        actions.appendChild(updateButton);
+        actions.appendChild(removeButton);
+        listItem.appendChild(input);
+        listItem.appendChild(actions);
+        list.appendChild(listItem);
     }
+    update(input) {
+        input.disabled = !input.disabled;
+    }
+    remove(listItem) {
+        listItem.parentNode.removeChild(listItem);
+    }
+}
+
+addButton.addEventListener("click", () => newItem());
+
+function newItem() {
+    console.log(itemToAdd.value);
+    itemToAdd.value !== "" ? new Item(itemToAdd.value) : console.log("Please enter an item");
+    itemToAdd.value = "";
 }
 ```
 
+## Updating our items
+Let's create a new method for handling the update of our list items. Before we do we will have to add an event listener on our action buttons.
+```js
+update(input) {
+    input.disabled = !input.disabled;
+}
+```
+We are toggling the inputs disabled property.
 
-### JavaScript
-Create a new file called `index.js`.
 
 ## Styles
 For this project, I'm also going to be using [TailwindCSS](https://tailwindcss.com/).
  
 ## Links
+- [Source](https://www.youtube.com/watch?v=h8SDHa_wGlU)
