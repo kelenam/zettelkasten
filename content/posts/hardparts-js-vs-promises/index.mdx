@@ -17,8 +17,8 @@ tags:
 1. Speak a little about how things in that old-setTimeout, pre-ES2015 model of things were improved upon in ES6 with facade functions like `fetch`. 
 2. As a refresher, why are we referring them as facade functions again? 
 3. Provide a rundown of what a promise does both in the browser features and in JS. What is it? What properties does it have? How does it get it's values, etc. 
-4. When we use the term **asynchronou** in this series, what are we saying?
-5. 
+4. When we use the term **asynchronous** in this series, what are we saying?
+5. Talk about Web APIs in relation to Promises and the Microtask Queue.
 
 ## Promises Introduction
 So we are now going to move onto what changed in ES2015/ES6 world.
@@ -228,13 +228,13 @@ So on the auto-invoked functions that get added to the callstack when they are r
 
 >* **MDN has a list of all these fetaures. They don't call these "facade functions" they call them **APIs**, application programming interfaces.**[^6]
 
-A bit on promises. So it turns out with promise objects, we can just create one directly, we don't have to have one automatically created by fetch, we can just create one, if we say `.resolve` that promise explicity, to have it automatically complete, and have its function ( we cant do this with fetch because its handling the relationship). But if we make our own prmise, we can that function automatically get added to the microtask queue.
+A bit on promises. So it turns out with promise objects, we can just create one directly, we don't have to have one automatically created by fetch, we can just create one, if we say `.resolve` that promise explicity, to have it automatically complete, and have its function ( we cant do this with fetch because its handling the relationship). But if we make our own promise, we can have that function automatically get added to the microtask queue.
 
 Something interesting you can do, if you had a function that is processing in the microtask queue, you can, within that function be adding more functions to be executed to the end of the microtask queue.
 
-The event loop is intersting in how it interacts with the microtask queue, we can theoretically never leave the microtask queue. The event loop will always execute anything on the microtask queue before it moves onto the callback queue.
+The event loop is intersting in how it interacts with the microtask queue, we can theoretically never leave the microtask queue. *The event loop will always execute anything on the microtask queue before it moves onto the callback queue.*
 
-* That is a distinction between the callback queue and the microtask queue, the standard callback queue does all the stuff in there and moves around again. The microtask queue however, once it enter, and youre filling in the back won't leave the microtask queue. You can "starve" the callback queue, but with some implications.
+* That is a distinction between the callback queue and the microtask queue, the standard callback queue does all the stuff in there and moves around again. The microtask queue however, once it enter, and youre filling in the back won't leave the microtask queue. You can "starve" the callback queue to escape it, but with some implications.
 
 ## Promises Review
 ### Promises
@@ -270,10 +270,10 @@ Prioritize functions in the microtask queue over the *Callback queue*.
 
 **Web applications**: Asynchronous JavaScript is the backbone of the modern-web -- letting us build fast 'non-blocking' applicaitions.
 
-All this is what makes JS really special.
+All this is what makes JS really special. 
 
 ## Links
 - [MAIN](/hardparts-js-v2-main)
 ----
 - [PREV ← | Asynchronous JavaScript](/hardparts-js-v2-asynchronous-javascript)
-- [NEXT → | ]()
+- [NEXT → | Classes and Prototypes](/hardparts-js-v2-classes-and-prototypes)
