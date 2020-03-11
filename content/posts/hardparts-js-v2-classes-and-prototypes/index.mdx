@@ -21,6 +21,19 @@ tags:
 3. What goals does the Object-oriented paradigm aim to address?
 4. Speak to the role of objects and the concept of *encapsulation*.
 5. If we had to epitomize the primary goal of OOP, what would it be?
+6. What are two of the easiest ways to create and add properties to objects?
+7. What's a third, but just as simple way of creating an object(empty), that gets us on the path of something more reusable?
+8. So we're creating objects with their functionality bundled together, we have this amazing paradigm, that's a great way to look at our programs (less so now than functional approach), But where still going wrong? 
+9. What are factory functions? How might they help us solve our dilema? Where in our example then do we still fall short?
+10. What problem is use of a prototype chain solving for us? Speak to how we might go about creating one and the elements required to do so successfull.
+11. What is an **implicit parameter**? What are the two key rules of the `this` keyword.
+12. What is `Object.prototype`, how is it useful? What are we enabling with regards to `__proto__`, when we use `Object.create()`? Does the `Object.prototype`
+13. How does `this` behave with regards to an arrow function?
+14. Where are situations where you might want to use an arrow function? Where would you not want to use an arrow function? 
+15. Functions are both ________ and ________. Because of this they have a property called? This property has a value of what? What can we do with this property and what problem does it help us solve?
+16. What are the three things that the `new` keyword automates for us?
+17. What is a little coding convention for factory functions and classes? Why do we need to specify this?
+18. What are some of the things that `class` make nice for us? What are some of the syntax quarks of classes?
 
 ## Class & OOP Introduction
 
@@ -66,8 +79,8 @@ And the functionality I need to have for each user (again simplifying!)
 
 How could I store my data and functionality together in one place?
 
-Two things:  
-1. We don't want to have to try and look over all our files of code to hunt down our increment function. In our ideal world, we would want our increment functionality, right there adjacent to somewhere it will be applied, like the users score.
+**Two things**:  
+1. We don't want to have to try and look over all our files of code to hunt down our increment function. In our ideal world, we would want our increment functionality, right there adjacent to somewhere it will be applied, like the users score.  
 2. We also want that functionality to be "private" to the thing its modifying and not used elsewhere in appropriately
 
 ### Objects - store functionality with their associated data!
@@ -105,6 +118,8 @@ user2.increment = function() {
 3. Next one is score, and 6.
 4. And then we create a property label, `increment` which has a value of a function, functions stored in an object are referred to more commonly as *methods*. We store that entire function body into `increment` property.
 
+>* **Let's review at least two simple ways of creating new objects: The first is with *object literal* syntax, where we fully define our object within itself. Then a second approach would be using *dot notation* after the object/empty or otherwise, to add properties to that object. This would be referred to as using.**[^6]
+
 ## Factory Functions
 What's another way, what's a built in function of JavaScript, whose output will be an empty object forevermore? `Object.create`...
 
@@ -119,7 +134,7 @@ user3.increment = function() {
     user3.score++;
 };
 ```
-Our code is getting repetitive, we're breaking our DRY principle. And suppose we have millions of users! What could we do?
+Our code is getting repetitive, we're breaking our DRY principle. And suppose we have millions of users! What could we do?  
 
 1. Declaring a constant `user3` in global memory, right hand side is going to immediately return out an empty object `{}`.
     - Even if we were to pass into those parens on `.create()` an object full of properties, it's still going to return out an empty object. Now that empty object might have some hidden properties on it depending on what we pass in, but it is always an empty object, no "direct" properties on it.
@@ -127,13 +142,15 @@ Our code is getting repetitive, we're breaking our DRY principle. And suppose we
 3. We then assign `user3` the score property which has the value 3
 4. And then we create a property label, `increment` which has a value of a function. We store that entire function body into the `increment` property/method.
 
+>* **`Object.create(null)` can be used to create a new empty object. Using `Object.create(null)` in this way, isn't doing anything special (when we pass in null), we still get returned to us an empty object.**[^7]
+
 So for general purposes, we've got data and functions/methods that work together and don't work with other stuff (technically we could still access that increment function in other areas, so its not strictly "protected"), we're good to go, except we're not staying very dry, we are doing this all manually for each user.
 
 Whenver we have code that is being done multiple times like adding properties, or methods, what do we tend to do with code that we find ourselves writing again again and again? Put it in a function.
 
-Let's drill in one more time, its a dream come true when we have 100,000 lines of code, to leave no mystery as to what/where  our functionality is with relationship to the data its being applied to.    
-    - Once you start thinking in terms of this paradigm of putting your data and the functionality together in one place, you start doing it a lot. You start thinking of everything in your application as: What's the data and the functionality connected to that particular feature?   
-    - It's a really nice paradigm, But this paradigm of OOP is increasingly not as popular as the functional programming style, but it remains a really intuitive way of thinking about structuring an application.
+> * Let's drill in one more time, its a dream come true when we have 100,000 lines of code, to leave no mystery as to what/where  our functionality is with relationship to the data its being applied to.    
+    - Once you start thinking in terms of this paradigm of putting your data and the functionality together in one place, you start doing it a lot. You start thinking of everything in your application as: What's the data and the functionality connected to that particular feature?  
+    - It's a really nice paradigm, But this paradigm of OOP is increasingly not as popular as the functional programming style, but it remains a really intuitive way of thinking about structuring an application.[^8]
 
 ### Solution 1: Create and return objects using functions
 ```js
@@ -151,7 +168,7 @@ const user1 = userCreator("Will", 3);
 const user2 = userCreator("Tim", 5);
 user1.increment();
 ```
-This Solution #1 is going to turn out to be untenable, but it gets us along way there. Everything else we do today is about making this much much more effecient.
+This Solution #1 is going to turn out to be untenable, but it gets us a long way there. Everything else we do today is about making this much much more effecient.
 
 ## Factory Functions Example
 ### Solution 1: Create and return objects using functions
@@ -193,11 +210,15 @@ user1.increment();
     - We also have to add any functionality manually to each and every user object.
 
 ### Solution 1: Generate objects using a function
-**Problems**: EAch time we create a newuser we make space in our computer's memory for all of our data and functions. But our functions are just copies.
+**Problems**: Each time we create a newuser we make space in our computer's memory for all of our data and functions. But our functions are just copies.
 
 Is there a better way?
 
 **Benefits**: It's simple and easy to reason about.
+
+> - Because we found ourselves repeating ourselves for each user, writing a lot of the same code, we did what we always do in situations like that, we wrapped everything in a function, where the things that change between users were made as parameters so they can adapt with different inputs. 
+- Remember, the goal is still the same here, we still want to encapsulate our data by producing an object. We are doing so now, internally in a function, creating that empty object, and giving it a name by which we can refer to it in order to sets its properties, and then returning that object out.
+- We've created here what can be referred to as a [**factory function**](). We are using a function as a sort of factory to produce other objects that might need multiple instances, e.g. users in an app. This particular version of the factory function above, is still untenable because of its method's redundant replication across users, but fundamentally this gets us about 90% of the way there. The last remaining bit is setting up its "prototypal inheritance/prototype chain", but this is it, once we do that, we're essentially doing the work of what classes are still doing under-the-hood in ES2015.[^9]
 
 ## Prototype Chain
 So intuitively, what might the solution be? We still want our function to be bundled with its data, maybe we can just add the one function in an object somehow have JS know that when it doesn't find the `increment` function on the user object, to not give up, and have us look elsewhere.
@@ -229,7 +250,7 @@ const user1 = userCreator("Will", 3);
 const user2 = userCreator("Tim", 5);
 user1.increment();
 ```
-- By the way, this approac here, is going to fundamentally achieve all the things we want to achieve besides the fact that its going to involve a little bit of writing of code, there might be some shorter-hand ways of doing this.
+- By the way, this approach here, is going to fundamentally achieve all the things we want to achieve besides the fact that its going to involve a little bit of writing of code, there might be some shorter-hand ways of doing this.
 - Solution 3 and 4 are going to just be shortened ways of doing the above.
 
 ## Prototype Chain Example: Prototypal Link
@@ -272,22 +293,26 @@ user1.increment();
 
 ![](/prototype-chain2.png)
 
+>- All we are doing is simply creating a shared store, an object, that is going to save a lot of our reused functionality as properties within that object. By using `Object.create()` we can then tell, the empty object that its creating where to look for that functionality that is no longer being store in each instance of itself, but instead in one shared place that can be referenced. The shared link that is established when we `Object.create(storeName)` and pass it an argument. Under the hood, JS is setting the hidden(ish) `__proto__` property of that object to be a "pointer" or a reference to the label/object of the item passed in as an argument to `Object.create()`. This "function" store, as we see above can simply just be a plain old object, out in global.[^10]
+
 ## Prototype Chain Example: Implicit Parameters
 The argument we pass `Object.create()` is always stored in the `__proto__`. It's a property not hidden like our [[scope]] property or our [[onFufilled]], `__proto__` is a hidden property but we can see it.
 
 Side note from MDN:   
 The `Object.getPrototypeOf()` method returns the prototype (i.e. the value of the internal [[Prototype]] property) of the specified object.
 
-So let's now, actually execute the `user1.increment()` method.
-1. So we have our new execution context and we've added it to the callstack, but the first line we encounter `this.score++`
-    - Here's the problem, does this `increment` function need to work on user1? on user2? user403? So this `increment` method needs to be working on their respective user objects scores, not the score of some other user.
-        - Don't panic. We have an amazing thing, called an [**implicit parameter**](), one that we don't even specify, one that is automatically there and filled in for us. This implicit paramter is called `this`.
-        - In our `user1.increment()` local memory we get the implicit parameter `this`, and the value of `this` is `user1`. Whatever is on the left-hand side of `.`, that object, that is what `this` is. (So in local memory something like `this: user1` exists).
-        - Here is our one key rule of `this`. It always attachs itself to the left hand side of the dot on which that function is being run. So it "evaluates" to `user1.score++`, we find `user1` in global memory, we find that `score` and we increment it. 
-        - This is one of our key uses of `this`, run a function that is shared through many different objects through the protolink to access the object on which that method is being executed.
+So let's now, actually execute the `user1.increment()` method...  
 
-Q: It seems like we are accessing `score` in up globally memory of the `user1` object, you're cautious about it from like a side-effects, potentially globally kind of consequences, kind of perspective, we have to accept that if we are taking this 
-model there are tradeoffs.
+1. So we have our new execution context and we've added it to the callstack, but the first line we encounter `this.score++`
+- Here's the problem, does this `increment` function need to work on user1? on user2? user403? So this `increment` method needs to be working on their respective user objects scores, not the score of some other user.
+    - Don't panic. We have an amazing thing, called an [**implicit parameter**](), one that we don't even specify, one that is automatically there and filled in for us. This implicit paramter is called `this`.
+    - In our `user1.increment()` local memory we get the implicit parameter `this`, and the value of `this` is `user1`. Whatever is on the left-hand side of `.`, that object, that is what `this` is. (So in local memory something like `this: user1` exists).
+    - Here is our one key rule of `this`. It always attachs itself to the left hand side of the dot on which that function is being run. So it "evaluates" to `user1.score++`, we find `user1` in global memory, we find that `score` and we increment it. 
+    - This is one of our key uses of `this`, run a function that is shared through many different objects through the protolink to access the object on which that method is being executed.
+
+>* **An implicit parameter is one that is simply a parameter that comes with a function without us having to ask for it. Every function has an implicit parameter called `this`. `this` has two key rules: (1) The value of `this` is going to be what is on the left-hand side of the `.` from the method that calls it. If there is nothing to the left hand side of that method, `this` defaults to the global/window object. (2) The other key rule is that if we use a `new` keyword, the automatically created object inside of that execution context is gonna label it: `this`.**[^11]
+
+Q: It seems like we are accessing `score` up in globally memory of the `user1` object, you're cautious about it from like a side-effects, potentially globally kind of consequences, kind of perspective, we have to accept that if we are taking this model there are tradeoffs.
 
 ![](/prototype-chain3.png)
 
@@ -312,16 +337,16 @@ const user2 = userCreator("Tim", 5);
 user1.hasOwnProperty('score');
 ```
 There is no property on `.hasOwnProperty` on user1, or  `userFunctionStore`, where is this function going to come from?
-`Object.prototype` which has a bunch of useful functions on it and it is availabel to all of our objects. But how? Well, all objects in JS have a default  `__proto__` which defaults to linking to `Object.prototype`.
 
-What we are kind of doing with `Object.create()` is kind of taking control of what we put in that `__proto__`, because by default it defaults to `Object.prototype`. `Object.prototype` also has a `__proto__` property but its value is `null` signifiying its the "end of the chain".
+>* `Object.prototype` which has a bunch of useful functions on it and it is available to all of our objects. But how? Well, all objects in JS have a default  `__proto__` which defaults to linking to `Object.prototype`.
+What we are kind of doing with `Object.create()` is kind of taking control of what we put in that `__proto__`, because by default it defaults to `Object.prototype`. `Object.prototype` also has a `__proto__` property but its value is `null` signifiying its the "end of the chain".[^12]
 
 ### What if we want to confirm our `user1` has the property score
 We can use the `hasOwnProperty` method - but where is it? is it on `user1`?
 
 All objects have a `__proto__` property by default which defaults to linking to a big object - `Object.prototype` full of (somewhat) useful functions
 
-We get access to it via `userFunctionStore`'s `__proto__` property -- the chain goes up.
+We get access to it via `userFunctionStore`'s `__proto__` property -- the chain goes up. 
 
 ## `this` Keyword
 
@@ -370,12 +395,12 @@ user1.increment();
 So let's just jump into `user1.increment()`
 1. First thing our implicit paramter, `this`, gets set to `user1`
 2. Next thing we declare a function `add1`, then invoke the function
-3. New call stack and exection context, the line of code inside is `this.score++`, but is our value of `this`? What would make sense is that while you are in the method, the peritent object, the object that we care about diong stuff to with the data is throughout going to be the object we are going to run the method on, even if we declare other functions inside. Their `this` should remain the object, but NO. `this` in local memory here, defaults, to the global window object. Not very useful, try to increment a global .score property on window.
+3. New call stack and exection context, the line of code inside is `this.score++`, but is our value of `this`? What would make sense is that while you are in the method, the peritent object, the object that we care about diong stuff to with the data is throughout going to be the object we are going to run the method on, even if we declare other functions inside. Their `this` should remain the object, but NO. `this` in local memory here, defaults, to the global window object. Not very useful, try to increment a global `.score` property on window.
     - In the old days, they would say `that = this` in the outer, so that the inner functions can have reference to `that` which would still point to the `user1` object. Gross.
     - You could also manually use `call/apply`, it would work like `add1.call(this)` in line 10 instead and it works again.
 
 ## Arrow Function Scope & `this`
-Let's take a look at the more standardly used way of doing things that uses *arrow functions*. That *arrow function* style of saving/declaring functions, automatically has it's `this` assignment *lexically scoped*, that is to say when we save the function when we execute it, what the `this` is determined by **where the function was saved**. Which means that if it was saved insdide of increment, where `this` is `user1` then it too should have a `this` of `user1`...
+>* Let's take a look at the more standardly used way of doing things that uses *arrow functions*. That *arrow function* style of saving/declaring functions, automatically has it's `this` assignment *lexically scoped*, that is to say when we save the function when we execute it, what the `this` is determined by **where the function was saved**. Which means that if it was saved inside of increment, where `this` is `user1` then it too should have a `this` of `user1`...[^13]
 
 ### Arrow functions override the normal `this` rules 
 ```js
@@ -397,12 +422,13 @@ const user1 = userCreator("Will", 3);
 const user2 = userCreator("Tim", 5);
 user1.increment();
 ```
-Let's just start at the execution of `user1.increment()`
+Let's just start at the execution of `user1.increment()`...
+
 1. In the execution context of this invokation the first thing is the implicit label `this` gets assigned the value `user1`
 2. We declare `add1` in the arrow function style, and immediately call it, which creates a brand new execution context
     - it's `this` assignment inside the local memory, remember the default is to look to the left of the dot assignment, and if there is no dot it defaults to the window/global. However, if it was created with an arrow function the `this` is going to be set to `this` assignment around the declaration of that function. The `this` of `add1` is *lexically scoped*, statically scoped, `this` assignment, that is to say: **it is from the moment of definition that we set our `this` to `user1`. Therefore, `this.score++` is going to evaluate to `user1.score++`, we have to go 4 levels out, but there's where it will find it to increment it.
 
-We don't want to use arrow functions on our methods on objects, because that would set their `this` to that global/window. However the functions inside of them, we will want to.
+>* We don't want to use arrow functions on our methods on objects, because that would set their `this` to that global/window. However the functions inside of them, we will want to.[^14]
 
 ![](prototype-chain4.png)
 
@@ -426,7 +452,7 @@ Our prototype approach involved a bit of writing of code... we had to create the
 Wouldn't it be a bit nice to automate some of this object building?
 
 Enter the `new` keyword, which automatically does for us:
-- a new object for us (we dont have to declare one)
+- creates a new object for us (we dont have to declare one)
 - it's also going to return that object out for us automatically
 - it's also going to make the link to some object full of functions out here (global), going to set the `__proto__` property for us as well.
     - To where though? Because previously we did this all manually. Where we going to put our shared store of functions?
@@ -488,7 +514,11 @@ All functions also have a property, just a property, called `prototype`. All fun
 
 That means, the function we're gonna use `new` on when it creates an object automatically, that desperately needs a place to link to, an big old empty object in which to store functions, remember, that function (`userCreator`) isn't just a function, it's also an object, which has a `prototype` property in it which contains a big old empty object.
 
-That means to the `prototype` property of the function, `new` will assign it's proto link to. They are going to be stored in the prototype property of the function that creates the new objects with the `new` keyword.
+>* - Functions are both functions and objects. You can think of them as function/object combos, but there is a function bit and an object bit. If we use `.` on the function name we get access to the object bit, if we use `()` we get access to the function bit.
+- All functions in their object bit automatically have a property on them called `prototype`. The default value inside of `.prototype` is a big empty object.
+- `new` will assign it's proto link to the `.prototype` property of the function that creates it. Our methods are going to be stored in the prototype property of the function that creates the new objects using the `new` keyword.
+- So now JS knows where to look for our functionality, but we still have to manually add those methods now that we know the location they will be searched for
+    - We do so by adding them to the .prototype object of our factory/constructor function, e.g. `userCreator.prototype.increment = function() { this.score++; }`[^15]
 
 ![](prototype-chain5.png)
 
@@ -526,13 +556,18 @@ We look up `userCreator` in global memory, we find it, we encoutner the `.` nota
 
 ![](/prototype-chain6.png)
 
+The `new` keyword, does what 3 things automatically for us? 
+1. It automatically creates an object for us that is given the label: `this` so we have a way to refer to it internally.
+2. It automatically sets the `__proto__` property on its auto-generated/`this` object, to be that of `.prototype` property of the constructor function that creates it.
+3. It returns `this` which is the object that was auto-created.[^16]
+
 ### Solution 3 - Introducting the keyword that automates the hard work: `new`
 **Benefits**: Faster to write. Often used in practice in professional code.
 
 **Problems**: 
 - 95% of developers have no idea how it works and therefore fail interviews
 - We have to upper case first letter of the function so we know it requires `new` to work!
-    - if we ran `userCreator` without the `new` keyword, the `this` will be assigned to the global! So maybe not idea, so there is a best pratice to capitalize the first letter of any function that is used as a constructor. This little problematic bit, the lack of clarity on needing to use the `new` keyword for special constructor functions, likely contributed to the introduction of classes (as well as a few other things).
+    - if we ran `userCreator` without the `new` keyword, the `this` will be assigned to the global! So maybe not idea, so there is a best pratice to capitalize the first letter of any function that is used as a constructor. This little problematic bit, the lack of clarity on needing to use the `new` keyword for special constructor functions, likely contributed to the introduction of classes (as well as a few other things).[^17]
 
 ## `class` keyword
 
@@ -559,7 +594,7 @@ user1.increment();
 Nothing changes under the hood, we just get to do these two separate declarations/assignments in one construct, we call it a class. We take the label of the fuction and make it the label of the class. As soon as we declare a class, we get a function+object combo just like before.
 We give the `userCreator` function bit from before a "sub-title" we call it `constructor` 
 - no longer do we need to manually have to assign those methods, we just list them out, even without commas between
-- nothing has changed under-the-hood, we are still doing the same thing assigning the methods to the prototype property of the object portion of the creator function. So when we run it with the `new` keyword, the function that gets run is the constructor.
+- nothing has changed under-the-hood, we are still doing the same thing assigning the methods to the prototype property of the object portion of the creator function. So when we run it with the `new` keyword, the function that gets run is the constructor.[^18]
 
 It looks like other languages in a way, but its under-the-hood implementation surely isn't the same. It's just as, we've seen it previously just these kind of factory functions.
 
@@ -571,6 +606,68 @@ It looks like other languages in a way, but its under-the-hood implementation su
 **Problems**:
 - 99% of developers have no idea how it works and therefore fail interviews/debug their classes.
 - But you will not be one of them!
+
+## Wrapping Up 
+Some things, I kind of observed from playing around:
+```js
+const userCreator = function(name, score) {
+    const user = Object.create(userCreator.prototype);
+    user.name = name;
+    user.score = score;
+    return user;
+}
+userCreator.prototype.increment = function() { this.score++ };
+user1 = userCreator('ash', 9)
+user1.increment() // --> 10
+
+// DON'T DO THIS ...
+userCreator.prototype.decrement = () => this.score--;
+user1.decrement() // --> NaN
+```
+- If you're not using the `new` keyword, the above still works as you would expect.  
+- If you're trying to set the methods for your future objects like above, remember that arrow functions `this` binding is lexically scoped, that is to say, that it is assigned the `this` context of where it was born/created. And in the above the `this` context default to the global/window. What it's trying to do when you run it is essentially look for `window.score` and decrement that, which is `NaN`.
+
+Last few thoughts on proto/prototype
+- All objects have a `__proto__` property. By default it's set to the `.prototype` property of `Object`. Arrays and Functions are also objects, but their `__proto__` property has an intermediate link, that is their respective `Function` and `Array`
+
+- Think of `__proto__` as the property that is like the address book of where to look for functionality 
+
+
+JS is only ever going to be asking `__proto__`, "do you know where I can find x?" Because `__proto__` itself never has those things itself, it only holds a reference to where to look next. And JS is only asking `__proto__` because it first checks locally if it can find those x. 
+`.prototype` on the other hand might have those things, and it's the store/repository (remember its an object), that `__proto__` checks. Which object's `.prototype` property is checked depends on what is specified in `__proto__`. 
+
+Another interesting thing, if you take the code above and run this...
+```js
+const userCreator = function(name, score) {
+    const user = Object.create(userCreator.prototype);
+    user.name = name;
+    user.score = score;
+    
+    /* DON'T DO THIS EITHER */
+    userCreator.prototype.increment = function() { user.score++; };
+    /************************/
+
+    return user;
+}
+
+userCreator.prototype.constructor //--> function userCreator(name, score)
+user1 = userCreator('ash', 9)
+user1.increment() // --> 10
+```
+- Even without classes, a `constructor` property exists on our `.prototype` and it stores the function and label of the the things to the left of `.prototype`.
+- You can also technically do the above, where we we move the assignment of `.increment` into the constructor function. We don't want to do this because we would then be declaring the same function each time we created a new user. It wouldn't be stored anywhere differently, but we are repeating an unnecessary evaluation with each instance.
+
+Here is something fun, you can do...
+```js
+5.__proto__
+// --> invalid
+
+//However...
+const five = new Number(5);
+five.__proto__;
+//--> Number ()
+```
+And from what we've gleaned from the `new` keyword is that it's creating a new empty object, set to `this`, it's setting the `__proto__` property of that object to the `.prototype` property of the function that creates it (`Number` in our case), and it's returning that object.
 
 ## Links
 - [MAIN](/hardparts-js-v2-main)
