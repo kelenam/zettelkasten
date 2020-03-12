@@ -11,7 +11,13 @@ tags:
 
 ## Summary Questions
 1. Briefly talk about the relationship between these 4 things: JavaScript, Node.js, V8, and libuv.
-2. So why do we even need Node if V8 and libuv are the things actually responsible for JS execution and filesystem/concurrency access?
+2. So why do we even need Node if V8 and libuv are the things actually responsible for JS execution and filesystem/concurrencyaccess?
+3. What can you say then are the two things Node is kind of responsible for doing?
+4. What is the responsibility/role of v8 and libuv?
+5. What are processes? What are threads? A running Node program/file would be considered a ________? It might run multiple _______.
+6. What is the gist of scheduling, and what is the role of your computer's **OS scheduler**?
+7. What are two strategies to improve the rate at which threads can be processed?
+
 
 We are starting with a very simple diagram
 ![](/our-code.png)
@@ -43,6 +49,9 @@ The other thing Node does is to provide a series of wrappers and a very unified 
 
 So by using Node, you don't have to work with all the C++ code that exits inside of libuv itself.
 
+>* So you can think of the two things Node does, as...
+1. It talks to us, and the JS code we write, through a consistent API that is the interface for a lot of nice wrappers on externalized functionality. If you've taken JS: Hard Parts, Will, referers (more specific the browser APIs)as "facade functions", functions that look and feel like JS but are doing so much more behind the scenes.
+2. It talks/translates via V8 and libuv in order to process different functionality, written in C++, that JS can't do so directly, things like filesystem interaction, or networking requests.[^3]
 
 ## Module Implementations 
 Let's look at how things are implement directly by just taking a look at the source code: https://github.com/nodejs/node
@@ -52,10 +61,11 @@ Two folders we are going to pay attention to : `lib` and `src`.
 
 In the require statement at the top the pbkdf2 file, we might notice something unfamiliar: `process.binding('crypto')` which is how nodejs joins up the C++ of the project to the JS side.
 
-![](cplusplus-js-binding.png)
+>![](cplusplus-js-binding.png) 
+> It's more interleaved than just strict isolation of libuv/v8/node responsibilities, but this visual explains it decently[^4]
 
 ## Node Backed by C++
-`process.binding('crypto')` is the bridge that binds to the C++ side of things. For now we are going to skip talking about V8 and look at the C++ side of the Node project, where the pbkdf2 function is actually implemented.
+`process.binding('crypto')` is the bridge that binds to the C++ side of things. For now we are going to skip talking about V8 and look at the C++ side of the Node project, where the `pbkdf2` function is actually implemented.
 - In that `src` file, you can find the `node_crypto.cc` file that is going to have about 5k lines of C++ code that the JS crytpo module depends on.
 - You can get the idea that whenever we run that JS function that it ultimately relys on upon some C++ code.
 
@@ -63,7 +73,7 @@ The other thing you might be curious about in here is, where does V8 and libuv c
 
 Well if we go back up to that node_crypto.cc file, around line 85 or so you're going to see a lot of `using` statements, e.g. `using v8::Array;` etc.
 
-The purpose of the V8 project inside of all this source code is to act as the intermediary and allow values that are defined inside of JS to be translated into their C++ equivalents.
+**The purpose of the V8 project inside of all this source code is to act as the intermediary and allow values that are defined inside of JS to be translated into their C++ equivalents.** [^4]
 
 All the `using` statements are importing the C++ definition of JS concepts, like the C++ understanding of what JS `false` is with (`using V8::False;`).
 The V8 project is used to translates the JS values that we are all familiar with and to translate them into their C++ equivalents.
@@ -80,8 +90,8 @@ We will be diving into the **event loop**, the **event loop** is used in Node to
 
 ### Threads
 Whenever anyone runs a program on our computer we start up something called a [**process**](). 
-- A [**process**]() is an instance of a computer program that is being executed. 
-- Within a single process we can have multiple things called **threads**. You can think of [**threads**]() as being some little to-do list that has as set of instructions that need to be executed by the CPU of your computer. This thread is given to your CPU
+>- A [**process**]() is an instance of a computer program that is being executed. 
+- Within a single process we can have multiple things called **threads**. You can think of [**threads**]() as being some little to-do list that has as set of instructions that need to be executed by the CPU of your computer. This thread is given to your CPU...[^5]
 
 ![](/threads.png)
 
@@ -89,42 +99,40 @@ If you open up activity monitor you can see your active thread count and process
 
 A process can have many/mutltiple active threads.
 
-One of the most interesting and important areas of study around threads is understanding something around [**scheduling**]() which refers to your operating systems (specifically OS Scheduler) ability to decide which thread to process and any given instance in time.
+One of the most interesting and important areas of study around threads is understanding something around [**scheduling**]() which refers to your operating systems (specifically the **OS Scheduler**) ability to decide which thread to process and any given instance in time.
 
 You only have a finite amount of threads/processes restricted by memory/ram.
 
-Your OS scheduler has to figure out what tasks to manage, and how to not spend too much time processing urgent threads to be excuted, things like input responses.
+Your **OS scheduler** has to figure out what tasks to manage, and how to not spend too much time processing urgent threads to be excuted, things like input responses.[^6]
 
 #### Two strategies to improve the rate at which threads can be processed...
 While there are more then two, we will focus on two specifically that may help with our work as Node devs....
 
-1. Add additional cores, more CPU cores, means more threads processed concurrently, (fyi a single core can already handle multiple threads via multithreading or hyperthreading)
-2. The other thing we can do, is more closely examine the work that is being done by each thread. This is where things get really relevant for us in the JS world.
+> 1. Add additional cores, more CPU cores, means more threads processed concurrently, (fyi a single core can already handle multiple threads via multithreading or hyperthreading)
+2. The other thing we can do, is more closely examine the work that is being done by each thread. This is where things get really relevant for us in the JS world.[^7]
 
-![](/threads.png)
+![](/threads2.png)
 
-Image we have two processes both computing for CPU attention. Keep in mind, any time our computer tries to read data off of some medium like a harddrive, we refer to that as [**input/output operaations**]() and it always takes some non-zero amount of time.
+Image we have two processes both computing for CPU attention. Keep in mind, any time our computer tries to read data off of some medium like a harddrive, we refer to that as [**input/output operations**]() and it always takes some non-zero amount of time.
 
-So during this I/O phase, our CPU is waiting on the harddrive to read some file and during this time, this thread #1 has abosolutely nothing else to do, your OS scheduler has the abiliity to detect this downtime, this kind of pause between instructions and it can decide to put thread number one on pause, address thread #2 then go back to thread #1.
+So during this I/O phase, our CPU is waiting on the hard drive to read some file and during this time, this thread #1 has abosolutely nothing else to do, your OS scheduler has the abiliity to detect this downtime, this kind of pause between instructions and it can decide to put thread number one on pause, address thread #2 then go back to thread #1.
 
 ### Summary
 - Threads are units of instruction waiting to be run by the CPU.
-- Deciding which order to execute these threads in is referred to as *scheduling*.
+- Deciding which order to execute these threads in is referred to as **scheduling**.
 - *Scheduling* is controlled by your OS
 - Two ways of improving the rate at which we process threads is:
     1. Add more CPU cores to our machine
     2. OR, allow our OS scheduler to detect big pauses in processing time due to expensive input and output (I/O) operations.
 
 ## The Node Event loop
-- Whenever we start up a node program on our computers. Node autoamtically creates, one thread and executes all of our code inside of that one single thread.
-
 ![](/node-program.png)
 
+>- Whenever we start up a node program on our computers. Node autoamtically creates, one thread and executes all of our code inside of that one single thread.
 - Inside of this one single thread (blue box) we have something called the **event loop**.
 - You can think of the **event loop** as being a control structure that defines what our one thread should be doing at any given point in time.
 - This event loop is the absolute core of every Node program that you and I run and, every program that we run will only have exactly one event loop.
-
-- Understanding how the event loop works is super important because that is where we will find a lot of our performance implications.
+- Understanding how the event loop works is super important because that is where we will find a lot of our performance implications.[^8]
 
 We are going to write pseudo-code to essentially walkthrough how the event loop works...
 
@@ -152,7 +160,7 @@ So inside of the shouldContinue function , Node does 3 separate checks to decide
 2. Check any pending OS tasks? (Like server listening to port?)
 3. Check if any long running operation, like fs call. Sounds similar to second check, but it really is truly a separate check.
 
-So you can kind of imagine that there might be like an internal array-like object in Node program that keeps track of any of these pending tasks that might get created? Maybe like 3 arrays to represent bookkeeping stuff...
+So you can kind of imagine that there might be like an internal array-like object in Node program that keeps track of any of these pending tasks that might get created? Maybe like 3 arrays to represent book-keeping stuff...
 
 ```js:title=pseudocode-of-node-event-loop
 const pendingTimers = [];
@@ -164,7 +172,7 @@ const pendingOperations = [];
 myFile.runContents();
 
 function shouldContinue() {
-    // Check one: Any pending setTimeout, setInternval, setImmediate?
+    // Check one: Any pending setTimeout, setInterval, setImmediate?
     // Check two: Any pending OS tasks (like server listening to port)
     // Check-three: Any pending long running applications (like fs module)
 
@@ -194,7 +202,7 @@ const pendingOperations = [];
 myFile.runContents();
 
 function shouldContinue() {
-    // Check one: Any pending setTimeout, setInternval, setImmediate?
+    // Check one: Any pending setTimeout, setInterval, setImmediate?
     // Check two: Any pending OS tasks (like server listening to port)
     // Check-three: Any pending long running applications (like fs module)
 
@@ -203,7 +211,7 @@ function shouldContinue() {
 
 // entire body executes in one 'tick'
 while(shouldContinue()) {
-    // 1) Node loosk at pendingTimers and sees if any functions 
+    // 1) Node looks at pendingTimers and sees if any functions 
     // are ready to be called
     
     // 2) Node looks at pendingOSTasks and pendingOperations 
@@ -220,7 +228,7 @@ while(shouldContinue()) {
 }
 
 // exit back to terminal
-```
+``` 
 The first step that happens in the event loop is Node looks at pending timers, and sees if any functions are ready to be called.
 
 Step 3 is the interesting one, it kind of just pauses, and wait for stuff to happen, if see something about to occur we continue with the last 2 step of the event loop.
@@ -237,6 +245,9 @@ readStream.on('close' () => {
 - This is the body of our event loop and occurs ever tick.
 
 - The most critical part of the event loop body is the pause that occurs in step 3, pausing instead of running through everything as fast as it can.
+
+### Node Event Loop Summary
+1. As soon as a Node program starts,
 
 ## Is Node Single Threaded?
 Let's clarify a very common misconception that Node is single threaded.
@@ -420,7 +431,7 @@ const pendingOperations = [];
 myFile.runContents();
 
 function shouldContinue() {
-    // Check one: Any pending setTimeout, setInternval, setImmediate?
+    // Check one: Any pending setTimeout, setInterval, setImmediate?
     // Check two: Any pending OS tasks (like server listening to port)
     // Check-three: Any pending long running applications (like fs module)
 
@@ -429,7 +440,7 @@ function shouldContinue() {
 
 // entire body executes in one 'tick'
 while(shouldContinue()) {
-    // 1) Node loosk at pendingTimers and sees if any functions 
+    // 1) Node looks at pendingTimers and sees if any functions 
     // are ready to be called
     
     // 2) Node looks at pendingOSTasks and pendingOperations 
@@ -457,18 +468,255 @@ In the last video we touched upon the threadpool automatically spun up by libuv,
 In this section, we will be looking more closely at this `pendingOSTasks` array.
 
 Let's write a little program that will fetch the google homepage and calculate how long that takes...
-```js:title=async.js
+```js:title=async.js {5,12,14-20}
 const https = require('https');
-
 const start = Date.now();
+ 
+function doRequest() {
+    https.request('https://www.google.com', res => {
+        res.on('data', () =>{});
+        res.on('end', () => {
+            console.log(Date.now() - start);
+        });
+    }).end();
+} 
 
-https.request('https://www.google.com', res => {
-    res.on('data', () =>);
-    res.on('end', () => {
-        console.log(Date.now() - start);
-    });
-}).end();
+doRequest();
+doRequest();
+doRequest();
+doRequest();
+doRequest();
+doRequest();
+doRequest();
 ```
 
 ## Libuv OS Delegation
+When we ran our `async.js` file, we saw it took about 240ms. We will take a look at some functions that don't seem to be using the libuv threadpool. 
+- Wrap our function in doRequest and at the bottom, run it a few times.
+- Interesting, if you notice, it looks like all calls appear to finish at the same time, yet we made 7 requests.
+    - libuv only has 4 threads, so only 4 tasks can be processed at a time
+    - So what is going on here?
 
+![](os-async-helpers.png)
+
+So what we are seeing here, is more evidence of libuv in play, but its _not_ related to our threadpool.  
+>- **Just as the node std lib has some functions that make use of libuv's threadpool, it also has some functions that make use of code that is built into the underlying operating system through libuv.**
+- So in this case, libuv sees we are attempting to make an HTTP request, neither libuv nor Node has any code to handle all these super low level operations that are involved with a network request instead, **libuv delegates the request making to the underlying operating system**.
+- It's actually our OS that does the real HTTP request. libuv, is used to issue the request, and just waits on the OS to emit a signal that some response has come back for the request.
+- So because libuv is delegating the work to the OS, the OS is the one making decisions about its thread management and generally how to handle the entire process of making the request.
+- Because the OS is making the request there is no blocking inside of our JS code/event-loop or anything else inside of our application, all the work is being done by the operating system itself and we're not touching the threadpool at all in this case.
+
+## OS/Async Common Questions
+- We we just talked about some function calls in the std that make use of delegation their task to the underlying operating system and run entirely outside of the *event loop*.
+
+Q. What functions in node std librar yuse the OS's async features?
+A. It kind of depends on the OS itself, BUT Almost everything around networking for all OS's. Some other stuff is OS specific. Don't try to detect or plan around this stuff ahead of time.
+
+Q. How does this os async stuff fit into the event loop?
+A. Tasks using the underlying OS are reflected in our `pendingOSTasks` array.
+
+
+```js:title=pseudocode-of-node-event-loop {2,14,22,23}
+const pendingTimers = [];
+const pendingOSTasks = [];
+const pendingOperations = [];
+
+// node myFile.js
+// New Timers, tasks, operations are recorded from myFile running
+myFile.runContents();
+
+function shouldContinue() {
+    // Check one: Any pending setTimeout, setInterval, setImmediate?
+    // Check two: Any pending OS tasks (like server listening to port)
+    // Check-three: Any pending long running applications (like fs module)
+
+    return pendingTimers.length || pendingOSTasks.length || pendingOperations.length;
+}
+
+// entire body executes in one 'tick'
+while(shouldContinue()) {
+    // 1) Node looks at pendingTimers and sees if any functions 
+    // are ready to be called
+    
+    // 2) Node looks at pendingOSTasks and pendingOperations 
+    // and calls relevant callbacks
+
+    // 3) Pause Execution. Continue when...
+    // -- a new pending OSTask is done
+    // -- a new pendingOperation is done
+    // -- a timer is about to complete
+
+    // 4) Look at pendingTimers. Call any setImmediate
+    
+    // 5) Handle any 'close' events 
+}
+
+// exit back to terminal
+```
+That's why when you start up a server and say listen on port:3000, that's exactly why your application continues running in the terminal and does not immediately exit to the command line.
+
+## Review
+
+![](event-loop-review.png)
+- You might be curious about `require` statements in that file. The instant you boot up node, all the code inside of that file and any required files as well are all executed, everything is instantly required in an executed as well.
+- We enter the event loop in green, and asks why overarching big question: *do we still have any work to do?*, if not it instantly exits, otherwise it goes through a series of different steps.
+
+1. **Big question**: Any work left to do? Look at timers, OS tasks, threadpool.
+2. Run `setTimeout`s, `setInterval`s
+3. **99% of our code is this**: Run callbacks for any os tasks or threadpool tasks that are done. 
+4. Pause and wait for stuff to happen. 
+5. Run any `setImmediate` functions
+6. Handle close events 
+7. Repeat.
+
+Remember, we refer to one execution of the event loop as a **tick**.
+
+## Crazy Node behavior
+Combining all our previous examples, you'll find it produces some unexpected behavior (would make a great Node interview question)
+
+```js:title=multitask.js {3,22,24-26,28-31}
+const https = require('https');
+const crypto = require('crypto');
+const fs = require('fs');
+
+const start = Date.now();
+
+function doRequest() {
+    https.request('https://www.google.com', res => {
+        res.on('data', () =>{});
+        res.on('end', () => {
+            console.log(Date.now() - start);
+        });
+    }).end();
+}
+ 
+function doHash() {
+    crypto.pbkdf2('a', 'b', 100000, 512, "sha512", () => {
+        console.log("Hash:", Date.now() - start);
+    });
+}   
+
+doRequest();
+
+fs.readFile('multitask.js', 'utf8', () => {
+    console.log('FS:', Date.now() - start);
+})
+
+doHash();
+doHash();
+doHash();
+doHash();
+
+```
+- Let's require now the filesystem module,: `const fs = require('fs');`
+- We are going to add a function call to that fs module and try to read all the code we just wrote into the `multitask.js` file. 
+- Add that `fs.readFile`, here is where things start getting really crazy. 
+    - We are going to add a function call to `doRequest` right above our `fs` call.
+    - then we are going to call `doHash` 4 times below 
+
+The interview question: What order will we see the `console.log` statements appear?
+
+~~I guess it comes down to how long fs takes and I imagine its an OS dependent task.~~
+~~I think from memory there is an option to specify `fs` stuff as asynchronous or sync, I don't know what it defaults to, but I think its synchronous.~~ 
+~~Let's think about how they might be added to the "arrays", which I imagine are just callback queues.~~
+~~We execute doRequest first, so it likley sends that off to OS to process~~
+~~we then encounter fs.Readfile, which lets presume, runs synchronously and will be blocking, so let's say it prints the file contents first. Depending on how long it takes, doRequest will likely finish in 270ms, and be put on the callback queue.~~
+~~In the meantime, after the OS tasks have been delegated, the doHash functions will be dispatched to libuv threads, so depending on how fast the `fs` call works.~~
+
+My guess, because Stephen says its crazy unexpected...  
+- 4 hashes: ~700ms
+- FS: ~1000ms
+- HTTP: ~270ms
+
+Huh! Interesting....
+```bash:title=my-pc-i7-6700k(4cores)
+228
+Hash: 1045
+FS: 1046
+Hash: 1055
+Hash: 1064
+Hash: 1066
+```
+- These were the results on my PC when I ran. 
+- If you run it again, you get the same ordered results!
+
+This is crazy, no way that the fs takes 2 seconds (1 second on my pc) to read files, what is going on? If we comment out those hash function calls, and re-run you can see that it takes our fs only 26ms to read.
+
+## Unexpected Event Loop Events
+Why do we always see 1 Hash before the console.log of the FS, and why do we see the HTTP request complete first? Oh, I was wrong, the FS is an asynchronous call.
+
+So why do we see the HTTP one finishes right away and the FS always seems to finish after the first hash?
+
+![](threadpool-os.png)
+
+Remember in the last few sections, we said, Node internally makes use of a threadpool for some very specific function calls, in particular everything inside of the `fs` module makes use of this threadpool, as we know, that crypto module function `pbkdf2` also makes use of the threadpool as well.
+
+However, the https request we are making does not make use of that threadpool, and instead reaches out directly to the OS.
+
+![](timeline.png)
+
+So here is a rough look at the timeline of what happened.
+
+Below you can kind of follow what's happened, we had to do a check of the file before we processed it, the blue boxes represent moments in which we were kind of paused, waiting for more info
+
+![](fs-read.png)
+
+### What happened
+- The HTTP module doesn't ever touch the threadpool so it completes first and separately.
+You can think of it as assigning and setting up 5 function calls that depend on the threadpool, and the first four each got assigned to some thread.
+- As soon as thread#1 got started on its work, it had to go through the diagram above, and do its checks. Now during that phase, thread#! starts to reach out to the HD, and as soon as it does that, it realizes, "hey, I'm going to be waiting for quite a while on this HD to give me info back. So, while I'm waiting for that info, I don't care about that FS task anymore, it can just sit around and wait". So as soon as it reaches out to the HD, Thread#1 is like, hey everyone, I am available to do something else like this fourth hashing function call.
+- Thread#1 temporarily forgets about that fs call
+![](unexpected-results.png)
+
+
+- Then one of the thread is eventually going to finish and does its `console.log()` and clear space for FS to resume, say in thread#2. It can pick back up work, and see that pending fs call, checks those statistics and then makes a followup request to get the file contents, it gets to the step: "HD accessed, file contents stream back to app", and because it has no other work to do it just kind of sits around waiting for the file contents to come back. Thread#2 then processes them and then we see that `FS:``console.log` appear.
+
+That's why we always see one hash before that FS logged.
+
+Tricky bonus question, "What if we set our threadpool count size to 5"?
+You will see that our FS
+```bash:title=threadpool-size-5
+FS: 52
+228
+Hash: 1045
+Hash: 1055
+Hash: 1064
+Hash: 1064
+```
+- Now that we have an extra thread, we have one that can be 100% responsible for everything the FS does.
+
+Likewise, if we did...
+```bash:title=threadpool-size-1
+221
+Hash: 1045
+Hash: 1055
+Hash: 1064
+Hash: 1064
+FS: 1102
+```
+
+*Aside*: Setting the threadpool doesn't seem to work for me on Windows 10. Trying on mac.
+https://github.com/nodejs/help/issues/1429 
+- On mac I get similar results with `process.env.UV_THREADPOOL_SIZE` being `undefined`, and unchanged by trying to `set` in command line.
+
+- https://stackoverflow.com/questions/11104028/process-env-node-env-is-undefined
+- Okay. So I think I got something to work.
+
+Set the NODE_ENV to development with, in terminal, in project root: `SET NODE_ENV=development`
+
+Set this in terminal, in root dir of project:
+`SET UV_THREADPOOL_SIZE=1`
+
+Then we get these results...
+```bash:title={pc-4core-threadpool-size-1}
+λ node multitask.js
+231
+Hash #1: 533
+Hash #2: 1027
+Hash #3: 1521
+Hash #4: 2015
+FS: 2016
+```
+
+## Links
+- [NEXT → | Enhancing Node Performance](/nodejs-grider-node-performance)
