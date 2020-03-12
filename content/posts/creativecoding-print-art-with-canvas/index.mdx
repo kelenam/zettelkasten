@@ -19,8 +19,271 @@ Then use the command `npm install canvas-sketch-cli --global` to install it glob
 Easiest way to test if its been installed successfully, is to mkdir a new empty dir, move into folder in terminal then type, `canvas-sketch [filename] --new --open` this will scaffold out a new project and open it.
 - this opens the browser, creates the file, and creates the package.json
 
-## Canvas Sketch Introduction
-Open MDN canvas API docs for handy reference.
+Run `canvas-sketch sketch.js` to start up server again if need be.
 
+## Canvas Sketch Introduction
+Open [MDN canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) docs for handy reference.
+
+```js
+const canvasSketch = require('canvas-sketch');
+
+const settings = {
+  dimensions: [ 2048, 2048 ]
+};
+
+const sketch = () => {
+  return ({ context, width, height }) => {
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, width, height);
+  };
+};
+
+canvasSketch(sketch, settings);
+```
+- we are requiring canvasSketch, it's a CLI but its also a JS library
+- settings object defines the size/settings.
+- The goal of this project, is to create each creative project within a single function if you can.
+- This `sketch` function returns another function, a kind of render function.
+  - Similar to React/Vue, for rendering/displaying. You have some props coming in, giving you that current state of the appliacation. But instead of returning a JSX tree or whatever, we're instead rendering into your canvas.
+  - You want to try and keep this a pure funtion if you can even though we are setting state in our canvas.
+  - The idea is that every time we are clearing the canvas and starting again from a fresh canvas.
+  - Ethods of canvasSketch to be more declarative.
+- `context` variable, if you reference the canvas docs, you can see more about this.
+
+The canvas API is kind of state based, we are setting the state of things, and then we are rerendering.
+
+## Canvas API Basics
+Looking for arcs, the way it works is that you specify the beginning of a path, everything after it is going to then be part of this path operation.
+```js {12,13}
+const canvasSketch = require('canvas-sketch');
+
+const settings = {
+  dimensions: [ 2048, 2048 ]
+};
+
+const sketch = () => {
+  return ({ context, width, height }) => {
+    context.fillStyle = 'orange';
+    context.fillRect(0, 0, width, height);
+
+    context.beginPath();
+    context.arc(width / 2, height / 2, 300, 0, Math.PI * 2, false);
+    context.fillStyle = "red"
+    context.fill();
+    
+    context.lineWidth = 40;
+    context.strokeStyle = "blue";
+    context.stroke();
+  };
+};
+
+canvasSketch(sketch, settings);
+```
+`arc` takes x and y coordinates, of the center (think of a compass)
+- then we want the radius of the circle, 
+- then start of how far around the circle we want to go
+- end would be Math.PI * 2, because these are in radians (not degrees), so Math.PI * 2 would be a full circle.
+- a boolean for direction, counter clockwise and clockwise, we can say false because its going to be a full circle
+
+Lastly, once we describe the path we fill it with `context.fill()`, but we don't see anything because our fill color is still set to orange, so like we were saying, *it's a state sort of based API* and so we have to change this fill stylle from orange to something else before we fill it...`context.fillStyle = "red"`
+
+There is another command called `.stroke()` which will take whatever path you have before it and outline it by default its a 1px black stoke we can make it thicker. **Remember, we have to set the parameters of the stroke function before, otherwise it's not going to apply**...
+`context.lineWidtth = 40;`
+`context.strokeStyle = "blue";`
+`context.stroke();`
+
+##  Canvas Sketch Applications
+So why are we using `canvasSketch`?
+
+Well, if click on your window to make sure you have it open and hit ctrl+s. you should have a message in your console which tells you the image has been exported to your downloads file, and that image is the exact dimensions of your code.
+
+So if we change our dimenions in our preset to something like `A4` or `letter`, `postcard`, you have these common print sizes for art we can now print.
+
+However, you should note, that if we try printing this now, it will be blurry that's because the resolution by default is 72. If want to print we can specify the `pixelsPerInch`...
+```js
+const settings = {
+  dimensions: 'A4',
+  pixelsPerInch: 300
+}
+```
+- So, so far we've noticed that the circle is changing sizes each time we change the resolution which isn't very good, because we want to make sure it looks the same as we expect it, so instead giving pxs in our circle (`300`), we can change it to be relative to the of the screen for example: `width * 0.2`, and same with the line width (`context.lineWidth = width * 0.05`)
+
+Another thing to note is that we are still working with pixel units, and thats fine if youre doing resolution independent things its okay, but what if we want something to be a specific size, how do we get from pixels to inches?
+
+One way of doing that is using a different unit in our settings 
+```js
+const settings = {
+  dimensions: 'A4',
+  units: 'cm',
+  pixelsPerInch: 300
+}
+```
+So this would change the units across the board on our project, so we could then say we want the circle to be 2cms, after we set the units in the settings we could just say...`context.arc(width / 2, height / 2, 2, 0, Math.PI * 2, false);` 
+
+You can also change the orientation, in settings with `orientation: 'landscape'` or `portrait`.
+You can also specify exact dimensions by prodivding an array with [w,h], which will be in whatever units we set in our settings, e.g. `dimensions [16 10]`, would be 16cm x 10xm
+
+2048 2048 is great for instagram or squares.
+
+## The Grid
+Something Matt noticed when he is doing his own creative projects, is that if he starts with an empty canvas, you can feel uncertain on where to go, so one thing you can do to combat this is: **start with a really simple theme that you can apply throughout your project**.
+You can start with just a grid or some circles or whatever.
+
+## Drawing the Grid
+```js
+const canvasSketch = require('canvas-sketch');
+
+const settings = {
+  dimensions: [ 2048, 2048]
+};
+
+const sketch = () => {
+ 
+  const createGrid = () => {
+    const points = [];
+    const count = 5;
+    for (let x = 0; x < count; x++) {
+      for (let y = 0; y < count; y++) {
+        const u = w / count;
+        const v = y /count;
+        points.push([ u, v ]);
+      }
+    }
+    return points;
+  };
+
+  const points = createGrid();
+
+  return ({ context, width, height }) => {
+    context.fillStyle = "white";
+    context.fillRect(0,0, width, height);
+  
+    points.forEach([ u, v ] => {
+      const x = u * width;
+      const y = v * height;
+
+    })
+  };
+};
+
+canvasSketch(sketch, settings);
+```
+- first thing is set the fillStyle to white, otherwise its transparent, then fill a rect the fill size of the screen.
+- let's create a function that is just going to make our grid. Outside of our render.
+- Intead of pixel coordinates we can use something Matt calls [**UV space**](), this is an idea where you work in numbers between zero and one rather than your final pixel coodinates. It's useful because you can start manipulating the numbers in different ways.
+- create a `u` variable between 0 and 1, for that we can do `x / count`, do something for the `v` coordinate:
+- `const v = y / count`
+- This gives us now a UV sort of coordinate where top left woudl be (0,0), and the bottom right would be closer to (1,1).
+- We'll see why later this is useful, for now we can just add coords to point array
+- `point.push([u,v]);
+
+- Whenver Matt works with coordinates or vectors or 2d x-y pairs or something like this, he just uses arrays. You could also use objects, but Matt prefers arrays.
+- Then we return the `points`.
+- don't forget to call and store the results of createGrid in points const.
+
+- So now with this array of points we are going to loop through each of them using `forEach`, 
+- `points.forEach(point => {})`, this `point` parameter, is easiser if we just destructure it using ES6...
+- If you warp the array with brackets you can just destructure the u and v coordinates that we have...
+- `points.forEach([ u,v ] => {})`
+
+Remember these coordinates are betwen 0 and 1, so we have to scale these back up to pixel space...so we can multiply them by corresponding width and height....
+```js
+points.forEach([u, v] => {
+  const x = u * width;
+  const y = v * height;
+
+  constext.beginPath();
+  context.arc(x,y,200, 0, Math.PI * 2, false);
+  context.strokeStyle = "black";
+  xontext.lineWidth = 40;
+  context.stroke();
+})
+```
+If we build this now, you will notice that are grid is kind of left alligned, and that's because our points they go to 0.8 but they don't go all the way to 1, so there is no points setter at 1 and when you multiply by 1 by width you should get the very end of the page, so in our UV coordinate system, instead of diving by count we can divide by `(count - 1)`, and that is just going to scale everything so our coordinates go exactly from zero all the way to one.
+- One thing to be mindful of, if your count happens to be very low, like 1 or 0, your items won't show because we might get a NaN situation where we are dividing by 0, so to guard for that, we can use a ternary...
+`const u = count <= 1 ? 0.5: x / (count - 1);`
+0.5 will just default to center coordinate.
+
+## Linear Interpolation
+So now, we've got a grid, next thing is to give it a little margin, like to give a little breathing room in each project. To do so we are going to be introducing an npm module. 
+
+- `npm i canvas-sketch-util`
+- must run in the same dir as a project.
+
+We are going to require a specific util called `lerp`
+`const { lerp } = require('canvas-sketch-util/math');`
+
+`lerp` is a function from the math library, it is short for **linear interpretation**, the way it works is you pass in a minimum and maximum bound, then a t value, and usually the `T` value is a value between 0 and 1. and if you pass in 0 to T the value you will get back is the same value as min and if you pass in 1 to the t value you are going to get the same value as max. And if if you pass in 0.5 to your T value you are going to get a value equally spaced between your min and your max, in the middle of the two.
+
+So back in our code, once we're required it, scroll down to our code where we set our points, instead of saying we  
+want to go from the top left to the top right with `const x = u * width`, what we want to do is interpolate from somewhere 
+close to the top left to somewhere close to the top right so we have some margin...
+
+Let's define our margin, can define it anywhere, but right below `points` seems good...
+```js {2,23,30,31}
+const canvasSketch = require('canvas-sketch');
+const { lerp } = require('canvas-sketch-util/math');
+
+const settings = {
+  dimensions: [ 2048, 2048]
+};
+
+const sketch = () => {
+  const createGrid = () => {
+    const points = [];
+    const count = 5;
+    for (let x = 0; x < count; x++) {
+      for (let y = 0; y < count; y++) {
+        const u = count <= 1 ? 0.5 : x / (count - 1);
+        const v = count <= 1 ? 0.5 : y / (count - 1);
+        points.push([ u, v ]);
+      }
+    }
+    return points;
+  };
+
+  const points = createGrid();
+  const margin = 100;
+
+  return ({ context, width, height }) => {
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, width, height);
+
+    points.forEach(([ u,v ]) => {
+      const x = lerp(margin, width - margin, u);
+      const y = lerp(margin, height - margin, v);
+  
+      context.beginPath();
+      context.arc(x,y,100, 0, Math.PI * 2, false);
+      context.strokeStyle = "black";
+      context.lineWidth = 40;
+      context.stroke();
+    });
+  
+  };
+
+};
+
+canvasSketch(sketch, settings);
+```
+- Just give it a margin of 100. It's just a number.
+- And here in const x we are giong to replace the `u * width` with `lerp`, and give it a min value, which is top left of our surface with margin included: `lerp(margin, width - margin, u)`
+- What this does is just set our minmum as our margin, and our max as the width minus the margin, with the `T` value set to `u`.
+- It's hard to see right now, but if we set margin to `400` you can see it more clearly.
+- We do the same thing on the y axis.
+
+## Adding Randomness
+- H  
+ 
+
+
+
+## Radius & Organic Randomness 
+## Color Palettes
+## Noise
+## Coding Noise with noise2D
+## Drawing with Text Characters
+## Canvas Q&A 
+ 
 ## Links
-- [Main](/creativecoding-canvas-and-webgl)
+- [Main](/creativecoding-canvas-and-webgl) 
