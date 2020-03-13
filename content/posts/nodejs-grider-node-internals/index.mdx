@@ -669,7 +669,7 @@ You can think of it as assigning and setting up 5 function calls that depend on 
 ![](unexpected-results.png)
 
 
-- Then one of the thread is eventually going to finish and does its `console.log()` and clear space for FS to resume, say in thread#2. It can pick back up work, and see that pending fs call, checks those statistics and then makes a followup request to get the file contents, it gets to the step: "HD accessed, file contents stream back to app", and because it has no other work to do it just kind of sits around waiting for the file contents to come back. Thread#2 then processes them and then we see that `FS:``console.log` appear.
+- Then one of the thread is eventually going to finish and does its `console.log()` and clear space for FS to resume, say in thread#2. It can pick back up work, and see that pending fs call, checks those statistics and then makes a followup request to get the file contents, it gets to the step: "HD accessed, file contents stream back to app", and because it has no other work to do it just kind of sits around waiting for the file contents to come back. Thread#2 then processes them and then we see that console.log of `FS:` appear.
 
 That's why we always see one hash before that FS logged.
 
