@@ -569,13 +569,14 @@ Aside: I had issues downloading the npm module `webworker-threads`. Having issue
 I'm going to try and download an LTS, version, as I'm actually slightly behind on both mac and windows and encountering similar errors for both machines.
 - Moving to LTS, didn't correct. Just going to not be messing around with webworkers for a bit I guess :( 
 
-
 ### Webworker Summary
 > - Makes use of the libuv threadpool; remember so too do a lot of node std lib functions.
 - is still somewhat experiemental in nature
 - you create a worker interface and define a new Worker within that interface. Internal to the worker you define its onmessage and postMessage properties, as well as outside within the worker interface itself.[^8]  
 
+## Update 
+3/14/2020: Just watched a short video on Kubernetes, clusters. It is just modeled just like web workers in Node and made me think of this section.
 
 ## Links
 - [PREV ← | The Internals of Node](/nodejs-grider-node-internals)
-- [NEXT ]
+- [NEXT → | Data Caching with Redis](/nodejs-grider-caching-with-redis) 
