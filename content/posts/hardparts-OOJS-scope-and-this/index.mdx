@@ -1,0 +1,142 @@
+---
+title: Scope & this | Object Oriented JavaScript
+date: 2020-03-13
+slug: hardparts-OOPJS-scope-and-this
+tags: 
+  - FEM
+  - Will Sentence
+  - OOP
+  - Hard Parts
+  - this
+  - scope
+---
+## Summary Questions
+1. What are Will's preferred names for the different use-instances of the `this` keyword?
+2. What is the biggest gotcha using the this keyword in OOP?
+
+## Calling Prototype Methods
+```js:title=factory-functions-with-prototype-properties
+function UserCreator(name, score) {
+    this.name = name;
+    this.score = score;
+}
+
+UserCreator.prototype.increment = function() {
+    this.score++;
+}
+UserCreator.prototype.login = function() {
+    console.log('login');
+}
+const user1 = new UserCreator('Eva', 9);
+user1.increment();
+```
+So finally getting to `.increment()` when we call it, a few things are going on...
+- added to call stack
+- new execution context 
+
+This function now, doesn't have an explicit reference to `user1` or `user2`, so how do we refer appropriately to this object? Well with the `this` keyword which is an **implicit parameter**. Normally when we want to make functions general, we make use of parameters, right, where the data coming in could change, they serve as placholders so that we can reference the thing they pass in.
+- Similarly when our `.increment` function is called it needs to be applied to a particular object, the one that is pertinent at this moment. What implicit parameter, what placeholder does JS give us in order to refer to the pertinent object at hand? `this`.
+- it's also a very different `this` then the auto-generated one by the `new` keyword.
+-  Whenever we call a function or a method, any execution context has a `this`, even the global has one (which refers to that global/window thing).
+    - Regular functions, not called with `new`, or called on the right hand side of a dot, they also have a this inside of it but its pretty useless, as it refers to that global/window object.
+- The rule for `this` when you call a function or a method on the right handside of an object, the `this` will point to the the thing to the left-hand side of the `.`.
+
+>- Two different uses of `this` when dealing with `new` keyword though, Will thinks they should have been named differently:
+    - The `this` within `new` context should have been called `autoCreatedObject`
+    - The `this` within method calls should have been called `theObjectatHand`[^1]
+
+## `this` Keyword Scoping Issue
+```js:title=what-is-this? {7-10}
+function UserCreator(name, score) {
+    this.name = name;
+    this.score = score;
+}
+
+UserCreator.prototype.increment = function() {
+    function add1() {
+        this.score++;
+    }
+    add1();
+}
+UserCreator.prototype.login = function() {
+    console.log('login');
+}
+const user1 = new UserCreator('Eva', 9);
+user1.increment();
+```
+- One small change, if we change the `increment` function to have a function within it called `add1`
+- So when we are in th execution context of `add1`, what is the implicit parameter, this set to? There is no dot to the left of its attempted invocation, so it defaults to the global/window thing. And you get some weird NaN result.
+- And yet, having sub-fucnctions/methods within another is definitely something you might be doing, but if if you do and refer to the `this`, doesn't point to the thing we need. 
+    - we used to do that weird `that = this` thing in the outer context.
+    - The popular approach is to use arrow functions to solve this. They will give us a `this` that is *lexically scoped*, meaning, the `this` context is the same as the environement in which it was declared/defined.
+
+>* **This example above is one of the biggest "gotchas" in OOP JS, sometimes you might see it as an interview question.**[^2]
+
+## Solving Scope with Arrow Functions
+```js:title=arrow-funtions {7,8}
+function UserCreator(name, score) {
+    this.name = name;
+    this.score = score;
+}
+
+UserCreator.prototype.increment = function() {
+    const add1 = () => { this.score++; }
+    add1();
+}
+UserCreator.prototype.login = function() {
+    console.log('login');
+}
+const user1 = new UserCreator('Eva', 9);
+user1.increment();
+```
+- `this` in our arrow function is going to point to the `this` of where it was defined.
+- This is the standard practice when we need to use a function inside of a method from a class.
+- Again, lexical is just, "where I was born" lexical just means position on the page, so where I was positioned on the page determines something about me.
+
+## ES6 `class` Keyword
+* We need to introduce arrow functions which - bind `this` lexically
+* In other languagess, this constructor function and the methods it has associated are bundled in a construct called  a *class*. 
+
+### Solution 4 
+We're writing our shared methods separately from our object 'constructor' itself (off in the `User.prototpe.object`)
+
+Other languages let us do this all in on place, ES2015 let's us do this too.
+
+![](/class-syntactic-sugar.png)
+- classes make our lives much much easier
+- but its just syntactic sugar, since what it's doing under the hood as our factory function/object + prototype chain.
+    - when we get to subclassing, we will see how classes actually differ under the hood.
+
+## Recap of the `class` Keyword
+- Remember classes in more traditional class based OOP langs implement classes very differently than JS does under the hood
+- While JS isn't a traditionally OOP lang, it is a prototypal lang (and Kyle Simpson would argue, that a prototypal lanugage has its advantage in the very fact that it can replicate a class like structure).
+
+### Benefits of classes
+- emerging as a new standard
+- feels more like style of other languages 
+
+### Problems of classes
+- A lot of JS devs don't understand what is happening under the hood, so its harder to debug.
+
+### JavaScript uses this `__proto__` link to give objects, functions, and arrays a bunch of bonus functionality. All objects by default have `__proto__`
+```js
+const obj = {
+    num: 3
+}
+
+obj.num // --> 3
+obj.hasOwnProperty("num") // ? where's this method?
+
+Object.prototype // { hasOwnProperty: FUNCTION }
+```
+- With `Object.create` we oveerride the default `__proto__` reference to the `Object.prototype` and reaplce with `functionStore`
+- But `functionStore` is an object so *it* has a `__proto__` reference to `Object.prototype` -- we just intercede in the chain.
+
+## Links 
+**Related:**
+- [`this`, classes, `new`, objects, factory functions, proto/prototype](/hardparts-js-v2-classes-and-prototypes)
+-----------
+**Nav:**  
+- [MAIN | Intro](/hardparts-OOJS-main)
+- [PREV ← | Prototype & new ](/hardparts-OOJS-prototype-and-new)
+- [NEXT → | Subclassing with Factory Functions ](/hardparts-OOPJS-scope-and-this)

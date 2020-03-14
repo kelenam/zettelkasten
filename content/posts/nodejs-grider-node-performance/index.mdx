@@ -10,17 +10,27 @@ tags:
   - performance
 ---
 
+## Summary Questions
+1. What are the two primary mechanisms by which we can improve performance in our Node applications?
+2. Without clustering what is something we may be at risk of doing if our app has some computational expensive functions it must carry out?
+3. What is clustering about? What is the cluster manager responsible for?
+4. Describe the control flow of an app/file that leverages clustering.
+5. Explain the basics of writing your own clustering solution. 
+6. If you're running your managing your own clustering, what's the of thumb for the number of children instances you should run?
+7. What is the recommended path for leveraging clustering in your Node application? What is the `-i` flag used for when running/starting your app with pm2? 
+8. What is the gist of web workers? How are they defined within your Node app?
+
 ## Enhancing Performance
 - Last section we spoke a lot about performance, when we are doing a lot of work inside of our event loop. Sometimes, its unavoidable, and you just have to do a lot of work inside of your event loop and there is no getting around it.
 
 We are going to look at at least two different ways to mitigate the performance impact of running a lot of code in our event loop.
 
 ### Two ways of Improving Node Performance
-1. Use Node in 'Cluster' Mode
+>* 1. Use Node in 'Cluster' Mode
     - used to startup multiple copies of node that are all running your server inside of them
     - We can't trick Node into runnning more than its single thread, but we can however, start multiple copies of our application to get multiple instances of our event loop. In a way in works very vaguely to making Node multi-threaded in a way.
-2. Use Worker Threads
-    - Worker threads are going to use the threadpool setup by libuv whenever we setup our application
+* 2. Use Worker Threads
+    - Worker threads are going to use the threadpool setup by libuv whenever we setup our application[^1]
 
 * Starting up Node in cluster mode to handle a lot of heavy duty performance relevant calculations or whatever, is the recommend approach here. Very well battle-tested procedure, and will confidently enhance performance within your application. Using worker threads, is way more *experimental*. Your "go to" should be to reach for clusters first, then workers, unless you're really versed in your need/use-case.
 
@@ -48,7 +58,7 @@ So the first thing to keep in mind here is that, whenever some event/request com
 
 ![](common-pattern.png)
 
-This pattern works for the most part, it only starts to breakdown when we have a lot of JS (we've written) in our app is taking a long time to process. This interfers with our Node server being ability to quickly handle/process requests in and responses out.
+>* This pattern works for the most part, it only starts to breakdown when we have a lot of JS (we've written) in our app is taking a long time to process. This interfers with our Node server being ability to quickly handle/process requests in and responses out.[^2]
 
 Let's go back over to our server...
 ```js:title=index.js
@@ -61,12 +71,13 @@ function doWork(duration) {
 }
 
 app.get('/', (req, res) => {
+    doWork()
     res.send('Hi There');
 });
 
 app.listen(3000);
 ```
-We use the function doWork to simulate a lot of computation, in it we kind of replicate work being done with our while loop.
+We use the function `doWork` to simulate a lot of computation, in it we kind of replicate work being done with our while loop.
 We pass in the duration we want the work to take, 5000 in our example.
 
 The thing to keep in mind is that our `app.get` is working in our event loop, not in some other threadpool or something like that, it's code processed in our event loop and for these 5 seconds, our event loop can do nothing else.
@@ -86,20 +97,23 @@ So here is kind of what clustering looks like behind the scenes.
     - it can start and stop instances, it can restart them, send them data, and do other administrative tasks
     - the instances themselves are what process and take in requests and do the actual work
 
+>* Clustering is essentially just pseudo-multithreading our Node process into other instances of itself, with one parent, **cluster manager** delegating to the slave/child instances the work it should be doing.[^3]
+
 ### Super simple, normal Node App
 
 ![](noncluster-node-app.png)
 - starts node, reads file, starts event loop, and we get a single node instance
 - very linear process
 
+### Super simple cluster
 ![](clustering-node-app.png)
-- We still run something like `node index.js` at command line 
+ - We still run something like `node index.js` at command line 
 - we still read file and launch node instance
 - But here is where things get different: The first instances that gets launched when we run that command, is what we refer to as the *cluster manager*. The cluster manager is then responsible for setting up worker instances. Those [**worker instances**]() are actually what is reponsible for processing incoming requests.
 - To create worker instances the cluster manager is going to require in the `cluster` module from the node std lib. `cluster` module just like `fs` has to be brought in.
 - one particular method on that module called `.fork` and whenever we call that fork function from within the cluster manager, something intersting happens: Node goes back to our internal js file and it executes it a second time, but it executes it that second time in a slightly different mode. This is also what starts up our worker instance.
 
-You can basically just imagine that our `index.js` file is going to be executed multiple times by Node. The first time it produced the cluster manager and then every time after that would be for a worker instance.
+>* You can basically just imagine that our `index.js` file is going to be executed multiple times by Node. The first time it produced the cluster manager and then every time after that would be for a worker instance.[^4]
 
 ## Forking Children
 ```js:title=index.js {1,4-8,24}
@@ -128,11 +142,11 @@ if (cluster.isMaster) {
     app.listen(3000);
 }
 ```
-- require in our `cluster` module, remember it's already in the Node std library. 
+> - require in our `cluster` module, remember it's already in the Node std library. 
 - The `cluster` module has several indespensible properties on it that we need to set up our cluster.
 - `.isMaster`: returns a boolean to tell you whether or this instance is the cluster manager "instance". This will be false for every other instance.
 - we use this single property: `cluster.isMaster` to determine what `index.js` file should do whenver it gets executed.
-    - remember b/c when we run that `.fork` index.js is going to run another time.
+    - remember b/c when we run that `.fork` index.js is going to run another time.[^5]
     
 ## Clustering in Action
 When we have only one child, that's really not doing anything, like we are running in normal mode, only one event loop instance.
@@ -314,7 +328,7 @@ So not only are we finishing faster that 3.5s, but the bulk of those hashes are 
 > 1. clustering is great, don't go overboard.
 2. In general, you want to match your number of children in your cluster to either:
     - The number of physical cores or
-    - The number of logical cores that you have
+    - The number of logical cores that you have[^6]
 
 **Logical cores** are just if your computer is counting its multithreaded coring abilities as cores (they are referred to as logical cores).
 
@@ -376,8 +390,8 @@ If we run `pm2 monit`
 We will get a cool terminal GUI to look through logs.
 
 To kill any active pm2 process:  `pm2 delete [applicationName]`
- 
-Usually you run pm2 on production envs, so less so in dev environments.
+
+> PM2 sounds like a great out of the box solution for cluster management, and looks like the de-facto standard in having all of this managed for you. Usually you run pm2 on production envs, less so in dev environments. Follow the steps above to get yourself setup with PM2 for clustering.[^7] 
 
 ## Webworker Threads 
 We are going to talk very briefly about worker threads....
@@ -554,6 +568,12 @@ Aside: I had issues downloading the npm module `webworker-threads`. Having issue
 
 I'm going to try and download an LTS, version, as I'm actually slightly behind on both mac and windows and encountering similar errors for both machines.
 - Moving to LTS, didn't correct. Just going to not be messing around with webworkers for a bit I guess :( 
+
+
+### Webworker Summary
+> - Makes use of the libuv threadpool; remember so too do a lot of node std lib functions.
+- is still somewhat experiemental in nature
+- you create a worker interface and define a new Worker within that interface. Internal to the worker you define its onmessage and postMessage properties, as well as outside within the worker interface itself.[^8]  
 
 
 ## Links

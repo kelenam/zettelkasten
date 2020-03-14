@@ -1,0 +1,87 @@
+---
+title: Object Creation | Object Oriented JavaScript
+date: 2020-03-13
+slug: hardparts-OOJS-object-creation
+tags: 
+  - FEM
+  - Will Sentence
+  - OOP
+  - Hard Parts
+  - objects
+---
+
+let's say we have users and scores...
+```js
+name: 'Julia'
+score: 
+```
+
+Objects - store functions with their associated data!
+```js
+const user1 = {
+    name: "Phil",
+    score: 4,
+    increment: function() {
+        user1.score++;
+    }
+};
+
+user1.increment(); //user1.score => 4
+```
+- Note we would also have a lot of more functions than  this, like login, logout, etc.
+- Objects help us with **encapsulation** althought it isn't really strictly implemented in JS
+
+## Object dot notations
+In the example above, we used object literal notation for our object creation. We can also use *dot notation* to assign values to properties of an object...
+
+```js:title=dot-notation
+const user2 = {}; // create an empty array
+
+user2.name = "Julia"; //assign properties to that object
+user.score = 3;
+user2.increment = function() {
+    user2.score++;
+}
+```
+
+## Object.create
+- `Object.create` A built in method in JS, that is always, going to store, on the left hand side of its assignment an empty object.
+- However, `Object.create` gives us a bonus feature (spoiler: __proto__ property designation of object)
+
+```js
+const user3 = Object.create(null);
+user2.name = "Julia"; //assign properties to that object
+user.score = 3;
+user2.increment = function() {
+    user2.score++;
+}
+```
+
+## Creating Objects with functions
+
+### Solution 1. Generate objects using a function
+```js 
+function userCreator(name, score) {
+    const newUser = {};
+    newUser.name = name;
+    newUser.score = score;
+    newUser.increment = function() {
+        newUser.score++;
+    };
+    return newUser;
+};
+
+const user1 = userCreator("Phil", 4);
+const user2 = userCreator("Julia", 5);
+user1.increment();
+```
+- This solution accomplishes a lot but becomes untenable in terms of its memory performance, as we are creating functions over and over again with each new user. Wouldn't it be better if we could just look up that same function in one stored place?
+
+
+## Links 
+**Related:**
+- [`this`, classes, `new`, objects, factory functions, proto/prototype](/hardparts-js-v2-classes-and-prototypes)
+-----------
+- [MAIN | Intro](/hardparts-OOJS-main)
+- [PREV ← | Intro ](/hardparts-OOJS-main)
+- [NEXT → | Prototype & new ](/hardparts-OOPJS-prototype-and-new)

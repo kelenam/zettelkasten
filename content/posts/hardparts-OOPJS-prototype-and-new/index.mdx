@@ -1,0 +1,118 @@
+---
+title: Prototype & new | Object Oriented JavaScript
+date: 2020-03-13
+slug: hardparts-OOPJS-prototype-and-new
+tags: 
+  - FEM
+  - Will Sentence
+  - OOP
+  - Hard Parts
+  - objects
+  - prototype
+---
+
+## Avoid Duplication with Prototype
+The benefit of wrapping all our logic/properties/functionality in a function solves our problem for the most part. It's easy to reason about, but it isn't easy to add functionality to, and it isn't performant (non-DRY).
+
+## Prototype Walkthrough
+
+```js 
+function userCreator (name, score) {
+    const newUser = Object.create(userFunctionStore);
+    newUser.name = name;
+    newUser.score = score;
+    return newUser;
+};
+
+const userFunctionStore = {
+    increment: function() {this.score++},
+    login: function(){console.log("You're logged in!");}
+};
+
+const user1 = userCreator("Phil", 4);
+const user1 = userCreator("Julia", 5);
+user1.increment();
+```
+- The `Object.create(userFunctionStore)` creates a link to the global function store we created by setting the `__proto__` property of the returned object. The argument of `userFunctionStore` is just telling `Object.create()` where to look next for functionality it may need, setting it's next direct link in the Prototype chain.
+
+## Prototype Chain
+- The lookup journey of `.increment()` doesn't find it directly on the object, so it looks up to `userFunctionStore` where it is found.
+- `__proto__` is the 'hidden' property that `Object.create()` sets the reference to.
+
+This hidden nature, the prototypal nature of JS is actually incredibly powerful. 
+
+### Problem 
+No problems! It's beautiful!
+```js
+const newUser = Object.create(userFunctionStore);
+///...
+return newUser
+```
+Maybe a little long winded! It's a super sophisticated approach, but it's not standard.
+Handcrafting an object, a function store, and a bond to that store, that gets a little repetitive. You're writing a lot of code by hand. JS didn't used to give us, out of the box, functions that gave use back objects we could use (it does now with classes, but under the hood, they are the above (with `new`) factory functions linked via prototypal "inheritance" or linking).
+ 
+## `new` & `this` Keywords
+
+### Solution 3 - Introductin the keyword that automates the hard work: `new`
+`const user1 = new userCreator('Phil', 4);`
+
+When we call the constructor function with `new` in front we automate 3 things:
+1. Create a new user object
+2. return the new user object
+3. {spoiler}: sets the `__proto__` property of the new user object to be set to the `.prototype` property of the object portion of the constructor function (`newUser`) itself.
+
+But now we need to adjust how we write teh body of `userCreator` - how can we:  
+- refer to the auto-created object  
+- Know where to put our single copies of functions?
+
+## Functions are Objects & Functions
+```js
+function multiplyBy2(num) {
+    return num*2;
+}
+multiplyBy2.stored = 5;
+multiplyBy2.stored; // --> 5
+multiplyBy2.prototype // --> {}
+```
+We could use the fact taht all functoins have a default proeprty on their object version, 'prototype', which is itself an object - to replace our `functionStore` object. 
+- Functions are function object combos, we normally don't care about the object bit, but in OOP, we do.
+
+## `new` Keyword & Share Functions with prototype
+### Complete Solution 3
+```js 
+function UserCreator(name, score) {
+    this.name = name;
+    this.score = score;
+}
+
+UserCreator.prototype.increment = function() {
+    this.score++;
+}
+UserCreator.prototype.login = function() {
+    console.log('login');
+}
+const user1 = new UserCreator('Eva', 9);
+user1.increment();
+```
+
+## Review of `new`
+
+### Benefits
+- faster to write
+- still typical practice in professional code
+
+This kind of factory function + `new` is cleaner to write especially when we start sub-classing.
+
+### Downsides
+- Devs might now fully understand how this is working 
+- we have to uppercase this function to let others know we need to use it with a `new` keyword. 
+
+Remember when you have 10,000 lines of code, wouldn't it be great if we wrap data with its functionality so that we know where to look for things? That's the dream of OOP.
+
+## Links 
+**Related:**
+- [`this`, classes, `new`, objects, factory functions, proto/prototype](/hardparts-js-v2-classes-and-prototypes)
+-----------
+- [MAIN | Intro](/hardparts-OOJS-main)
+- [PREV ← | Object Creation ](/hardparts-OOJS-object-creation)
+- [NEXT → | Scope & this ](/hardparts-OOPJS-scope-and-this)
