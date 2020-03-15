@@ -9,17 +9,572 @@ tags:
   - servers
 ---
 
-## Summary Question 
-1. What is Node.js?
-
 ## What is Node.js?
->- **JavaScript Runtime** (NOT a language or a framework)
-- Built on the **V8 JavaScript engine (same as google chrome)
+[^ **What is Node.js? What does it allow us to do?**]**JavaScript Runtime** (NOT a language or a framework)
+- Built on the **V8 JavaScript engine** (same as google chrome)
 - Written in C++
 - Essentially allows us to run **JavaScript code on the server**
 
+## Why use Node?
+[^ **Why use Node over something like PHP or Python?**]Why Node?
+- fast, efficient, and highly scalable
+- event driven, non-=blocking I/O model
+- Popular in the industry
+- Same language on the frontend and backend (JS)
+
+## Non-Blocking I/O  
+[^ **What does non-blocking I/O even mean?**]I/O stands for Input/Output
+- versus something like PHP which is synchronous and runs on multiple threads, where every request spawns a new thread,
+and can max-out memory load of server. Because they are synchronous requests, they have to sit and wait before starting the next...
+- works asynchronously, and uses an **event loop** to manage delegation
+- Working on a single thread using non-blocking I/O calls
+- supports tens of thousands of concurrent connections
+- optimizes throughput & scalability in apps with many I/O operations
+- All of this makes Node.js apps very fast and efficienty
+- It's not as good with CPU intensive apps, long running calculations...
+
+### Event Loop
+![](event-loop.png)
+- The event loop is why Node is so fast and efficient
+
+## Best Types of Projects for Node
+- REST API & Microservices
+- Real Time Services (Chat, Live Updates)
+- CRUD Apps - Blogs, Shopping Carts, Social Networks
+- Tools & Utilities
+- Short Answer: Anything that is not CPU intensive.
+
+A lot of times you'll be building a backend API with Node, where you won't even be serving for instance, HTML pages, you'll be serving JSON, and do all your databse interaction within Nodejs. It works with any database, relational, and non-relational. Node and MongoDB are a really common pairing.
+
+
+## NPM - Node Package Manager
+- Install 3rd party packages (frameworks, libraries, tools, etc)
+- Packages get stored in the "node_modules" folder
+- All dependencies are listed in a "package.json" file
+- NPM scripts can be created  to run certain tasks such as run a server
+```
+npm init                // generates a package.json file
+npm install express     // Installs a package locally
+npm install -g nodemon  // Installs a package globally
+```
+
+## Node node_modules
+- Node Core Modules (path, fs, https, etc)
+- 3rd party modules/packages installed via NPM
+- Custome modules (files)
+```js
+const path = require('path');
+const myFile = require('./myFile')
+```
+You own files can also be exported as modules, enabling you to export functions, variables, classes, or anything else from one file you can include in another. In the case of our own module you have specify relative/absolute path.
+
+## Getting Started
+To get started you need to have Node installed... 
+- Node comes with a REPL environment, the command to run it is `node`.
+
+First thing you want to do with Node, is `npm init` your project/directory, default to entry point is `index.js`, also common for `app.js`, `main.js`, etc.
+
+One of the main purposes of npm init, is a place to organize/store our **dependencies**.
+
+As an example: `npm install uuid`
+
+If you want to save a module only as a dev dependency, the flag is (`-D`)...
+`npm install -D nodemon`
+
+When you are ready to deploy, you avoid pushing up your node_modules folder.
+- When we want to run a file, the file extension is optional: `node index == node index.js`
+
+JS files that you create are going to be modules where you export some portion of their functionality to other files
+
+### Modules and `module.exports`
+```js:title=person.js
+const person = {
+  name: 'Sara',
+  age: 45
+}
+```
+If we want to use this person object somewhere else, we simply use `module.exports = person`. Then we can go over into `index.js` and say...
+```js:title=index.js
+const person = require('./person'); 
+
+console.log(person);
+```
+If you want to export classes...
+
+```js:title=person.js
+class Person {
+    constructor(name, age) {
+        this.name = name,
+        this.age = age
+    }
+
+    greeting() {
+        console.log(`I am ${this.name} and I am ${this.age}`);
+    }
+}
+
+module.exports = Person; 
+```
+Now we could do something like this ....
+```js:title=index.js
+const Person = require('./person'); 
+
+const person1 = new Person('John', '30')
+
+person1.greeting();
+```
+[^ **Write two super simple files, where you export a Person class from one file to an index file.**]Remember, to stay consistent with your capitalization, if you're importing a class, make the `const` in the receiving file of the module is named accordingly, since we have to make use of the `new` keyword for classes
+
+[^ **You might think that our imported file is just being run directly, but that's not what's happening, what's really happening is...**]It might seem like this `person.js` file is getting run directly, but actually when you include a module like this, it's *automatically* wrapped in a [**module wrapper function**]() which looks like this...
+
+```js
+//Module Wrapper Function
+(function (exports, require, module, __filename, __dirname) {
+// Your module code
+});
+```
+[^ **What does this *module wrapper function* give use access to?**]This is what is wrapped around all our modules
+  - we have access to `module`, `require`, `exports` and filename and dirname..
+  - to check we can even just console.log within `person.js`...
+  - `console.log(__dirname, __filename);`
+
+### Why not `import from`?
+[^ **Why don't we use `import from...` like we do in React? What is the name of the way we must do it in Node?**]We don't do something like `import Person from './person'` because Node hasn't yet implemented this yet. If you want to make use of this syntax you have to make use of Babel to compile to ES6, it's the last feature that hasn't been executed in Node yet.
+
+The method of using the module via a `require` statement is called [**CommonJS**](). The other way, is the ES6 way.
+
+## Some of Node's Core Modules
+If we go to the docs you can take a look at the docs and the docs specifically for the core modules.
+
+### A few methods from `path`
+```js:title=path_demo.js 
+const path = require('path');
+
+// Base file name
+console.log(path.basename(__filename));
+// --> path_demo.js
+// Directory name
+console.log(path.dirname(__filename));
+// -> C:\Users\k\projects\traversy-node\reference
+// File extension
+console.log(path.extname(__filename));
+//--> js
+
+// Create path object
+console.log(path.parse(__filename));
+// {
+//   root: 'C:\\',
+//   dir: 'C:\\Users\\k\\projects\\traversy-node\\reference',
+//   base: 'path_demo.js',
+//   ext: '.js',
+//   name: 'path_demo'
+// }
+
+// Concatenate
+// ../test/hello.html
+console.log(path.join(__dirname, 'test','hello.html'));
+```
+Doing path.dirname will get us the same as `__dirname` of course, but we are using the `path` module to get it.
+- If we do `path.parse` we get back an object, and since its an object we can extract any property off that object we want.
+ 
+`console.log(path.join(__dirname), 'test', 'hello.html');`  
+- the abovetakes, the dirname, a folder called test, and a file called hello.html. 
+- This works really well when you have issues with *delimiters* basically file path, forward slash/back slash between unix/windows machines. This will put the right delimiter in for us.
+
+## A few methods from 'fs'
+```js:title=create-folder
+const fs = require('fs');
+const path = require('path');
+
+// Create folder
+fs.mkdir(path.join(__dirname, '/test'), {}, err => {
+  if (err) throw err;
+  console.log('Folder created...');
+});
+
+```
+#### Folder creating with `fs.mkdir`
+- By default `fs.mkdir` is asynchronous. So it takes a callback, anything you want to do after its done. However, there is also a synchronous version of most of these methods... like `fs.makedirSync`. If you use this, you'll wait until the process is complete until it moves on.
+  - most cases you want to use the asynchronous version.
+
+`fs.mkdir()`, we actually want to add a `test` folder. To the callback we get an error argument, we check to see if there was an error with if(err)
+
+#### File creation with `fs.writeFile` 
+There is a method called `open` that you can used to create a file, however, if you want to write to it right away you can use `writeFile` that that will create it and write to it....
+```js:title=create-file
+const fs = require('fs');
+const path = require('path');
+
+// Create File
+fs.writeFile(path.join(__dirname, '/test', 'hello.txt'), 'Hello World!', err => {
+  if (err) throw err;
+  console.log('File written to...');
+});
+```
+- The second parameter that `.writeFile` takes is the content to write to the file.
+- If we tried running another write file again with different contents, like if we were to write to the same time, what `writeFile` does is over-writes what is already in that file.
+
+#### Append file with `fs.appendFile`
+- If you want to append to a file you use `appendFile`. What you should do, since this is asynchronous, is you should add the second call inside the callback of the first call..
+```js
+const fs = require('fs');
+const path = require('path');
+
+// Create File
+fs.writeFile(path.join(__dirname, '/test', 'hello.txt'), 'Hello World!', err => {
+    if (err) throw err;
+    console.log('File written to...');
+    
+    // Append file
+    fs.appendFile(path.join(__dirname, '/test', 'hello.txt'), '\n I love Node.js', err => {
+        if (err) throw err;
+        console.log('contents appended to...');
+        
+    });
+});
+```
+#### Reading from a file `fs.readFile`
+```js:title=reading-a-file
+const fs = require('fs');
+const path = require('path');
+
+// Read File
+fs.readFile(path.join(__dirname, '/test', 'hello.txt'), 'utf8', (err, data) => {
+  console.log(data);
+}
+
+```
+- For reading a file you need to pass in the file type encoding, if you don't add it (`'utf8'`), you'll get back a raw buffer and not give you back the actual data. Because we put the encoding, we can put, after the `err`, the `data` that is in the file, and we can go ahead and `console.lo`g the data.
+
+#### Renaming a file with `fs.rename`
+```js
+const fs = require('fs');
+const path = require('path');
+
+// Read File
+fs.readFile(path.join(__dirname, '/test', 'hello.txt'), path.join(__dirname, '/test', 'helloworld.txt'), err => {
+  console.log(data);
+}
+```
+- First two arguments it takes, is the old file name, the second is the new file name, the third is the callback.
+
+
+## OS Modules 
+- Gives us functionality for handling the OS
+```js
+const os = require('os');
+
+// Platform
+console.log(os.platform());
+// -> darwin (OSX), or win32 for windows
+
+// CPU Arch
+console.lo(os.arch());
+
+// CPU Core Info
+console.log(os.cpus());
+
+// Free Memory
+console.log(os.freemem());
+
+// Total memory
+console.log(os.totalmem());
+
+// Home dir
+console.log(os.homedir());
+
+// Uptime
+console.log(os.uptime());
+```
+- cool bc you can build system related apps
+
+## URL Module
+```js
+const url = require('url');
+const myUrl = new URL('https://mywebsite.cvom/hello.html?id=100&status=active');
+
+// Serialized URL
+console.log(myUrl.href);
+// Gives us the same as above
+console.log(myUrl.toString());
+
+// Host (root domain)
+console.log(myUrl.host);
+// Hostname (does not get port)
+console.log(myUrl.hostname);
+// Pathaname
+console.log(myUrl.pathname);
+// Serialized query
+console.log(myUrl.search);
+// Params object
+console.log(myUrl.searchParams);
+// Add Param
+myUrl.searchParams.append('abc', '123');
+console.log(myUrl.searchParams);
+// Loop through params
+myUrl.searchParams.forEach((value, name) => console.log(`${name}: ${value}));
+
+```
+
+## Events
+Looking at the events emitters. Essentially we can create an event emitter class and things that listen to those events and have something fired off.
+
+```js:title=events
+const EventEmitter = require('events');
+
+// Create class
+class myEmitter extends EventEmitter {}
+
+// Init object
+const myEmitter = new myEmitter();
+
+// Event listener
+myEmitter.on('event', () => console.log('Event Fired!'));
+
+// Init event
+myEmitter.emit('event');
+// --> Event Fired!
+```
+
+### Creating a Logger
+In the root file, create a logger.js file
+- Don't forget to have UUID installed 
+```js:title=logger.js
+const EventEmitter = require('events');
+const uuid = require('uuid');
+ 
+class Logger extends EventEmitter {
+  log(msg) {
+    // Call event
+    this.emit('message', { id: uuid.v4(), msg })
+  }
+}
+
+module.exports = Logger;
+```
+
+Back in `index.js`
+```js:title=index.js
+const Logger = require('./logger');
+
+const logger = new Logger();
+
+logger.on('message', (data) => console.log(`Called Listener`, data));
+
+logger.log('Hello World');
+```
+You can kind of see how this might be useful; the ability to listen for events.
+
+## Basic Web Server
+```js:title=http_demo.js
+const htttp = require('http');
+
+http.createServer((req, res) => {
+  // Write response
+  res.write('Hello World');
+  res.end();
+}).listen(5000m () => console.log('Server running on 5000...'))
+```
+- We want an http object we get it by calling, `http.createServer((req, res) => {})`
+- `res.write` writes to the page
+- needs to listen on some port...
+  
+Let's create something useful and head over into `index.js`
+
+If you use express it makes this stuff a lot easier, however its a good idea to know how to do this without express.
+
+## Web server without express
+```js:title=index.js
+const http = require('http');
+const path = require('path');
+const fs = require('fs');
+
+const server = http.createServer((req, res) => {
+  if (req.url === '/') {
+    res.writeHead(200, { "Conten)t-Type": 'text/html' });
+    res.end(content, 'utf8');(200, { 'Content-Type': 'text/html '})
+    res.end('<h1>Home</h1>') 
+  } else
+    // Some server error
+    res.writeHead(500);
+    res.end(`Server Error: ${err.code}`);
+  }
+});
+
+const PORT = process.env.port || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+```
+- the line where we specify `process.env.port` is us looking for the port of the server and defaults to 5000 if the specified one isn't found.
+- We've already see writing out to the browser some html but that's not what we want, we want to load a file.
+- first lets see if we can check the url
+- You don't have to do `res.write('content')`, you can technically just do `res.end('<h1>Home</h1>')`
+  - Note, if we change something in the HTML, it won't change the html unless we restart the server
+  - this is where nodemon comes in handy
+
+- Advise to not have nodemon be global, instead keep it a dev dependency and use scripts...
+```json:title=package.json
+"scripts": {
+  "start": "node index",
+  "dev": "nodemon index"
+}
+```
+#### Serving files from our server
+Create a new file called `public`, this is where our public html files and css and anything like that should go....
+Also create an index.html and about.html, and just populate it with basic html boiler plate and a header.
+
+```js:title=index.js
+const http = require('http');
+const fs = require('fs');
+const path = require('path');  
+
+const server = http.createServer((req, res) => {
+    if (req.url === "/") {
+        fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, content) => 
+        {
+            if (err) throw err;
+            res.writeHead(200, { 'Content-Type': 'text/html'});
+            res.end(content);
+        })
+    }
+
+    if (req.url === "/about") {
+        fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, content) => 
+        {
+            if (err) throw err;
+            res.writeHead(200, { 'Content-Type': 'text/html'});
+            res.end(content);
+        })
+    }
+});
+
+const PORT = process.env.port || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+```
+Back to our code, everything is pretty much just an h1, no HTML tags, or anything... so we can `res.writeHead` to write to our headers.
+
+To review, we....
+- Are checking the url `/` which it is, we are going to read the file which is `index.html` in the `public` folder
+- Then check for an error
+- then set the status and content type
+- then server the html page
+
+Of course, we could just copy and paste this below for the `about` page... like we do in 14 above.
+
+
+### What about REST APIs?
+So if we wanted to be serving a REST API, it wouldn't be HTML that we were serving, it would be JSON.
+
+let's change this up a little
+```js:title=index.js-rest-api
+const http = require('http');
+const fs = require('fs');
+const path = require('path');  
+
+const server = http.createServer((req, res) => {
+    if (req.url === "/") {
+        fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, content) => 
+        {
+            if (err) throw err;
+            res.writeHead(200, { 'Content-Type': 'text/html'});
+            res.end(content);
+        })
+    }
+
+    if (req.url === "/api/users") {
+      const users = [
+        { name: 'Bob Smith', age: 40 },
+        { name: 'Jane Doe', age: 30 }
+      ];
+      res.writeHead(200, { "Content-Type": "application/json"});
+      res.end(JSON.stringify(users));
+    }
+});
+
+const PORT = process.env.port || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+```  
+- So normally we would be fetching this from a database or something, but let's just hard code it in for now.
+- So we stil need to write our headers for a 200 response, except for text/html we want to say `application/json`
+- we then need to turn this JS array of objects into JSON, so we do `res.end(JSON.stringify(users));`
+- You could do this if you wanted to build some REST API or some microservice, but you would likely use Express or something else instead of doing it like this.
+
+### Why this isn't efficient
+- So right, our code is pretty bad, we have a bunch of `if` statement to catch routing and it's a bit all over the place.
+- We also have no way to currently handle our CSS, or anything to include images/files so this isn't going to work. So let's start over a bit....
+
+The first thing we want to do is...
+
+#### Make the file path dynamic
+```js
+let filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
+```
+- This will give us the abiliity to set the file path, if isn't `/` to be set to req.url, or the specified url the user is hitting.
+
+Now we are also going to want to set the content type, like css has, text/css, application/json, etc.
+So what we will do next is get the extension of our file...
+
+#### Setting the content type based on the extension name 
+```js
+// Extension of file
+let extname = path.extname(filePath);
+
+// Initial content type
+let contentType = 'text/html';
+
+// Check ext and set content type
+switch(extname) {
+  case '.js':
+    contentType = 'text/javascript';
+    break;
+  case '.css':
+    contentType = 'text/css';
+    break;
+  //...
+}
+
+// Read File
+fs.readFile(filepath, (err,content) => {
+  if (err) {
+    if(err.code == 'ENOENT') {
+      // Page not found
+      fs.readFile(path.join(__dirname, 'public', '404.html'), (err, content) => {
+        res.writeHead(200, { "Content-Type": 'text/html' });
+        res.end(content, 'utf8');
+      })
+    } else {
+      // Some server error
+      res.writeHead(500);
+      res.end(`Server Error: ${err.code}`);
+    }
+  } else {
+    // Success
+    res.writeHead(200, { "Content-Type": contentType });
+    res.end(content, 'utf8');
+  }
+})
+```
+- We really didn't cover errors, but the error we are looking for with that second if, is ENONENT or page not found 
+  - We want to handle this by handling an error page, a 404, so create that page.
+- The error handling isn't really we do with the 500 isn't too great, but it will do for now.
+
+In review:
+
+- We are declaring a server that gets a request and response every time a file is sent. Then we are going to basically look in the public folder and evaluate
+- We are going to evaluate whatever req.url is if it's forward slahs we go to index.html otherwise we are going to load whatever that file is called
+- Then we are going to evaluate the extension, and then set the content type based on it
+- We are going to read the file, and err check, if its a specific err, ENOENT, file not found we will load a 404 page, if its any other error we will 500 out 
+- if it's Successful we just return the intended page
+- So now, if we include CSS in our HTML pages, they work and everything is working nicely, if you open the network tab of our pages working you will see that the document is giving the right status codes and content types of our files.
+  - Because now we are working server-side, so its essential you have a good handle on HTTP.
+
+As far as projects go, before we deploy on Herkou, you want to make sure of two important things:  
+1. You want to make sure the `PORT` constant we set is going towards `process.env.PORT` 
+1. You have your start and dev scripts (one using nodemon the other node)
 
 
 
 ## Key Insights
 * Understanding that Node.js is a runtime, not a language or a framework. Under the hood its just JS. 
+
+
+## Summary Questions
