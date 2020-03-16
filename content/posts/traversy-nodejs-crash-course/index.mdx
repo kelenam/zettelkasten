@@ -176,12 +176,14 @@ console.log(path.join(__dirname, 'test','hello.html'));
 ```
 Doing path.dirname will get us the same as `__dirname` of course, but we are using the `path` module to get it.
 - If we do `path.parse` we get back an object, and since its an object we can extract any property off that object we want.
- 
+
 `console.log(path.join(__dirname), 'test', 'hello.html');`  
-- the abovetakes, the dirname, a folder called test, and a file called hello.html. 
+- the above takes, the dirname, a folder called test, and a file called hello.html. 
 - This works really well when you have issues with *delimiters* basically file path, forward slash/back slash between unix/windows machines. This will put the right delimiter in for us.
 
-## A few methods from 'fs'
+[^ **What does `path.basename()` return, what param does it take? What does `path.dirname()` return, what param does it take? What does `path.extname()` return, what param does it take? What does `path.parse()` return, what param does it take?**]
+
+## A few methods from `fs`
 ```js:title=create-folder
 const fs = require('fs');
 const path = require('path');
@@ -194,12 +196,15 @@ fs.mkdir(path.join(__dirname, '/test'), {}, err => {
 
 ```
 #### Folder creating with `fs.mkdir`
+[^ **How do you create a new folder in Node.js? What parameters does it take?**]
 - By default `fs.mkdir` is asynchronous. So it takes a callback, anything you want to do after its done. However, there is also a synchronous version of most of these methods... like `fs.makedirSync`. If you use this, you'll wait until the process is complete until it moves on.
   - most cases you want to use the asynchronous version.
 
-`fs.mkdir()`, we actually want to add a `test` folder. To the callback we get an error argument, we check to see if there was an error with if(err)
+`fs.mkdir()`, we actually want to add a `test` folder. To the callback we get an error argument, we check to see if there was an error with `if(err)`
+
 
 #### File creation with `fs.writeFile` 
+[^ **What does `fs.writeFile` do? How do you use it?**]
 There is a method called `open` that you can used to create a file, however, if you want to write to it right away you can use `writeFile` that that will create it and write to it....
 ```js:title=create-file
 const fs = require('fs');
@@ -215,6 +220,7 @@ fs.writeFile(path.join(__dirname, '/test', 'hello.txt'), 'Hello World!', err => 
 - If we tried running another write file again with different contents, like if we were to write to the same time, what `writeFile` does is over-writes what is already in that file.
 
 #### Append file with `fs.appendFile`
+[^ **What does `fs.appendFile` do? How do you use it?**]
 - If you want to append to a file you use `appendFile`. What you should do, since this is asynchronous, is you should add the second call inside the callback of the first call..
 ```js
 const fs = require('fs');
@@ -234,6 +240,7 @@ fs.writeFile(path.join(__dirname, '/test', 'hello.txt'), 'Hello World!', err => 
 });
 ```
 #### Reading from a file `fs.readFile`
+[^ **⭐ How do you read from a file in Node?**]
 ```js:title=reading-a-file
 const fs = require('fs');
 const path = require('path');
@@ -515,47 +522,71 @@ So what we will do next is get the extension of our file...
 
 #### Setting the content type based on the extension name 
 ```js
-// Extension of file
-let extname = path.extname(filePath);
+const http = require('http');
+const fs = require('fs');
+const path = require('path');  
 
-// Initial content type
-let contentType = 'text/html';
+const server = http.createServer((req, res) => {
 
-// Check ext and set content type
-switch(extname) {
-  case '.js':
-    contentType = 'text/javascript';
-    break;
-  case '.css':
-    contentType = 'text/css';
-    break;
-  //...
-}
+    // Build file path
+    // Build file path
+    let filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
 
-// Read File
-fs.readFile(filepath, (err,content) => {
-  if (err) {
-    if(err.code == 'ENOENT') {
-      // Page not found
-      fs.readFile(path.join(__dirname, 'public', '404.html'), (err, content) => {
-        res.writeHead(200, { "Content-Type": 'text/html' });
-        res.end(content, 'utf8');
-      })
-    } else {
-      // Some server error
-      res.writeHead(500);
-      res.end(`Server Error: ${err.code}`);
+    // Extension of file
+    let extname = path.extname(filePath);
+
+    // Initial content type
+    let contentType = 'text/html';
+
+    console.log(filePath);
+    // Check ext and set content type
+    switch(extname) {
+    case '.js':
+        contentType = 'text/javascript';
+        break;
+    case '.css':
+        contentType = 'text/css';
+        break;
+    case '.json':
+        contentType = 'application/json';
+        break;
+    case '.png':
+        contentType = 'image/png';
+        break;
+    case '.jpg':
+        contentType = 'image/jpg';
+        break;
     }
-  } else {
-    // Success
-    res.writeHead(200, { "Content-Type": contentType });
-    res.end(content, 'utf8');
-  }
-})
+
+    // Read file
+    fs.readFile(filePath, (err, content) => {
+        if(err) {
+            if(err.code === 'ENOENT') {
+                // Page not found
+                fs.readFile(path.join(__dirname, 'public', '404.html'), (err, content) => {
+                    res.writeHead(200, { "Content-Type": contentType });
+                    res.end(content, 'utf8');
+                })
+            } else {
+                // Some server error
+                res.writeHead(500);
+                res.end(`Server Error: ${err.code}`);
+            }
+        } else {
+            // Success
+            res.writeHead(200, { "Content-Type": contentType });
+            res.end(content, 'utf8');
+        }
+    })
+    
+});
+
+const PORT = process.env.port || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 ```
 - We really didn't cover errors, but the error we are looking for with that second if, is ENONENT or page not found 
   - We want to handle this by handling an error page, a 404, so create that page.
-- The error handling isn't really we do with the 500 isn't too great, but it will do for now.
+- Not a very elegant way to handle the 500 but it will do for now.
 
 In review:
 
@@ -564,13 +595,12 @@ In review:
 - Then we are going to evaluate the extension, and then set the content type based on it
 - We are going to read the file, and err check, if its a specific err, ENOENT, file not found we will load a 404 page, if its any other error we will 500 out 
 - if it's Successful we just return the intended page
-- So now, if we include CSS in our HTML pages, they work and everything is working nicely, if you open the network tab of our pages working you will see that the document is giving the right status codes and content types of our files.
+- So now, if we include CSS in our HTML pages, this works, if you open the network tab of our pages working you will see that the document is giving the right status codes and content types of our files.
   - Because now we are working server-side, so its essential you have a good handle on HTTP.
 
 As far as projects go, before we deploy on Herkou, you want to make sure of two important things:  
 1. You want to make sure the `PORT` constant we set is going towards `process.env.PORT` 
 1. You have your start and dev scripts (one using nodemon the other node)
-
 
 
 ## Key Insights

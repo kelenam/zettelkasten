@@ -1,0 +1,115 @@
+---
+title: Subclassing with class, extends, & super | Object Oriented JavaScript
+date: 2020-03-15
+slug: hardparts-OOPJS-subclassing-with-class-extends-super
+tags: 
+  - FEM
+  - Will Sentence
+  - OOP
+  - Hard Parts
+  - classes
+  - subclassing
+---
+
+## Create an Object with a classes
+We are able to emulate a classical OOP paradigm with JavaScript's prototypal paradigm.
+
+![](solution-4.png)
+We are declaring a class, which we know under the hood is just a function/object combo. We have this new function object/combo, UserCreator, which has a subtitle now, `constructor`.
+
+[^ **What is the prevailing "standard" in class and subclass writing in a post-ES2015 world?**]The modern standard in subclassing objects is by using ES6 classses: the `class`, `extends`, `super` keywords to extend the functionality of a class, but really, under the hood they are really still just factory functions as we've been creating.
+```js
+class userCreator {
+    constructor(name, score) {
+        this.name = name;
+        this.score = score;
+    }
+    sayName() {
+        console.log(`I am ${this.name}`);
+    }
+    increment() {
+        this.score++;
+    }
+}
+
+const user1 = new userCreator('Phil', 4);
+const user1 = new userCreator('Tim', 4);
+
+user1.sayName();
+
+class paidUserCreator extends userCreator {
+    constructor (paidName, paidScore, accountBalance) {
+        super (paidName, paidScore);
+        this.accountBalance = accountBalance;
+    }
+    increaseBalance() {
+        this.accountBalance++;
+    }
+}
+const paidUser1 = new paidUserCreator('Alyssa', 8, 25);
+paidUser1.increaseBalance();
+paidUser1.sayName();
+```
+
+![](user1.png)
+
+## Creating a Subclass with extends
+Well, now we would like to *extends* the class to create a subclass.
+
+- We declare a class (function/object combo) called `paidUserCreator`   
+- This object bit has a prototype, which we will assign the method `increaseBalance`. 
+
+### So what does `extends` do? 
+
+It's going to do two major things, we want, any object that comes out of `paidUserCreator`, which will be `paidUser1`, we want that paid user to have a bond to its set of of functions but we want that object to also have access to the set of functions of `UserCreator`,
+  
+[^ **What does the `extends` keyword do for us?**]The two things `extends` does...  
+    1. The first thing `extends` does is extends the newly created object's `__proto__` property up to `userCreator.prototype`. (We did this manually, before), now `extends` does this for us.  
+    2. We get acess to `super` inside of this extended subclass. And `super`, is going to say, go run that `userCreator` bit, but in a special way.
+
+`super` goes and takes us over to `userCreator` to create our object, and instead of how we did in solution 3...
+```js
+function paidUserCreator (paidName, paidScore, accountBalance) {
+  userCreator.call(this, paidName, paidScore);
+
+  // userCreator.apply(this, [paidName, paidScore]);
+  this.accountBalance = accountBalance;
+
+}
+```
+Where we are technically mutating the state of the external `this`, we are instead going to make the object inside of `userCreator`, but it's going to have its proto auto-set to `paidUserCreator`'s functions.
+
+[^ **What happens if you overwrite the `__proto__` property of a subclass to `null`?**]That means, that there is one other thing that `extends` does... It also sets the `__proto__` of the `paidUserCreator` function/object to be that of `userCreator.prototype`
+  - this is going to let `super` know what it needs to go run, and that is the `userCreator` function to create itself.
+  - If you overwrite `__proto__` in this `paidUserCreator` function, it's going to freak out, like if you set it to `null`, `super` isn't going to do anything.
+
+![](extends-super.png)
+
+Where the pink pen is the class, the red pen will be everything that `extends` handles.
+
+## Creating an object with a subclassing
+So when we are running `const paidUser1  = paidUserCreator('Alyssa', 9 , 25);`... 
+
+
+[^ **What happens when we call the `new` keyword on a class that is extending from another class? How is this handled differently than if we were using `new` and `call` in a factory function?**}⭐ When we are calling the `new` keyword in a class that `extends` from another class it does something weird. There is a `this` assignment, but it is **unitialized**. And we must, immediatley have a `super` call before it. The `this` isn't `undefined` it's just unitialized, and we cannot refer to it yet. 
+
+The reason for this is because the pertinent object we want isn't actually being born in `paidUserCreator` like we did before where the `this` context or the new object is passing its reference to `userCreator` with `call` to have its properties mutated as a side-effect. No. It's actually going to be born in `userCreator` itself where it is automatically returned out and assigned into the `this` in the subclass (we can't assign values to `this`, but this)
+
+`super` also does something interesting in that it automatically sets the returned object's `proto` to not be it's `userCreator.prototype`, but instead to be `paidUserCreator`s prototype.
+
+## Using super in a subclass constructor
+[^ **What is happening when we use `super` in a subclass?**]`super` is kind of like using the `new` keyword in a way under the hood, but it's more like [`Reflect.construct`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect/construct)(which is kind of a new way to for us to get more control over what the `new` keyword does) within our parent class and setting the `__proto__` property of this auto-generated object to the appropriate sub-classes' prototype (`paidUserCreator.prototype`).
+- it's different than using the `call` + `new` approach we previously did with our factory function, in that, we aren't mutating the outer `this` by passing it into `userCreator`'s function portion, we are actually creating that object within `userCreator` with `super` which returns us out the object that we then use and refer to as `this` in our subclass, all while automatically setting the `__proto__` property of the created object to the right object, our subclass `prototype`.
+
+![](paidUserCreator.png)
+
+## Wrapping up
+Solution 4 is a clean implementation but you have to still know what is happening under the hood.
+
+## Links 
+**Related:**
+- [`this`, classes, `new`, objects, factory functions, proto/prototype](/hardparts-js-v2-classes-and-prototypes)
+-----------
+**Nav:**  
+- [MAIN | Intro](/hardparts-OOJS-main)
+- [PREV ← | Subclass with `new` and `call` ](/hardparts-OOPJS-subclassing-new-and-call)
