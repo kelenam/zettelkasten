@@ -1,0 +1,64 @@
+---
+title: Promises | New Hard Parts 
+date: 2020-03-16
+slug: hardparts-new-promises
+tags: 
+  - FEM
+  - Will Sentence 
+  - Hard Parts
+  - asynchronous
+  - promises
+  - iterators
+  - generators
+---
+
+## Introducing Promises 
+
+### Introducing the readability enhancer - Promises
+- Special objects built into JS that get returned immediately when we make a call to a web browser API/feature (e.g. `fetch`) that's set up to return promises (not all are)
+- Promises act as a placeholder for the data we hope to back from the web browswer feature's background work
+- We also attach the functionality we want to defer running until that background work is done (using the built in `.then` method)
+- Promise objects will automatically trigger that functionality to running  
+    - The value returned from the web browswer feature's work (e.g. the returned data from the server using `fetch`) will be that function's input/argument 
+
+## Promises
+
+### Solution 3 - Using two-pronged "facade" functions that...
+...both initiate background web browswer work *and* return a placeholder object (promise) immediately in JavaScript
+```js 
+function display(data) {
+    console.log(data);
+}
+
+const futureData = fetch('https://twitter.com/will/tweets/1');
+
+futureData.then(display); // Attaches display functionality
+
+console.log("Me first!"); 
+``` 
+- `fetch` is giving us that JS consequence, a placeholder object, a **promise** that we will be able to reference elsewhere in our code with the expectation that value will be fufilled.
+
+- So we might think we could say something like, go display futureData.value, but the problem is we have no idea when that value is going to be updated. So there is no way right now, no way in our synchronous processing of existing code to say something like, `display(futureData.value)` or something like that, because we have no idea when it's going to evaluate to a value.
+    - The only place that is going to know when this value comes back is this `fetch` two-pronged facade function, so we are going to attach functions to that object, push them into an array that are going to be auto-triggered when the value gets updated.
+    - By the way, we we triggering those functions with `value` (the requested data) passed into those functions.
+    - So the thing that gets returned out from `fetch` on the JS side, is known as a *promise object*, that looks like ...
+    ```
+    { 
+        value: //...,
+        onFufilled: [ ...fns]
+    }
+    ```
+    - That promise object gets stored in global memory with the label `futureData`  
+    - `fetch` also has its browser consequence, making the XHR (XML HTTP Request), and it defaults to making a `GET` request.
+
+## Promises Q&A 
+## Promises & Microtask Queue
+## Microtask Queue Q&A 
+## Wrapping up Promises
+
+
+
+## Links 
+**Nav:**  
+- [MAIN | Intro](/hardparts-new-main) 
+- [NEXT → | ](/)

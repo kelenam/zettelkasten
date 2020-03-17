@@ -52,7 +52,14 @@ paidUser1.increaseBalance();
 
 paidUser1.sayName(); // "I'm Alyssa"
 ```
-We are going to be using `call` to allow us to take control of our `this` assignment inside of `userCreator` for the fact that we are going to use that `userCreator` code again (we don't want to have to write code to reassign `name` and `score`). We want to use this creator function to add those properties but its going to be bit messy because that `userCreator` function required a `new` kewyword which created an object but we're using the `new` keyword over here, in `paidUserCreator` that is creating a different object. How are these going to work together?
+> [^ **What are still the two things we want to make sure we do when we are subclassing a class with `new` and `call`?**]The two primary things we want to accomplish are still the same as if we were trying to do this without `new` and `call`. We want (1) To create the subclass reusably from its class, and to still have its `__proto__` property set appropriately to its function store first (2) we want to set the 'function store' of the subclass to look up the function store of its parent if its not found on the child.
+
+> [^ **How do we accomplish the goals of subclassing using `new` and `call`?**]We accomplish this using `new` and `call` by....  
+> 
+> 1. We are calling the parent class with the `call` keyword and passing in the subclasses `this` context.  
+2. We are setting the subclasses prototype with `Object.create(parentClass.prototype)`. We can also use `Object.setPrototypeOf` but refer below to see why we use `.create` in this case.
+
+>[^ **What is interesting about using `call` and why are we using it here when subclassing?**]We are going to be using `call` to allow us to take control of our `this` assignment inside of `userCreator` for the fact that we are going to use that `userCreator` code again (we don't want to have to write code to reassign `name` and `score`). We want to use this creator function to add those properties but its going to be bit messy because that `userCreator` function required a `new` kewyword which created an object but we're using the `new` keyword over here, in `paidUserCreator` that is creating a different object. How are these going to work together?
 
 Well, what we are going to do is, we're not even going to use `userCreator` with the `new` keyword.
 
@@ -64,10 +71,8 @@ Let's quickly just jump into what is going on in our `paidUserCreator` declarati
 - We will need access to those `userCreator` functions as well since we are extending that class.
   - Within that internal `prototype` object there exists the semi-hidden property: `__proto__`
   - The approach Will uses, is: `paidUserCreator.prototype = Object.create(userCreator.prototype);` to completely overwrite the existing object at `paidUserCreator.prototype` by creating a new empty object with `Object.create` and setting the `__proto__` of that object to point to `userCreator.prototype`.
-    - Note: you could also say: `Object.setPrototypeOf(pbj, prototype)`, However MDN actually recommends using `Object.create()` since due to how things are optimized in the JS lang, setting `[[Prototype]]` is actually a very slow operation.
+[^ **Why might we use `Object.create` instead of `Objectt.setPrototypeOf`? What do we have to remember when using `Object.create`?**] Note: you could also say: `Object.setPrototypeOf(pbj, prototype)`, However MDN actually recommends using `Object.create()` since due to how things are optimized in the JS lang, setting `[[Prototype]]` is actually a very slow operation. However, we have to remember that `Object.create` always returns an empty object that sets the `proto` property of that object. 
 - Next we want to make sure we want the sub-class gets its new functionality so we assign it to the `paidUserCreator.prototype`.
-
-- We are using our parent class not in the context of 
 
 ## Using a `call` Method in a Constructor
 So let's address the hardest bit to kind of walk through which is this little bit using `call`
@@ -81,23 +86,24 @@ function paidUserCreator (paidName, paidScore, accountBalance) {
   this.accountBalance = accountBalance;
 }
 ```
-When we are in the execution context of our paidUserCreator, and we hit the line where we are invoking a function with `call`, 
-- This is one of the more puzzling bits since we are calling the `userCreator` function but not direclty with parens, we're not calling it with the `new` keyword. It should have a `new` keyword, right, because that's what the `this` is going to refer to in the auto created object, but instead we are going to say, "nah, we don't want it to refer to a different auto created object. We want it to refer to the auto-created object of the child, created by `paidUserCreator`, so we can add properties to it to extend it as a subclass.
+When we are in the execution context of our `paidUserCreator`, and we hit the line where we are invoking a function with `call`, 
+- This is one of the more puzzling bits since we are calling the `userCreator` function but not directly with parens, we're not calling it with the `new` keyword. It should have a `new` keyword, right, because that's what the `this` is going to refer to in the auto created object, but instead we are going to say, "nah, we don't want it to refer to a different auto created object. We want it to refer to the auto-created object of the child, created by `paidUserCreator`, so we can add properties to it to extend it as a subclass.
   - we want to be able to then be able to use the `new` keyword with `paidUserCreator` so we automatically get that object created with the properties that `userCreator` would produce in addition to the ones we add to `paidUserCreator`
 - the `this` that gets passed to `userCreator` as the first argument when we invoke it with `call` is simply a pointer to the outer `this` context. 
-- It's helpful to renmember that the two `this`s refer to different things, the `this` inside of `userCreator` is a different this that is inside of `paidUserCreator`, they are both pointers but to different objects, since this is holding a reference it has to go and look up.
+- It's helpful to remember that the two `this`s refer to different things, the `this` inside of `userCreator` is a different this that is inside of `paidUserCreator`, they are both pointers but to different objects, since this is holding a reference it has to go and look up.
+
+>[^ **What are two quirks of using `call` on the parent class inside of a subclass?**]The quirks of using `call` in a subclass are...
+>
+>1. We are using `userCreator`, without the `new` keyword, when `userCreator` has its property definitions referencing a `this`, which we would expect to be generated automatically by `new`.
+2. We have two different `this` keywords that mean different things, however, when we pass in the outer `this` as the first argument to `call`, JS, under-the-hood is essentally assigning the inner `this` reference to the outer `this` reference so that when we are modifying properties in both `userCreator` and `paidUserCreator` they are modifying the same object.
 
 ## Assigning Properties to instance
-- I think it is important to note that this is a side-effect, from within the userCreator, because we're not returning anything out, because we are changing stuff on a reference to an outer object (`this` context of `paidUserCreator`). 
-- We didn't need a return, emphasizes how its already kind of like side-effecting or mutating the outer object by adding to it the properties of `userCreator`.
-  - this is going to let `super` know what it needs to go run, and that is the `userCreator` function to create itself.
-  - If you overwrite `__proto__` in this `paidUserCreator` function, it's going to freak out, like if you set it to `null`, `super` isn't going to do anything.
+>[^ **What's an interesting behavior (regarding `this`) of using `call` on the parent class to set the child's intial properties? What is an indicator proving this?**]I think it is important to note that this is a side-effect, from within the userCreator, because we're not returning anything out, because we are changing stuff on a reference to an outer object (`this` context of `paidUserCreator`). 
+- We didn't need a `return`, emphasizes how its already kind of like side-effecting or mutating the outer object by adding to it the properties of `userCreator`.
 
 ## Prototype Tracing
 ![](call-and-new.png)
 - The diagram above documents flow up until we call `paidUser1.increaseBalance()`;
-
-
 
 ## Links 
 **Related:**
@@ -107,3 +113,5 @@ When we are in the execution context of our paidUserCreator, and we hit the line
 - [MAIN | Intro](/hardparts-OOJS-main)
 - [PREV ← | Subclassing with Factory Functions ](/hardparts-OOPJS-subclassing-with-factory-functions)
 - [NEXT → | Subclsasing with class, extends, and super](/hardparts-OOPJS-subclassing-with-class-extends-super)
+
+## Summary Questions

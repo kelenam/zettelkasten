@@ -11,13 +11,6 @@ tags:
   - subclassing
 ---
 
-## Summary Questions
-1. What is the gist of subclassing?
-2. How do we use `Object.setProtoTypeOf()`? When would we use it and what purpose does it serve?
-3. Walk through how we would implement subclassing with factory functions without the `new` keyword...
-4. `this` in a method always refers to what? Unless we use what to call the function? What is the purpose for doing so?
-5. What is the difference between `.call` and `.apply`? And how are they both used?
-
 ## Intro to Subclassing and Inheritance
 
 ![](subclassing.png)
@@ -25,9 +18,9 @@ Note: Error on the slide; The `bonusScore` under paid user should be `accountBal
 
 This proto/prototype lookup ability is what JS does to enable extensibility of its own functions and objects. What this means is that we can leverage that same principle/dynamic ("prototypal inheritance") and in an OOP style, "subclassing", to pass knowledge or work that's been previously written, down to a child of that class.
 
->- **subclassing**: creating a sub-version, a slightly more specific notion of a class, of an existing class. It's extending the functionality of that parent class for a more specific use-case.[^1]
+> [^ **What is the gist of subclassing?**]**subclassing**: creating a sub-version, a slightly more specific notion of a class, of an existing class. It's extending the functionality of that parent class for a more specific use-case. 
 
-The semnatic beef with the word "inheritance" is that it implies that all those "traits"/functionality also live on the object itself. That's not the case, they only have links to other objects.
+> [^ **Why is the word "inheritance" discouraged when used to talk about JavaScript's prototype chain?**]The semantic beef with the word "inheritance" is that it implies that all those "traits"/functionality also live on the object itself. That's not the case, they only have links to other objects.
 
 ## Create object with Factory Functions
 
@@ -79,7 +72,7 @@ paidUser1.sayName(); // "I'm Alyssa"
 bonus property, while a regular user wouldn't have access to a bonus property.
 - So wouldn't it be nice if the `__proto__` (the place JS goes to look for functionality) of `paidUserFunctions` had a link up to `userFunctions` so it still have a link up to the same set of shared functions.
 
-`Object.setProtoTypeOf` takes in as it's first argument, an object, and then as it's second argument, whatever you want to set `__proto__` to of that first argument, in our case in the above it would be: `Object.setProtoTypeOf(paidUserFunctions, userFunctions)`
+[^ **What might be better name for `Object.setPrototypeOf()`**]`Object.setProtoTypeOf` takes in as it's first argument, an object, and then as it's second argument, whatever you want to set `__proto__` of to that first argument, in our case in the above it would be: `Object.setProtoTypeOf(paidUserFunctions, userFunctions)`
     - It's called `setProtoTypeOf` because technically, they call anything that's referenced from `proto` the "prototype" of this object, but it's referenced through something called `__proto__` this can be confusing since it's actually setting the `__proto__` property. It's explicitly not setting a property called prototype, its explicitly setting a property called proto. (This is because in the spec proto is actually called [[prototype]] which isn't very helpful )
 
 ## Creating an object with a Sub-Factory Functions
@@ -91,7 +84,7 @@ So on line 34 in the above, we are creating a new `paidUser1` which we don't yet
     - so after this object is returned...
 - We need to override the `__proto__` assignment of the newly created `newPaidUser` object to correctly point to the `paidUserFunctions` store first so we say.... `Object.setProtoTypeOf(newPaidUser, paidUserFunctions);`
 
->* **We use the `Object.setProtoTypeOf()` (more accurately its setting the `__proto__` property of), to adjust where the prototype chain should look up first for its functionality. We use it by passing it two arguments: the first is the object whose `__proto__` property we want to "set", and the second is the place to look for functionality first.**[^2]
+> [^**How do we use `Object.setProtoTypeOf()`? When would we use it and what purpose does it serve?**] **We use the `Object.setProtoTypeOf()` (more accurately its setting the `__proto__` property of), to adjust where the prototype chain should look up first for its functionality. We use it by passing it two arguments: the first is the object whose `__proto__` property we want to "set", and the second is the place to look for functionality first.**[^2]
 
 ![](override-proto.png)
 
@@ -101,7 +94,7 @@ Can `paidUser1.sayName()` still access the `userFunctions` functionality? Yes, v
 This is THE way of how subclassing works at its most fine-grained level, everything else, like new and classes are abstractions on top of this as we will later see with the `extends` and `super` keyword.
 
 ## Subclass Review
->- So even though we aren't yet using the `class` keyword, we would still consider this "**subclassing**" even though it's making use of factory functions and no `new` keyword. We are still creating an object from another object without rewriting all of its functionality from scratch or duplicating it and then extending it, we are instead, calling it (the parent class) within a factory function of the exteder/child/sub-class and adding more specific data/functionality to that object.
+> [^ **Walk through how we would implement subclassing with factory functions without the `new` keyword...**]So even though we aren't yet using the `class` keyword, we would still consider this "**subclassing**" even though it's making use of factory functions and no `new` keyword. We are still creating an object from another object without rewriting all of its functionality from scratch or duplicating it and then extending it, we are instead, calling it (the parent class) within a factory function of the exteder/child/sub-class and adding more specific data/functionality to that object.
 - In the example above, we are creating two factory functions and two function stores
 - We made explicit to set the proto of our second function store to "inherit" from the first.
 - We call one factory function within another to extend its functionality and then make sure to override that produced object's `__proto__` property to the correct first stop: its own function store.[^3]
@@ -121,7 +114,7 @@ obj.increment.call(otherObj); // otherObj.num now 11
 ```
 > `this` always refers to the object to the left of the dot on which the function (method) is being called - unless we override that by running the function using `.call()` or `.apply()` which lets us set the value of this inside of the `increment` function. 
 
-> - We need to know that we can control how we call functions using other techniques besides just grabbing the function's identifier and throwing parentheses on the end of it to call it. Well, we can actually use a few built in controls to do this...`call` and `apply`.[^4]
+> [^ **`this` in a method always refers to what? Unless we use what to call the function? What is the purpose for doing so?**]- We need to know that we can control how we call functions using other techniques besides just grabbing the function's identifier and throwing parentheses on the end of it to call it. Well, we can actually use a few built in controls to do this...`call` and `apply`.
 
 What we want to accomplish is being able to take control, inside of the functions *execution context*, of the `this` assignment. Now we sort of saw this with the arrow function, but we weren't really taking control, we were just saying, don't have the `this` be defined by where the function is being called but have it instead be defined by where the function was first stored and saved. 
 
@@ -162,8 +155,8 @@ We manually took control of our functions, exeuction context, `this` assignment,
 
 ![](/call.png)
 
->* `apply` behaves very similarly, we could similarly swap out `call` for `apply` and this is identitcal.
-- The only difference between `call` and `apply`, is that if our function (`increment` in this case) is expecting inputs, with `call` we would just say `.call(otherObj, arg1, arg2, arg3)` whereas with `apply` we put all those arguments in as an array... `.apply(otherObj, [arg1, arg2, arg3])`[^5]
+> [^ **What is the difference between `.call` and `.apply`? And how are they both used?**] `apply` behaves very similarly, we could similarly swap out `call` for `apply` and this is identitcal.
+- The only difference between `call` and `apply`, is that if our function (`increment` in this case) is expecting inputs, with `call` we would just say `.call(otherObj, arg1, arg2, arg3)` whereas with `apply` we put all those arguments in as an array... `.apply(otherObj, [arg1, arg2, arg3])`
 
 ## Links 
 **Related:**
@@ -173,3 +166,5 @@ We manually took control of our functions, exeuction context, `this` assignment,
 - [MAIN | Intro](/hardparts-OOJS-main)
 - [PREV ← | Default Prototype Chain ](/hardparts-OOPJS-default-prototype-chain)
 - [NEXT → | Subclassing with new and call](/hardparts-OOPJS-subclassing-new-and-call)
+
+## Summary Questions

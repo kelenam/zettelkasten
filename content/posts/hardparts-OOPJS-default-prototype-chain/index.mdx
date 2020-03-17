@@ -24,7 +24,6 @@ Object.prototype // { hasOwnProperty: FUNCTION }
 ```
 - We have that secrete `__proto__` property on our `obj` object, when we assign our `num` property its in the regular object portion of it, and `__proto__` is technically hidden (but still accessible)
 
-
 - As soon as any JS runtime starts, it adds in the background, a function/object combo with the label `Object`. It's a function/object. It's actually a function that when called with the `new` keyword is going to return us an object.
 - That `Object` as all function/object combos have, has the property `.prototype` which is itself is a big old object.
   - It also has a few different properties within that `prototype` property, like `hasOwnProperty`
@@ -51,8 +50,6 @@ Function.prototype.__proto__ //--> Object.prototype { hasOwnProperty: FUNCTION }
 - `.toString()` looks at the `prototype` property of `multiplyBy2` can't find it so it looks at `Function.prototype` as the next thing since its the  `__proto__` of `multiplyBy2`.
 - we can access `.hasOwnProperty` through the prototype chain, since it won't find it on `multiplyBy2`, won't find it on `Function.prototype`, so it looks up to `Object.prototype`, where it will be found.
 
-
-
 ## Links 
 **Related:**
 - [`this`, classes, `new`, objects, factory functions, proto/prototype](/hardparts-js-v2-classes-and-prototypes)
@@ -60,4 +57,4 @@ Function.prototype.__proto__ //--> Object.prototype { hasOwnProperty: FUNCTION }
 **Nav:**  
 - [MAIN | Intro](/hardparts-OOJS-main)
 - [PREV ← | Scope and this ](/hardparts-OOPJS-scope-and-this)
-- [NEXT → |  ]()
+- [NEXT → | Default Prototype Chain](/hardparts-OOPS-subclassing-with-factory-functions)
