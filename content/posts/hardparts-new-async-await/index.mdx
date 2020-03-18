@@ -1,0 +1,36 @@
+---
+title: Async Await | New Hard Parts 
+date: 2020-03-17
+slug: hardparts-new-async-await
+tags: 
+  - FEM
+  - Will Sentence 
+  - Hard Parts
+  - asynchronous
+  - promises
+  - iterators
+  - generators
+  - async/await
+---
+### Async/await simplifies all this and finally fixes the inversion of control problem of callbacks
+```js
+async function createFlow() {
+    console.log("Me first!");
+    const data = await fetch('https://twitter.com/will/tweets/1');
+    console.log(data);
+}
+createFlow()
+
+console.log("Me Second!");
+```
+No need for a triggered function on the promise resolution, instead we auto trigger the resumption of the `createFlow` execution (this functionality is still added to the microtask queue though)
+
+## Links 
+**Related:**  
+- [Traversy: callbacks, promises, `async`/`await`](traversy-async-js)
+---
+**Nav:**  
+- [MAIN | Intro](/hardparts-new-main) 
+- [PREV ← | Generators ](/hardparts-new-generators)
+ 
+## Summary Questions
