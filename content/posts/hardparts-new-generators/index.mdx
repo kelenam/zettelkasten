@@ -51,7 +51,7 @@ const element2 = returnNextElement.next();
 ```
 And the built in iterators actually produce the `next` element in the format: `{ value:  4}`.
 
-We still need to define a function so it returns out the "backpack", the closure over the surrounding data. We aren't going to return out the function independently by itself, but instead as a method on an object. It's just wrapping our functions, it still gets that bond to the surrounding memory.
+> [^ **How can we return out an object and still have closure over the local variable environment?**]Because remember, that a function even as a method on an object, has a "backpack" of its lexical/surrounding state even if it happens to be within an object.  We still need to define a function so it returns out the "backpack", the closure over the surrounding data. We aren't going to return out the function independently by itself, but instead as a method on an object. It's just wrapping our functions, it still gets that bond to the surrounding memory.
 
 Objects don't get the backpack, only functions, because when that function gets called is the only way we can access that backpack of data, if its just an object with no function, there is no backpack.
 
@@ -71,7 +71,7 @@ The way iterators are built into JS, are as objects with methods on them that ar
 
 Now, that we know this, we are going to start using, built in tools to give us these returnNextElement.next()  functions that when run will give us each of our elements one by one, and we are going to produce those flows of data not with an array, but by using a function.
 
-We're actually going to define a function that has a kind of intermediate returns, they're stamnents that return out, our next element in our flow. Always this kind of fusion of data and functionality, now we're producing flows of data not from a collection of data but from a function. This is going to give us a behavior in JS that you would have never thought allowed. 
+[^ **What do generators allow us to do that iterators do not? Why is it helpful to know how iterators are implemented to better understand generators? How are they similar and how are they different?**]With **generators**, we're actually going to define a function that has a kind of intermediate return (`yield`), they're statements that return out, our next element in our flow. Always this kind of fusion of data and functionality, now we're producing flows of data not from a collection of data but from a function. This is going to give us a behavior in JS that you would have never thought allowed. 
 
 It uses a **star function**, known as a **generator function** to produce our flows of data. It's going to take us back in, to continue our execution of that `createFlow` function.
 
@@ -100,10 +100,9 @@ const element2 = returnNextElement.next();
 
 ![](generators.png)
 
-So it's working as expected, we are getting as stream of data, only not we are producing our flows using a function, what that allows us to do is dynamically set what data flow out to us when we "turn on the tap" and give ourselves a next element. 
+So it's working as expected, we are getting as stream of data, only now we are producing our flows using a function, what that allows us to do is dynamically set what data flow out to us when we "turn on the tap" and give ourselves the next element. 
 
-We can even, set it from outside, we can sort of return back and get the execution context with new data to determien what the next result of our flow of data's going to be. We get complete control over what the next element in our flow is going to be.
-
+> We can even, set it from outside, we can sort of return back and get the execution context with new data to determien what the next result of our flow of data's going to be. We get complete control over what the next element in our flow is going to be.
 In an array, `[4,5,6]`, thats set, we couldn't control that, we couldn't have logic determining what the later elements would be it was just, it was what it was. We can now control it, but it takes some really precise thinking and it may feel weird.
 
 ### This allows us to dynamically set what data flows to us (when we run `returnNextElement`'s function)
@@ -189,7 +188,7 @@ const returnNextElement = createFlow()
 const futureData = returnNextElement.next()
 futureData.then(doWhenDataReceived)
 ```
-This is goign to bring back everything from our web-browswer features, everything from our new generator functions which themselves are an implementation of an iterator, our microtask queue, our event loop, and closures.
+This is going to bring back everything from our web-browswer features, everything from our new generator functions which themselves are an implementation of an iterator, our microtask queue, our event loop, and closures.
 
 1. we create in memory function definition of `doWhenDataReceived`
 2. we declreate a special generator function called `createFlow`
@@ -226,6 +225,6 @@ That's why solution 2, in the end is also true, it's not a wrong model, under th
 **Nav:**  
 - [MAIN | Intro](/hardparts-new-main) 
 - [PREV ← | Iterators ](/hardparts-new-iterators)
-- [NEXT → |   ](/hardparts-new-generators)
+- [NEXT → |  Async / Await ](/hardparts-new-async-await)
 
 ## Summary Questions

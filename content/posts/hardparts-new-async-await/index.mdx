@@ -25,6 +25,61 @@ console.log("Me Second!");
 ```
 No need for a triggered function on the promise resolution, instead we auto trigger the resumption of the `createFlow` execution (this functionality is still added to the microtask queue though)
 
+So, for the first time we were able to return back into a funtion's execution context after we've left it. We were able to do so using our generator object's `.next()` method that guides us back into the `createFlow` execution context, we manually do so (the moving in and out of the execution context) by using `.next()` which was triggered by the trigger of our `dueWhenDataReceived` callback that was attached to our `futureData` promise object.
+
+This flow of going inwards and outwards gets complex, so JS gives us an `async` function that's going to automate that process of going back into the `createFlow` function.
+
+It's going to say, don't worry, we don't have to trigger going back into it. Instead, we are going to automatically go back into it, we're gonna pass the response object value back in as the evaluated result of the yield expression, and store that straight in data.
+
+Using `async`, we don't have a need for a trigger function, the promise resolution. It's instead auto triggered...that task though is still added to the microtask queue.
+
+So let's walk through it...
+
+1. We are declaring a const in global memory that stores a new kind of function, an `async` function.
+2. We are going to invoke that function by its stored label + parens. 
+  - When we execute create flow this time, we are going to immediately enter its execution context (unlike our generator function when we had to trigger it with the `.next()` method)
+3. It hits that console.log() and logs "Me First".
+4. In local memory declaring const, `data`, for now it's not given a value, its' going to be the evaluated  result of that expression on the right hand side...
+5. On the right hand side, we say, `await fetch()`
+  - `fetch` does its two-pronged functionality, by returning a promise in JS, and making the XHR request in the browser web features.
+    - two properties of promise object, `value` and `onFufilled`
+    - in web browser, we spin up xhr, takes: url, path, type: GET. Sending out http message to url.
+      - on completion we are going to update that promise objects value. We didn't give that promise object itself a label in JS, but the web browser knows where that object is stored, and that's the `value` property its going to update.
+6. Now, the all-powerful `await` keyword is going to throw us out of the `createFlow` execution context. Where we encounter...
+7. Our next line of `console.log("Me second")`
+  - In other words, we've set up or asynchronous work and we continue running our synchronous code, now to do all this we are stepping out of our function, and wouldn't it be wonderful if we could step back in to our function so that when we do get the value back from the request we can hopefully continue running our code and log the data.
+8. So now, in JS we are done, but in the background, about ~200ms later we get the response back which in turn updates the `value` property of our promise object, at which point, what are we going to do? We never passed in any functions to the hidden `onFufilled` array by using `.then` like we normally would have. No, instead we simply continue on with our `createFlow` execution context, where we "paused".
+9. We re-enter `createFlow`, add it back on to our call stack and come back in where we left of, `await` was super powerful, it threw us straight out, like yield, we never got to assign anything to data, that's not a bad thing, and we are hoping that data gets updated with whatever this right hand side evaluates to, and what does it update it evaluate to? The value `hi` we get as a response passed into value.
+10. Once we've assigned data it's value, we hit the next line which just `console.log('hi');`
+
+> [^**What is the syntax of `async`/`await`, how do you "instantiate" an `async` function?**]In review, the syntax for `async`/`await` is, the keywords `async` to denote its an async function. And `await` where we want to auto-pause/auto-resume our code when the asynchronous action completes, and we "initialize" this async function by simply invoking it with parens, like any other function.
+
+>[^ **How do `async`/`await` compare to `*`/`yield`**] You can think of `async`/`await` as being like a cleaned up version of `*`/`yield`(generators). We still get the exit/returning to an execution context as we do with generators, however, we don't have to worry about manually calling the `.next()` to resume the execution context of the async function, not to mention, we don't have to deal with "instantiating" and saving in memory the *generator objecct* that initializes the object that we call `.next()` on. Instead we simply invoke the async function itself with `createFlow()`
+
+We resume context automatically when `await` evaluates to a value. We don't have to deal with calling `.next(value)` again with the returned value grabbed from the `value` property of the returned promise. 
+
+We get a more intuitive reading of this line...
+```js
+ const data = yield fetch('http://twitter.com/will/tweets/1');
+```
+In the above generator version, `data` isn't being assigned the result of `yield fetch`, it's just exiting out so that when JS runs `returnNextElement.next(value)` via us passing it to `.then()` through `doWhenDataReceived`, runs do we get that `value` argument passed to `....next(value)` does data get evaluated to anything.
+
+Compared to...  
+```js
+    const data = await fetch('https://twitter.com/will/tweets/1');
+```
+Now, when the asynchronous request returns, it simply resumes execution context of where it left off, and automatically passed the responses `value` property back to where we left off, in this case, assigning it to `data`, and the rest of the execution context continues.
+
+## Summary
+> [^ **Review some of the concepts this course touches on and what it takes us through**]We saw: the foundations of JS: 
+- Memory/thread, **execution context**
+- We saw that get agumented by web browser features, the **callback queue**, **the event loop**, the microtask queue,
+- New built in asynchronous feature of JS: **promise** objects, whose differed functionality isn't assigned to the callback queue but the **microtask queue**. 
+- We added this whole new way of thinking about how collections of data can be accessed and have data applied to them, known as **iterators**. It made us rethink collections of data as instead of being static thing we go and get elements from to instead these beautiful flows of data that when I run a function, switch the tap on, we get the next element like a stream of data.
+- Then we discovered we could control the nature of those flows, what element we got each time and dynamically create those sets of data, dynamically determining what those sets of data could be by defining it in a function and setting our `yield` keyword to return out those elements as we went. That was by using **generators** or __* functions__ What that was allowing us to do was exit and re-enter our execution context...
+- It gave us in the end, `async` / `await` where we enter a function to initiate a backgroung task, an asynchronous task and then only return to that function, leave it and then return to that function when we get a response back frmo the slow, long-term tasks.
+
+
 ## Links 
 **Related:**  
 - [Traversy: callbacks, promises, `async`/`await`](traversy-async-js)

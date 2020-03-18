@@ -19,7 +19,7 @@ JavaScript is a [**single threaded**]() (one command executing at a time) and ha
 
 So what if we need to *wait some time before we can execute certain bits of code?* Perhaps we need to wait on fresh data from an API/server request or for a timer to complete and then execute our code.
 
-We have a conundrum - a tension between wanting to *delay some code execution* but *not wanting to blockg the thread* from ant further code running while we wait.
+We have a conundrum - a tension between wanting to *delay some code execution* but *not wanting to blocking the thread* from ant further code running while we wait.
 
 ### Solution 1
 ```js 
@@ -38,7 +38,9 @@ display(dataFromAPI);
 console.log('Me later!');
 ```
 ### Goals
-1. Be able to do tasks that take a long time to complete e.g. getting data from the server
+>[^ **What are our three goals we want to accomplish with asynchronous code?**]Our three goals are... 
+>
+> 1. Be able to do tasks that take a long time to complete e.g. getting data from the server
 2. Continue running our JavaScript code line by line without one long task blocking further JavaScript executing
 3. When our slow task completes, we should be able to run functionality knowing that task is done and data is ready!
 
@@ -50,10 +52,11 @@ Conundrum!
 **Benefits**
 - It's easy to reason about
 
-## AsynchronousWeb Browser APIs 
-So to get around this we have to introduce a whole new world of features that happen oustide of the JS engine itself, these are the features of the web browser. 
+## Asynchronous Web Browser APIs 
+> [^ **How do we solve for asynchronicity in JavaScript in the web?**]We solve it by... 
+So to get around this we have to introduce a whole new world of features that happen oustide of the JS engine itself, these are the features of the web browser and their respective APIs.
 
-The only way to solve the 3 goals listed above is to tackle the 
+The only way to solve the 3 goals listed above is to understand how these web browser features work.
 
 ## Solution 2 - Introducing Web Browswer APIs/Node background threads
 ```js
@@ -113,7 +116,8 @@ It may be a weird feeling to cede control to a function that operates elsewhere 
 - [Traversy: callbacks, promises, `async`/`await`](traversy-async-js)
 ---
 **Nav:**  
-- [MAIN | Intro](/hardparts-enw-main) 
+- [MAIN | Intro](/hardparts-new-main) 
 - [PREV ← | Introduction](/hardparts-new-main)
 - [NEXT → | Promises](/hardparts-new-promises)
  
+## Summary Questions

@@ -16,9 +16,9 @@ tags:
 
 ### Introducing the readability enhancer - Promises
 - Special objects built into JS that get returned immediately when we make a call to a web browser API/feature (e.g. `fetch`) that's set up to return promises (not all are)
-- Promises act as a placeholder for the data we hope to back from the web browswer feature's background work
+- **Promises** act as a placeholder for the data we hope to back from the web browswer feature's background work
 - We also attach the functionality we want to defer running until that background work is done (using the built in `.then` method)
-- Promise objects will automatically trigger that functionality to running  
+- Promise objects will automatically trigger that functionality to run   
     - The value returned from the web browswer feature's work (e.g. the returned data from the server using `fetch`) will be that function's input/argument 
 
 ## Promises
@@ -88,7 +88,7 @@ We need a way of queuing up all this deferred functionality.
 - JS has an additional queue called the *microtask que*, the spec calls it the [**job queue**](https://www.ecma-international.org/ecma-262/7.0/#sec-jobs-and-job-queues)
 - Promises, get queued in the microtask queue which takes precedence over the callback queue, which is referred to as the **task queue** in the spec.
 
-- FYI, the spec is just guidance on how things should be implemented JS engine-makers may not always follow the spec 1-to-1 but they do for the most part, 99% of the time.
+- *FYI, the spec is just guidance on how things should be implemented JS engine-makers may not always follow the spec 1-to-1 but they do for the most part, 99% of the time.*
 
 ![](event-loop.png)
 
@@ -117,3 +117,5 @@ Asynchronous JavaScript is the backbone of the modern web -- letting us bulid fa
 - [MAIN | Intro](/hardparts-new-main) 
 - [PREV ← | Asynchronous JavaScript ](/hardparts-new-asynchronous-javascript)
 - [NEXT → | Iterators](/hardparts-new-main-iterators)
+
+## Summary Questions
