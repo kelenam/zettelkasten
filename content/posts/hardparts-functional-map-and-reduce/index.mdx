@@ -109,7 +109,7 @@ const summed = reduce([1,2,3], add, 0)
 
 ![](reducers.png)
 
-> ⭐ Right now we are reducing data with more data. Imagine if we could reduce something, element by element, repeatedly inside of reduce, image we could reduce something that was not not but instead something else, not a list of data, but a list of something else. That would change everything about how we write code.
+> [^ **Right now our reducer is reducing data with more data, what might be the next "evolution" we could take this reducer to, in order to really make it powerful?**]⭐Right now we are reducing data with more data. Imagine if we could reduce something, element by element, repeatedly inside of reduce, image we could reduce something that was not just data but instead something else, not a list of data, but a list of something else. That would change everything about how we write code.
 
 ## Built-In Array Methods
 ### Interlude - arrays, objects and functions have access to ‘methods’
@@ -158,7 +158,10 @@ const sumOfGreaterThan2 = array.filter(greaterThan2).reduce(add,0)
 ```
 >[^ **⭐ What is special about outputs of HOFs that are arrays?**]⭐ The output of each higher order function (HOF), where it’s an array, has access to all the HOFs (`map`, `filter`, `reduce`) through the prototype chain. Meaning we can chain them since their output can be operated on by an ensuing HOF.
 
-- Chaining isn't the most functional programming style of writing code, but we're going to see it as a lot of peole do do it in JavaScript this way, but then after that we will do the more clean, compartmentalized functional style.
+> [^ **Speak a little to array method chaining and what problems it solves and its limitations.**]Chaining isn't the most functional programming style of writing code, but we're going to see it as a lot of people do do it in JavaScript this way, but then after that we will do the more clean, compartmentalized functional style.
+- Chaining is useful only if you are doing consistent operations on things that evaluate to a value that can be chained. It's not as readable as it could be with a more functional approach.
+- Because of **referrential transparency** (a functions evaluated value is treated identically to the value itself, e.g. `add2(2)` === `4`), you don't have to create a new variable to hold the result of a function in memory before running a subsequent operation on it.
+
 
 ![](chaining.png)
 
@@ -168,7 +171,7 @@ const sumOfGreaterThan2 = array.filter(greaterThan2).reduce(add,0)
 ---- 
 **Nav**:
 - [MAIN](/hardparts-functional-main)
-- [PREV ← | Higher Order Fucntions](/hardparts-functional-higher-order-functions)
+- [PREV ← | Higher Order Functions](/hardparts-functional-higher-order-functions)
 - [NEXT → | Composition ](/hardparts-functional-composition)
 
 ## Summary Questions
