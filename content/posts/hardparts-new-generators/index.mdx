@@ -67,11 +67,11 @@ The way iterators are built into JS, are as objects with methods on them that ar
 }
 ```
 
-[^ **Why is it useful to have our iterators return out objects with a `value` property instead of just the value itself?**]Where `done` will evaluate to `true` when it is finished. Useful, because if we were checking by value, it's possible there could be a `undefined` in our collection.
+> [^ **Why is it useful to have our iterators return out objects with a `value` property instead of just the value itself?**]Where `done` will evaluate to `true` when it is finished. Useful, because if we were checking by value, it's possible there could be a `undefined` in our collection.
 
 Now, that we know this, we are going to start using, built in tools to give us these returnNextElement.next()  functions that when run will give us each of our elements one by one, and we are going to produce those flows of data not with an array, but by using a function.
 
-[^ **What do generators allow us to do that iterators do not? Why is it helpful to know how iterators are implemented to better understand generators? How are they similar and how are they different?**]With **generators**, we're actually going to define a function that has a kind of intermediate return (`yield`), they're statements that return out, our next element in our flow. Always this kind of fusion of data and functionality, now we're producing flows of data not from a collection of data but from a function. This is going to give us a behavior in JS that you would have never thought allowed. 
+> [^ **What do generators allow us to do that iterators do not? Why is it helpful to know how iterators are implemented to better understand generators? How are they similar and how are they different?**]With **generators**, we're actually going to define a function that has a kind of intermediate return (`yield`), they're statements that return out, our next element in our flow. Always this kind of fusion of data and functionality, now we're producing flows of data not from a collection of data but from a function. This is going to give us a behavior in JS that you would have never thought allowed. 
 
 It uses a **star function**, known as a **generator function** to produce our flows of data. It's going to take us back in, to continue our execution of that `createFlow` function.
 
@@ -146,7 +146,7 @@ iterators and generators are a fairly common paradigm, because traditional compu
 ## Introducing Async Generators
 Functions that give us a kind of "flow of data", where we can turn on/off the "tap" so to speak, are all considered **iterators**. Anything that gives a flow element by element. 
 
-But here, in **generators**, we are producing the flow by running through a function hitting a yield statement giving that as the next element in the flow, we're not running functionality to give, to generate the next element of our flow. That also means we get control manually ourselves, into a functions execution context, with the `next` method. We now have manual control of returning into a functions execution context, first the first time ever, we did so by simply keeping track of the position of where we left of using closure. We were used to storing data/state, now we're storing also the position in the execution context.
+But here, in **generators**, we are producing the flow by running through a function hitting a `yield` statement giving that as the next element in the flow, we're not running functionality to give, to generate the next element of our flow. That also means we get control manually ourselves, into a functions execution context, with the `next` method. We now have manual control of returning into a functions execution context, for the first time ever, we did so by simply keeping track of the position of where we left of using closure. We were used to storing data/state, now we're storing also the position in the execution context.
 
 ### And most importantly, for the first time we get to pause ('suspend') a function...
 ... being run and then return to it by calling `returnNextElement.next()`
@@ -175,7 +175,7 @@ futureData.then(doWhenDataReceived)
 We get to control when we return back to `createFlow` and continue executing--by setting up the trigger to do so (`returnNextElement.next()`) to be run by our function that was triggered by the promise resolution (when the value returned from twitter)
 
 ## Async Generators
-This is going to be us using generators to build async/await from scratch essentially...
+This is going to be us using generators to build `async`/`await` from scratch essentially...
 ```js:title=async-generators
 function doWhenDataReceived (value){
  returnNextElement.next(value)

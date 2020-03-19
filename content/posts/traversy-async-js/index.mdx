@@ -21,4 +21,221 @@ Callbacks were used as the primary way of dealing with asynchronous data, until 
 - Then in ES7 (or so), `async`/`await` was introduced which is still dealing with promises but in a different way, we are dealing with the response in a 'synchronous-readable' way, it is visually more easy to reason about.
 - Also going to look at `promise.all` where if you are resolving multiple promises you can call them all at the same time, and wait for each one to be done.
 
-## callbacks
+## Callbacks
+
+```html:title=index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async JS</title>
+</head>
+<body>
+        <script src="callbacks.js"></script>
+</body>
+</html>
+```
+Our example...
+```js:title=callbacks.js
+const posts = [
+    { title: 'Post One', body: "This is Post One "},
+    { title: 'Post Two', body: "This is Post Two "},
+];
+
+
+function getPosts() {
+    setTimeout(() => {
+      let output = '';
+      posts.forEach(post => {
+        output += `<li>${post.title}</li>`;
+      });
+      document.body.innerHTML = output;
+    }, 1000);
+}
+
+
+function  createPost(post, callback) {
+    setTimeout(() => {
+        posts.push(post);
+        callback()
+    }, 2000);
+}
+
+createPost({title: 'Post Three', body: 'This is post three'}, getPosts);
+```
+- If we didn't pass the callback, we wouldn't repaint the DOM with our updatesd post list. We pass in `getPosts` as the callback to run after our new post is added to repaint.
+
+## Promises
+Let's keep the same code and 
+```js:title=promises.js {19-29, 36}
+const posts = [
+    { title: 'Post One', body: "This is Post One "},
+    { title: 'Post Two', body: "This is Post Two "},
+];
+
+
+function getPosts() {
+    setTimeout(() => {
+      let output = '';
+      posts.forEach(post => {
+        output += `<li>${post.title}</li>`;
+      });
+      document.body.innerHTML = output;
+    }, 1000);
+}
+
+
+function  createPost(post, callback) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+          posts.push(post);
+
+          let error = false;
+
+          if (!error) {
+            resolve();
+          } else {
+            reject('Error: something went wrong');
+          }
+
+      }, 2000);
+
+    }) 
+}
+
+createPost({title: 'Post Three', body: 'This is post three'}).then(getPosts).catch(err => console.log(err));
+```
+- We are going to be modifying our createPost function to instead return a Promise.
+`return new Promsie();`
+- A promise takes a callback, and that callback takes two parameters:
+  - resolve: successful action
+  - reject: unsuccessful action
+
+- So basically this is waiting, then setting the timeout, then it resolves, once it resolves then it will call getsPosts which we pass to `.then()`.
+
+You can add error handling with `.catch` chained to the `.then`
+
+You're typically going to be dealing with promises, from like axious/fetch and things, but it's good to know how to create them ourselves.
+
+## `promise.all`
+We don't want to keep chaining `.then` statements, so let's 
+```js
+const promise1 = Promise.resolve("hello world");
+const promise2 = 10;
+const promise3 =  new Promise((resolve, reject) => setTimeout(resolve, 2000, 'Goodbye'));
+
+Promise.all([promise1, promise2, promise3]).then((values) => console.log(values));
+```
+- Notice since we have a setTimeout for 2seconds the whole thing will come back as slow as the longest promise.
+
+## Using `fetch`
+We don't want to keep chaining `.then` statements, so let's 
+```js
+const promise1 = Promise.resolve("hello world");
+const promise2 = 10;
+const promise3 =  new Promise((resolve, reject) => setTimeout(resolve, 2000, 'Goodbye'));
+
+const promise4 = fetch('https://jsonplaceholder.typicode.com/users').then(res => res.json());
+
+Promise.all([promise1, promise2, promise3]).then((values) => console.log(values));
+```
+If we ran this, without `res.json()` we would wouldn't be able to read the contents of the response so we need to run two `then`s technically, the first response is the data, the second then is to map the response to json. 
+
+## `async` / `await`
+async await is just a different way to handle responses, its not like a different way to write reponses
+We need the label the function as async with the `async` keyword if we we want to use await inside of it...
+
+```js:title=async-await {37-40, 42}
+const posts = [
+    { title: 'Post One', body: "This is Post One "},
+    { title: 'Post Two', body: "This is Post Two "},
+];
+
+
+function getPosts() {
+    setTimeout(() => {
+      let output = '';
+      posts.forEach(post => {
+        output += `<li>${post.title}</li>`;
+      });
+      document.body.innerHTML = output;
+    }, 1000);
+}
+
+
+function  createPost(post, callback) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+          posts.push(post);
+
+          let error = false;
+
+          if (!error) {
+            resolve();
+          } else {
+            reject('Error: something went wrong');
+          }
+
+      }, 2000);
+
+    }) 
+}
+ 
+// Async / Await
+async function init() {
+  await createPost({title: 'Post Three': body: 'This is post three'});
+  getPosts();
+}
+
+init()
+```
+So all we are doing is essentially now just saying, we are awaiting that `createPost` to be done until we move on and call `getPosts()`, then we just call init on line 42.
+
+- async/await just a more elegant way to handle promises
+- if we wanted to use it with `fetch` we can do that as well...
+
+```js:title=async-await-with-fetch
+async function fetchUsers() {
+  const res = await fetch('https://jsonplaceholder.typicode.com/users');
+  const data = await res.json();
+  console.log(data);
+}
+
+fetchUsers();
+```
+- Now remember, the `fetch` API is a little weird, because the first promise that it returns is going to be the data unformatted, so we are going to need to call `res.json()` on that, so what we do is create another variable called `data` and set it to `await res.json()` then we can log the `data`.
+
+## Clarifications
+```js
+
+function createPost(post) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+          posts.push(post);
+
+          let error = false;
+
+          if (!error) {
+            resolve();
+          } else {
+            reject('Error: something went wrong');
+          }
+
+      }, 2000);
+
+    }) 
+}
+
+createPost({title: 'Post Three', body: 'This is post three'}).then(getPosts).catch(err => console.log(err));
+```
+Let's break this down....
+1. We are declaring a function in global memory called `createPost`
+2. We are calling create post, added to call stack with new execution context, 
+  - In createPost's execution context we create in local memory label, `post` which we assign the object passed in, the post object.
+  - We encounter a return statement, which is going to return us a new Promise object. Remember the 3 things new does for us: sets the this to the new object, (2) sets the proto of that object (3) returns that object. We pass in one argument and that is a callback/arrow function that gets executed (as the "executor") immediately and we active the browser API feature, `setTimeout`, which itself takes a callback, that isn't triggered until 2s later.
+3. In the meantime, we chain on `.then` and push to our resolve array, the `getPosts` function and do the same with catch with a callback that will log the error.
+4. After 2s, our timer is done, we push the post, to the array, declare a var error and set its value to false, if checks the error, case evaluates to true, we run the resolve function which triggers, getPosts, to be run.
+
+## Links
+- [HP: iterators, generators, promises, async/await](hardparts-new-main)

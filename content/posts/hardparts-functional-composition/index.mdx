@@ -1,0 +1,83 @@
+---
+title: Composition | Hard Parts - Functional
+date: 2020-03-18
+slug: hardparts-functional-composition
+tags:
+  - JS
+  - FEM
+  - Will Sentence
+  - Hard Parts
+  - functional programming
+---
+## Function Composition
+
+### Function Composition
+- Chaining with dots relies on JavaScript's prototype feature--functions return arrays which have access to all the HOFs (map,filter,reduce)
+- I'm passing my ouput into the next function automatically
+- What if I want to chain functions that just return a regular output?
+    - e.g. `multiplyBy2`, `add3`, `divideBy5` 
+
+### We could keep track with global variables...
+```js
+const multiplyBy2 = x => x*2;            
+const add3 = x => x + 3;
+const divideBy5 = x => x / 5;
+
+const initialResult = multiplyBy2(11);
+const nextStep = add3(initialResult);
+const finalStep = divideBy5(nextStep);
+
+console.log("finalStep", finalStep)
+```
+
+But that’s risky, people can overwrite.
+
+Our `multiplyBy2(11)` call is [**referentially transparent**](), meaning I could essentially pass in 22 and the evaluated result of this function and they will be the same thing.
+
+### Or we can use the fact the JavaScript evaluates every function call before it moves on...
+```js
+const multiplyBy2 = x => x*2
+const add3 = x => x+3
+const divideBy5 = x => x/5
+const result = divideBy5(add3(multiplyBy2(11)))
+```
+Now this is pretty unreadable though!
+> [^ **What does *referentially transparent* mean and why does it matter with regards to function composition?**](Btw This relies on our functions being [**referentially transparent**]() - we can replace the call to the function with its return value with no consequences on our app). 
+
+So what are we doing here ultimately? We are combining a number (the result of multiplyBy2(11)) or 22, with add3, which becomes 25, then we are combining 25 with divideBy5 to get 5. Again, we are combining two things to make one incrementally...
+
+**We’re combining a function with a value to get a result then combining that result with another function to get another result and so on... What's this remind you of?**
+
+### Reduce as the most versatile function in programming
+```js
+const multiplyBy2 = x => x*2
+const add3 = x => x+3
+const divideBy5 = x => x/5
+const reduce = (array, howToCombine, buildingUp) => {
+    for (let i = 0; i < array.length; i++){
+        buildingUp = howToCombine(buildingUp, array[i])
+    }
+    return buildingUp
+};
+const runFunctionOnInput = (input,fn) => {
+    return fn(input)
+}
+const output = reduce([multiplyBy2, add3, divideBy5], runFunctionOnInput, 11)
+```
+
+
+## Function Composition with Reduce
+
+## Function Composition Review
+
+
+## Links
+
+- [HP: functions and callbacks](/hardparts-js-v2-functions-and-callbacks)
+---- 
+**Nav**:
+- [MAIN](/hardparts-functional-main)
+- [PREV ← | Higher Order Fucntions](/hardparts-functional-higher-order-functions)
+- [NEXT → | Highter Order Functions ](/hardparts-functional-higher-order-functions)
+
+## Summary Questions

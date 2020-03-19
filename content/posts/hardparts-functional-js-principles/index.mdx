@@ -1,0 +1,47 @@
+---
+title: JavaScript Principles Review | Hard Parts - Functional
+date: 2020-03-18
+slug: hardparts-functional-js-principles
+tags:
+  - JS
+  - FEM
+  - Will Sentence
+  - Hard Parts
+  - functional programming
+---
+## Executing JavaScript Code: A Review
+
+Code is saved (defined) in functions--to be run later.
+
+As soon as we start running our code, we create a **global execution context**
+
+- Thread of execution (parsing and executing the code line after line)
+- Live memory of variables with data (known as a Global Variable Environment)
+
+
+## Call Stack Review
+Every time we call a function it gets added to the call stack. If we have too many functions on the stack and we run out of memory that is called **stack overflow**.
+
+
+## Functions Review
+
+### Suppose we have a function copyArrayAndMultiplyBy2
+```js
+const copyArrayAndMultiplyBy2 = (array) => {
+    const output = [];
+    for (let i = 0; i < array.length; i++) {
+        output.push(array[i] * 2);
+    }
+    return output;
+}
+const myArray = [1,2,3];
+const result = copyArrayAndMultiplyBy2(myArray);
+```
+All of these functions are pretty much the same throughout, we are just changing inputs essentially. Wouldn't it better if we could also make part of the functionality adapt to the inputs we are passing it, wouldn't it be nice if we could have a little placeholder for funcionality itself?
+
+
+## Links
+- [MAIN](/hardparts-functional-main)
+---- 
+- [PREV ← | Introduction](/hardparts-functional-main)
+- [NEXT → | Highter Order Functions ](/hardparts-functional-higher-order-functions)
