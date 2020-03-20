@@ -11,18 +11,93 @@ tags:
 ---
 
 ## Pure Functions
+#### Listing out our ‘lines of code’ (functions) by name with each one’s consequence limited to only affect the next ‘line’ (function call/invocation)
+```js 
+const multiplyBy2 = x => x*2
+const add3 = x => x+3
+const divideBy5 = x => x/5
+const subtract4 = x => x-4
+const reduce = (array, howToCombine, buildingUp) => {
+    for (let i = 0; i < array.length; i++){
+        buildingUp = howToCombine(buildingUp, array[i])
+    }
+    return buildingUp
+};
+
+const runFunctionOnInput = (input,fn) => { return fn(input) };
+const output = reduce([
+        multiplyBy2,
+        add3,
+        divideBy5,
+        subtract4
+    ],
+    runFunctionOnInput, 11
+);
+``` 
+> [^**What is point free style? What is its main benefit?**]The functions are run through with data one by one, the style is called **point free**, sometimes ironically known as **pointless**. We write out a list of functions, and we do not explicitly state their arguments and their return values in that line in which we use them...
+
+- we don't explicitly state the calling of them with either.
+- instead we rely on just listing them out and knowing the structure by which they're executed
+    - which is just input then output of that line which is input of the next line
+- this is known as [**point free style**]() of coding.
+- increases readability: it's do do do do, not do with that value do those with two values...
+    - every line there we know exactly what its doing
+    - no looking up the rest of my code if it has effects elsewhere
+    - it's only effect is that very next line 
+    - and we get to remove the worry about arguments then becuase its only input, we don't need to explicitly state inputs because I know the only input is the output from the previous line.
+
+### Pure functions
+- Functions as tiny units to be combined and run automatically must be highly absolutely predictable
+- We rely on using their evaluated result to pass the input to the next unit of code (automatically). Any **side effects** would destroy this...
+```js
+let num = 10
+const add3 = x => {
+    num++
+    return x+3
+}
+add3(7)
+```
+`num++` is a side-effect, its mutating a global var, a consequence of the function.
 
 ## Immutability
+A [**side-effect**]() is when a function has consequences outside of its own lines in local memory that isn't exclusively the returning of some value. 
+
+A function with **side-effects** would be known as an **impure function** and would destroy everything we are trying to accomplish with reduce.
+
+If this is the case, then let's make sure we have no side effects. There may be a side-effect we missed....
+
+### Immutability
+```js 
+const array = [1,2,3]
+const multiplyBy2 = num => num*2
+
+const result = array.map(multiplyBy2) // [2,4,6]
+const newResult = array.map(multiplyBy2) // [2,4,6]
+// if map mutated array instead of making a copy
+// of that array, and modifying the copy
+// we could get out [4,8,12] the second time we 
+// ran newResult. Thankfull that's not the case.
+```
+
+If we want the only consequence of map to be on that line and to achieve ‘referential transparency’ (I can replace the function call with its output and it’s the same) - then I need to preserve my data and not manipulate it at all.
+
+> [^ **What is a possible hidden danger that might make our functions impure if we're not paying attention?**] JavaScript passes a reference (‘link back to the globally saved version’) to the `arr` when it’s inserted into the function `map`. If we change (‘mutate’) the input array our function is not pure - it’s unpredictable - I can’t figure out what it does just be reading it and looking at its output there in that line - undoes all our hard work
+
+> In order to make sure every line of code we run is self-contained on that line only to not mutate any data where it is passed by reference by a link back to its original version. And it's that little hidden thing where we might otherwise break our pure function rules without realizing it.
+
 ## Pure Functions & Immutability Review
 
-
+### Pure functions & immutability
+- **Easier to add features** - Every saved function be safely used in new combinations , confident it won’t break other parts of the app
+- **More readable** - Every line is ‘complete’ - it’s fully descriptive - exactly what it does is discoverable its name and limited to that input/output
+- **Easier to debug** - No 1000s of lines of interdependence
 ## Links
 
 - [HP: functions and callbacks](/hardparts-js-v2-functions-and-callbacks)
 ---- 
 **Nav**:
-- [MAIN](/hardparts-functional-main)
-- [PREV ← | Higher Order Functions](/hardparts-functional-higher-order-functions)
-- [NEXT → | Composition ](/hardparts-functional-composition)
+- [🏠 MAIN](/hardparts-functional-main)
+- [PREV ← | Composition ](/hardparts-functional-composition)
+- [NEXT → | Closure ](/hardparts-functional-closure)
 
 ## Summary Questions
