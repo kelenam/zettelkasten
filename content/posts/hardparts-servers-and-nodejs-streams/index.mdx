@@ -61,6 +61,13 @@ We are using the NodeC++ feature fs with the `createReadStream` and pass it this
 
 Once this NodeC++ feature handler sets up, it returns immediately to JS an object with methods that will allow us to edit the NodeC++ context/environment/connection/open-stream instance, and it stores that Object that gives us "edit/interactive" access with the left-side reference we store its call to which we've named `accessTweetsArchive`
 
+This returned object has a connection to this particular open stream of data or open access point of this particular file.
+
+Again, Node is just trigger background feature, setup auto-run function, have it auto run when the background feature finishes its work, have auto inserted data from node. That's all this is again and again and again.
+
+So now, we need an auto run function that we need to run on an event, which we do on the next line with `accessTweetsArchive.on('data', doOnNewBatch);`
+
+
 ## Links
 - [PREV ← | File System](/hardparts-servers-and-nodejs-file-system)
 - [NEXT → |]()

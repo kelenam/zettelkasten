@@ -1,5 +1,5 @@
 ---
-title: Intro to Servers & Node.js
+title: 📑 Intro to Servers & Node.js
 date: 2019-09-10
 slug: /hardparts-servers-and-nodejs-intro
 tags:
@@ -30,11 +30,11 @@ What kind of data are we going to load up... From tweeter....
     - images
     - video
 
-So where is all this code and data coming from?
+> [^ **When a user visits a site like twitter what does the browser receive and where does it come from?**]So where is all this code and data coming from?
 Comes from a **server**, which is nothing but another computer connected to the internet, ready to receive a message from all requests being made, Michael, Rich, Zep.
 - Pinging the server to ask for all data/code being stored (and able to receive) the requests being made to it.
 
-We need to determine how to handle requests on that server(that computer).
+>[^ **As developers what do we need to determine in order to process incoming user requests?**]We need to determine how to handle requests on that server(that computer).
 What do we need on that computer? We need code. Code that can [***introspect***](), *aka look into the message(request) being made of it*. Then it decides what to send back.
 
 ### Servers are the behind-the-scences of all web applications-where our client-side code/data comes from
@@ -42,14 +42,14 @@ Computer connected to the internet - a permanent store of code/data, always on, 
 - How's this computer know what to send back?
 - How can we access these inbound messages as developers and send code/data back in response?
  
-So the this server (this computer) is receving messages, where? On that computers *network card* so what languages would you use to command, to make instructutions to that computer to handle the network request? Some lanuguages would be, PHP, Java, Ruby, C, C++, JS.
-- Like a server, the server needs to server data back to the clients.
+> [^ **WWhere do incoming request to a server land?**]So the this server (this computer) is receving messages, where? On that computers *network card* so what languages would you use to command, to make instructutions to that computer to handle the network request? Some lanuguages would be, PHP, Java, Ruby, C, C++, JS.
+- Like a server, the server needs to serve data back to the clients.
 
 Wouldn't it be great to use the computers networking ability to determine what to send back?
-We write code! 
+> [^ **Given we are in charge of the server, how do we manage what this server/computer knows what to send back to a user making a request? or dealing with inbound messages?**]We write code! 
 
 ### Sending the right data back rquires using multiple features of the computer
-- ***network socket***, receive an send back messages over the internet
+>- ***network socket***, receive an send back messages over the internet
 - ***filesystem*** - thats where the html/css/js code is stored in files
 - ***CPU***: for cryptography and optimizing hashing passwords
 - ***kernel*** - I/O managagement
@@ -58,17 +58,19 @@ Our dream - be able to use JS to control this computer because (1) we know JS an
 
 So we might need to manage the files and file storage that exist on the server.
 
-We know for sure we cannot use any of those internal features of the server. But that's the critical thing we need to do? What language would allow us to interface with the machine? Well C++
+> [^ **Given we might need to access the internal features of the machine/server our application lives on, things like, network sockets, filesystem, CPU, and the kernel, we are going to need... How does Node.js fit into all of this?**]We know for sure we cannot use any of those internal features of the server with just JS. What language would allow us to interface with the machine? Well C++ for one.
 So if we are able to use JS to access those features/inbound messages we need to leverage C/C++
-    - JS works in hand with C++ so we can write JS code to control C++ built features that allow us to control our computers internals
-    - C++ and JS together are known as **Node.js**.
-    - JS -> Node -> Computer Feature (e.g. network, filesystem)
+
+>- JS works in hand with C++ so we can write JS code to control C++ built features that allow us to control our computers internals
+- C++ and JS together are known as **Node.js**.
+- JS -> Node -> Computer Feature (e.g. network, filesystem)
 
 Does this mean we need to know C++ inside out?    
 It turns out we're going to get from JS, a ton of labels builts into JS that are gonna give us, labels like HTTP, FS< that we will have to sort of tell JS we want to use, that will give us access to C++ features that give us access to the computer's internals.
 
 We dont need to know C++ code, but we do need to understand the mental models of how its working. How these JS labels are going to trigger C++ features.
-- Much Node is C++ code. 
+
+Much Node is C++ code. 
 
 ## JavaScript, Node & the Computer
 
@@ -77,16 +79,18 @@ We dont need to know C++ code, but we do need to understand the mental models of
 - JS does not! So it has to work with C++ to control these computer features, 
 
 Our request is going to hit the network card not going to go straight into a JS envrionment. We are going to need Node C++ built features to communicate to network features.
-To do so we are going to use JS labels to leverage Node/C++ features (they look like JS functions but under the hood they are commands to Node C++ features) and that will communicate with the Network.
+
+[^ **In order for us to write JS code with the expectation that it does server-side operations we need to leverage the fact that...**]To do so we are going to use JS labels to leverage Node/C++ features (they look like JS functions but under the hood they are commands to Node C++ features) and that will communicate with the Network.
 
 - A bulk of the hardwork is happening in the Node/C++ sphere, we should understand this intimately.
 - So C++ is actually interacting with abstraction layers of the OS to control the computer internals/OS.
 
 ### Rewind, We had better understand JS to understand Node.js then...
-It's a language that does 3 thigns (and 1 involves a lot of help from c++)
+[^ **What 3 things must we realize JS does in order to understand Node?**]It's a language that does 3 things (and 1 involves a lot of help from c++)
+
 1. Saves data and functionality (code)
 2. Uses that data by running functionality (code) on it
-3. Has a ton of built-in labels that triggers Node features taht are built in C++ to use our computers internals.
+3. Has a ton of built-in labels that triggers Node features that are built in C++ to use our computers internals.
 
 ## Let's see the 2 things that JS does by itself - saving and using data
 
@@ -111,7 +115,7 @@ Global b/c available globally.  as opposed to local context like function scope.
 1. First line: declare variable num and assign it to 3
 2. Next (skip comment)line: Saves the function body and gives it a label called multiplyBy2.   
     - Declare register, define, they all mean the same thing, they mean, take the function label and then its body and parameters and save the code. Do not do it now, save it for later.
-        - Two parts to running a function: 1) Running its Code (2) Inserting actually values as inputs
+        - Two parts to running a function: (1) Running its Code (2) Inserting actually values as inputs
         - Functions super important, bundling functionality we will save for later. Going to be doing a lot of saving code to be run later. 
 3. Declare output is a label, we don't know what to store yet since we haven't executed it yet, it's now in this kind of temporal deadzone where it isn't yet initialized.
     - Aside; We are manually inserting the input/arg there, with num. I have a sneaking suspicion that Node might end up being the one who puts the parens on the end of our function code. who inserts the input automatically for us--this ends up being the entire paradigm of node.
@@ -124,16 +128,16 @@ TO RUN CODE OF A FUNCTION, WHAT DO WE NEED? We need a new?? **Execution Context*
     - This new memory is called local(temporary) and this memory is just for inside of this function.
     - We do the same steps with result, then assing it the computation of 3 * 2, then return result which gets returned to global scope output binding with the assignment of the returned value 6.
 
-***That's all JS really does. It saves data and code and runs that code on the data***.
+>[^ **In the simplest terms what two primary things does JS boil down to doing?**]***That's all JS really does. It saves data and code and runs that code on the data***.
 - But we are the ones who tell it to run, currently, we are the ones putting the parens on at the end of functions.
 - As we will later see, Node is going to be taking over putting parens on the end/dictating execution.
 
 ## Executing Node Code
 
 ### So Let's see JS's other talent - built-in labels that trigger Node Features
-We can set up, with a JS label, a Node.js feature (ans so computer internals) to wait for requests for html/css/js tweets from our users.
+We can set up, with a JS label, a Node.js feature (and so computer internals) to wait for requests for html/css/js tweets from our users.
 
-How? The most powerful built-in Node feature of all: **HTTP** (and its associtaed with built-in label in JS- also `http` conventiently).
+>[^ **What is the most powerful built-in Node feature? What is a socket?**]How? The most powerful built-in Node feature of all: **HTTP** (and its associtaed with built-in label in JS- also `http` conventiently).
 - [**HTTP**]() is just the format by which you send messages or requests from a web browser
 - Whenver you type in a URL and press ENTER you send out a message and it sends it out in HTTP format
 - [**socket**]() An open channel to the internet, two-way open channel. We need to have that channel prepped such in the way that it's ready to receive HTTP formatted messages.
@@ -151,6 +155,86 @@ So reiterating. `http.createServer` is a Node/C++ label for JS that establishes 
 - This label is not automatically availble to us in JS
     - One line will bring it into our progam.
  
-
 ## Links
 - [NEXT → | Using Node APIs](hardparts-servers-and-nodejs-node-apis)
+
+## Summary Questions
+
+
+1: [1:40:30] JavaScript Crash Course For Beginners
+2: [39:01] JavaScript DOM Crash Course - Part 1
+3: [21:21] JavaScript DOM Crash Course - Part 2
+4: [33:45] JavaScript DOM Crash Course - Part 3
+5: [22:08] JavaScript DOM Crash Course - Part 4 [Final Project]
+6: [51:45] JavaScript BookList App | No Frameworks
+7: [17:46] Build A Filterable List With Vanilla JavaScript
+8: [16:57] Simple Weight Converter App With JavaScript & Bootstrap 4
+9: [34:56] JavaScript Higher Order Functions & Arrays
+10: [40:21] JavaScript OOP Crash Course (ES5 & ES6)
+11: [24:31] Async JS Crash Course - Callbacks, Promises, Async Await
+12: [1:09:43] AJAX Crash Course (Vanilla JavaScript)
+13: [30:54] Fetch API Introduction
+14: [28:27] Create a Custom PDF Viewer With JavaScript
+15: [19:29] Quick Autocomplete App With JS & JSON
+16: [45:30] Learn JavaScript By Building A Bookmarker Application
+17: [36:25] Pure JavaScript Type Writer Effect
+18: [32:47] Google Geocode API & JavaScript Tutorial
+19: [27:27] Google Maps JavaScript API Tutorial
+20: [31:27] Create a Modal With HTML, CSS & JavaScript
+21: [31:55] Full Screen Responsive Image Slider | No Libraries
+22: [25:52] Vanilla JS Number Facts App - Ajax & Fetch
+23: [44:08] Text To Speech & Synthesis App - JavaScript & Web Speech AP
+24: [35:00] JavaScript Zipcode App Using Fetch & Bulma CSS
+25: [41:08] Facebook Login & Graph API | JavaScript SDK
+26: [4:58] Simple JavaScript Slideshow In 5 Minutes
+27: [27:26] Full Screen Image Slider With HTML, CSS & JS
+28: [29:54] Use Babel & Webpack To Compile ES2015 - ES2017
+29: [22:36] Modern Image Gallery With ES6 Vanilla JavaScript
+30: [18:52] Animate Your Font Awesome Icons With JavaScript
+31: [45:53] Build a Reddit Search App With ES6, Fetch & Parcel
+32: [33:59] Star Ratings With JavaScript & Font Awesome
+33: [38:25] Responsive Coming Soon Landing Page With Countdown
+34: [19:00] Drag & Drop With Vanilla JS
+35: [1:10:23] Fancy Form UI From Scratch - HTML, CSS3, JS & Sass
+36: [49:59] Build A Pet Find App | JS, Parcel, Babel, Fetch-JSONP
+37: [58:24] YouTube API Project With Authentication
+38: [32:38] Build A Speed Typing Game In JavaScript
+39: [35:11] Dynamic Landing Page | JavaScript
+40: [47:03] Rock Paper Scissors Game - UI & JavaScript
+41: [29:36] Linked List Data Structure | JavaScript
+42: [35:32] JavaScript Password Generator
+44: [ 18:15 ] Animated Counter With JavaScript (HTML, CSS)
+45: [28:54] Web Components Crash Course
+
+
+
+
+1: [1:30:08] Node.js Crash Course
+2: [1:24:57] Node.js With Passport Authentication | Full Project
+3: [20:15] Intro To Web Scraping With Node.js & Cheerio
+4: [23:01] Node.js API Authentication With JWT
+5: [32:39] Send SMS Text Messages From Node.js
+6: [23:48] Full Node.js Deployment - NGINX, SSL With Lets Encrypt
+7: [37:11] Node.js Image Uploading With Multer
+8: [45:18] Build A Command Line Interface With Node.js & MongoDB
+9 [26:13] Using MySQL With Node.js 
+10 [25:37] Intro To The Node.js PayPal REST SDK 
+11 [1:01:53] Node.js & Stripe API - Ebook Sales App & Heroku Deploy 
+12: [17:42] Redis Caching in Node.js 
+13 [29:54] Nodemailer - Send Emails From Your Node.js App 
+14 [29:52] Push Notifications Using Node.js & Service Worker 
+15 [13:47] TypeScript Setup With Node & Express 
+16 [37:23] Koa.js Crash Course - Modern & Minimalist Node.js Framework 
+17 [55:22] Uploading Files to MongoDB With GridFS (Node.js App) 
+18 [25:33] reCAPTCHA v2 Client-Server Implementation With Node.js 
+19 [34:12] Build A Node.js & Redis App From Scratch 
+20 [46:37] Keystone JS Tutorial - A Node.js CMS 
+21 [35:43] Node js With CouchDB 
+22 [10:19] Node.js Static Server in Minutes 
+23 [1:05:59] RESTful API From Scratch Using Node, Express and MongoDB 
+24 [38:30] HTTP Crash Course & Exploration 
+25 [34:07] Build a Custom URL Shortener Service 
+~~26[6:59] Outdated Programming Courses Can Still Be Beneficial~~
+27 [1:12:39] Node.js & Express API | Expense Tracker - Part 2 (MERN) 
+28 [10:00:01] 10 Hour Best Tinnitus Sound Therapy Ever #2
+

@@ -12,10 +12,10 @@ tags:
 ## Introducting the File System API
 
 ### We have much of our twitter app set up now - handling, inspecting and responding to these messages (‘requests’) is the core of our app, of Node, and of servers
-— But, Node can do even more. We have an archive of tweets stored in a huge file (1.5GB)
-— Unfortunately they’re saved on our computer, not in our little JavaScript-specific data store (JavaScript memory)
-— Could we load them into JavaScript to run a function that removes bad tweets?
-— We can use fs to do so but there might be some issues with a file that large
+- But, Node can do even more. We have an archive of tweets stored in a huge file (1.5GB)
+- Unfortunately they’re saved on our computer, not in our little JavaScript-specific data store (JavaScript memory)
+- Could we load them into JavaScript to run a function that removes bad tweets?
+- We can use fs to do so but there might be some issues with a file that large
 
 ## Importing with `fs`
 
@@ -41,7 +41,7 @@ So that string we pass as the first arg to `.readFile` of `./tweet.json`. Is jus
 
 Every file in your computer has a path.
 
-So what is this JSON thing? JavaScript Object notation. An object full of tweets in our example.
+>[^ **What is JSON?**]So what is this JSON thing? **JavaScript Object notation**. An object full of tweets in our example.
 A javascript object that is essentially converted into a string of characters in the format of a JS object.
 Json is just a string of text.
 
@@ -81,7 +81,7 @@ B/c there is too much variety in how different computer architectures handle fil
 So b/c our file is 1.5gs its going to take as awhile. Like 15 seconds (we might want to break this up later) However, once the file completes loading we useImportedTweets.
 
 ### Error first pattern
-⭐ **Error-first pattern** is when the first argument of our functons are going to be any error data we get back, the second one will be any data we actually care about.
+> [^ **What is the *error-first pattern*?**]⭐ **Error-first pattern** is when the first argument of our functons are going to be any error data we get back, the second one will be any data we actually care about.
  
  A lot of Node features, their auto triggered function, the auto run function will take two inputs, the first one will represent any error data, the second is the data we care about.
 
@@ -112,12 +112,11 @@ fs.readFile('./tweets.json', useImportedtweets)
 ### File System Q & A
 
 So, the raw JSON data we have coming in from the file system is actaully stored in a **buffer**, a very flexible way of storing data, more info here: https://nodejs.org/api/buffer.html#buffer_buffer a series of zeros and ones. Technically the returned data from Node isn't json stringified, it gets passed into node as a series of zeros and ones known as a buffer format.
-So it isn't converted until we actually run, JSON.parse() on it which stringifies and formats to JSON in one go.
+So it isn't converted until we actually run, `JSON.parse()` on it which stringifies and formats to JSON in one go.
 
 Remember we have to require any kind of like node module.
 
 Everything autocreated by Node doesn't have a label we have to set parameters in order to be able to hold references to the things returned to us.
-
 
 ## Links
 - [PREV ← | Events and Error Handling](/hardparts-servers-and-nodejs-error-handling)
