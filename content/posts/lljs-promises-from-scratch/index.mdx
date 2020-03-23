@@ -93,8 +93,9 @@ class LLJSPromise {
 ```
 
 ### The main ways we interact with a promise
-- The main ways we interact with a promise is by calling `.then(fn)` and .`catch(fn)` methods.
-    - Both of these end of creating new promises, which are dependent on the result of the parent promise
+>- ⭐ The main ways we interact with a promise is by calling `.then(fn)` and/or `.catch(fn)` methods.  
+- Both of these end up creating new promises, which are dependent on the result of the parent promise
+
 ![](parent-promise.png)
 
 - mechanically speaking we will need a way to communicate with these promises which are created based on this, the parent, promise.
@@ -180,7 +181,7 @@ class LLJSPromise {
 > `onFulfilled` or `onRejected` must not be called until the **execution context** stack contains only platform code. [3.1].
 
 - Essentially we just have to wait for all synchronous code to complete, and delay the running of the user's `computation` function, until the next cycle of the event loop. 
-- to get around this we are giong to use a `setTimeout` with no time delay.
+-[^ **In our homebrew Promise, how do we make sure the event loop processes the rest of the sychnronous code outside of this promise?**] to get around this we are giong to use a `setTimeout` with no time delay.
 ```js {17,24}
 const state = {
     PENDING: 'pending',
@@ -368,8 +369,8 @@ class LLJSPromise {
             setTimeout(() => {
                 try {
                     computation(
-                        this._onFufilled.bind(this);
-                        this._onRejected.bind(this);
+                        this._onFufilled.bind(this); //this should be commas?
+                        this._onRejected.bind(this);  // no comma
                     );
                 } catch (ex) {}
             });
@@ -501,6 +502,10 @@ Now we can check if we are dealing with a promise or if we are dealing with a no
 If it is a promise we need to wait for it to settle, taking on a value or a rejection reason and pass that result to the `controlledPromise`, thankfull that's as easy as 
 
 Timestamp: at 12m15s. 
+
+## Key Insights
+- What are we trying to do with a proimse? 
+- A proimse returns another promise. However nothing we do to the original promise can modify it's value once it's settled.
 
 
 ## Links

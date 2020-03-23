@@ -1,0 +1,229 @@
+---
+title: Materialize | NN
+date: 2020-03-22
+slug: nn-materialize
+tags:
+  - web-dev
+  - Materialize
+  - CSS
+  - HTML
+  - JS
+  - NN
+---
+
+## Setting Up
+- Need to add Materialize to project,
+- We'll use the CDN, and include in the head.
+
+```html 
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js">
+```            
+
+Also going to import the google font icon library:
+```html 
+  <!--Import Google Icon Font-->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+```
+- This will give use icons in our project
+
+## Basic Text Styles 
+- Materialize comes with some default styles 
+- Let's create a wrapper container, with a class of `container`, a container is special class in Materialize with its own styles...
+
+- Most elements are using REMs as units.
+>[^ **What are `rem`s? How are they measured?**]- **REMs** Root Element, if our document (html) has a font-size of 14px, what we are going to do is take that root element value of the font size then we are going to be a muliple of that root value for our text elements, so an h1 with a `font-size: 4.2rem;` will be 4.2x the size of the base root style.
+
+### p `flow-text`
+Giving a `p` tag a class of `flow-text`, gives them auto-resizing ability based on screen size, as the screen gets bigger/smaller so does the text. It's useful for things like introductions to paragraphs or maybe first lines of a blog?
+
+## Hiding Content
+```html 
+<div class="container">
+    <h4 class="hide">Hide me on all screen sizes</h4>
+    <h4 class="hide-on-small-only">Hide me on small screen sizes</h4>
+    <h4 class="hide-on-med-only">Hide me on medium screen sizes</h4>
+    <h4 class="hide-on-large-only">Hide me on large screen sizes</h4>
+    <h4 class="hide-on-med-and-down">Hide me on medium & small screen sizes</h4>
+    <h4 class="hide-on-med-and-up">Hide me on medium & large screen sizes</h4> 
+</div>
+```
+- Assigning a class of ...
+    - `hide` will hide the whole element
+    - `hide-on-small-only` hide only small screens, smll tabs and mobile
+    - `hide-on-med-only` hide only med screens, tablets
+    - `hide-on-large-only` hide on large screens, tablets
+    - `hide-on-med-and-down` hide on medium sizes and below
+    - `hide-on-med-and-up` hide on medium sizes and up
+    
+## Colors
+We have a huge range of colors for materialize 
+
+- To change background colors we can give a class of the color name, to make it darker or lighter we can say darken or lighten. 
+- `blue lighten-4`, for the color lighter color range.
+- We could also do something like `purple darken-4`
+- To change text color : `red-text` 
+
+We can also darken or lighten the text:
+- `purple-text text-darken-2`
+- The number values relate to the degree to darken/lighten, like 2x, 3x, etc.
+
+> Thing to remember, just specify a color for changing the bg color, say {colorName}-text for text color.
+> use lighten-{intensity} or text-lighten-{intensity} to lighten and darken for darken
+
+## Text Formatting
+Make sure to give your box class a height of 200px,
+```html
+<body>
+    <div class="container">
+        <h5 class="center-align">Center Alignment</h5>
+        <h5 class="left-align">Left Alignment</h5>
+        <h5 class="right-align">Right Alignment</h5>
+    </div>
+
+    <div class="container grey lighten-2 box valign-wrapper">
+        <h5>Vertical Alignment</h5>
+    </div>
+
+    <div class="container">
+        <p class="truncate">aksdajfkl;asjf;lslk;sdajfkl;jfkl;kdajfs uasdflksjaf;klasdflk jasd;kfjasd;lfj a;sklfkl;asjfkl;asjfkl;as;flkas;lfkasj;lkasjdkljasdklfjaskd;fjasklfj;lkafjl;asjf;kladj;kl</p>
+    </div>
+</body>
+```
+- To vertically align things you go to the parent element of the item you want to align and say: `valign-warpper`, and now it's vertically aligned within the parent.
+
+### Truncating text...
+We can use the `truncate` class on text to make it like a text-preview, think of like a blog preview.
+
+## Buttons
+```html 
+<div class="container">
+    <h4>Buttons</h4>
+    <a href="#" class="btn waves-effect waves-light">Normal Button</a>
+    <a href="#" class="btn-small">Small Button</a>
+    <a href="#" class="btn-large">Large Button</a>
+    <a href="#" class="btn indigo">Indigo Button</a>
+    <a href="#" class="btn disabled">Disabled Button</a>
+    <h4>Floating button</h4>
+    <a href="" class="btn-floating pink pulse"></a>
+    <h4>Other Elements</h4>
+    <div class="btn">I am a div tag</div>
+</div>
+```
+
+> Really amazing for creating buttons quickly...
+Wow, just give the class `btn`. Neat. Even has default hover stylings.
+
+Circular buttons that we normally put icons inside of are called. `btn-floating`
+- `pulse`, gives animation to floating buttons.
+
+We can also give divs a btn class to make it look like a button. 
+- You have to setup your own js/or anchoring because its not an a tag to link you anywhere
+
+### waves effect
+- if we giev the class `waves-effect` and `waves-light`, (`waves-dark` works as well) you can get some cool click animations.
+
+## Icons
+- Remember, we grabbed the google font library, and included it via the CDN?
+- `<i class="material-icons">error</i>`
+- There are so many icons, the way we output they is by using the corresponding keyword within the `<i>label</i>` i tags. e.g. the error one above
+> We can style these as text elements, because remember, our labels are text elements internal to the tags, so to change this to red we would add the class `red-text`
+
+### Icons on Button
+```html 
+ <div class="container">
+    <h4>Icons</h4>
+    <i class="material-icons red-text text-lighten-2">error</i>
+    <i class="material-icons yellow-text text-darken-2">warning</i>
+    <i class="material-icons grey-text text-lighten-2">cloud</i>
+    <i class="material-icons blue-text text-darken-1">folder</i>
+
+    <h4>Icons on Button</h4> 
+    <a href="" class="btn indigo">
+        <span>send</span>
+        <i class="material-icons right">send</i>
+    </a>
+    <a href="" class="btn pink waves-effect waves-light">
+        <span>email</span>
+        <i class="material-icons left">email</i>
+    </a>
+
+    <h4>Icons on floating button</h4>
+    <a href="" class="btn-floating blue pulse">
+        <i class="material-icons">add</i>
+    </a>
+    <a href="" class="btn-floating red pulse">
+        <i class="material-icons">remove</i>
+    </a>
+    <a href="" class="btn-floating orange pulse">
+        <i class="material-icons">edit</i>
+    </a>
+    <a href="" class=""></a>
+</div>
+```
+What we can do is have an a tag `<a href="#" class="btn indigo"></a>`
+
+- Inside of that a tag, you can add a span tag, you don't have to but in-case you want to target it for your own css styles separately.
+- its not quite centered so you say `left` or `right` to align better.
+
+> We usually use circular buttons for edit add or delete. with `remove` and `add`, and `edit` icon labels. Wow. these are really great.
+
+## Responsive Grid
+```html 
+<div class="container">
+    <div class="row"> 
+        <div class="col s3">content</div> 
+        <div class="col s3">content</div> 
+        <div class="col s3">content</div> 
+        <div class="col s3">content</div> 
+    </div>
+    <div class="row"> 
+        <div class="col s12 m6">content</div> 
+        <div class="col s12 m6">content</div> 
+        <div class="col s12 m6">content</div> 
+        <div class="col s12 m6">content</div> 
+    </div>
+    <div class="row"> 
+        <div class="col s12 m6 l4">content</div>  
+        <div class="col s12 m6 l4">content</div>  
+        <div class="col s12 m6 l4">content</div>  
+        <div class="col s12 m6 l4">content</div>  
+    </div>
+    <div class="row"> 
+        <div class="col s12 m6 l4 xl2">content</div>  
+        <div class="col s12 m6 l4 xl2">content</div>  
+        <div class="col s12 m6 l4 xl2">content</div>  
+        <div class="col s12 m6 l4 xl2">content</div>  
+    </div>
+    <div class="row"> 
+        <div class="col s12 m8 ">content</div>  
+        <div class="col s12 m4 ">content</div>  
+        <div class="col s12 m4 ">content</div>  
+        <div class="col s12 m8 ">content</div>  
+    </div>
+</div>
+```
+- we need a class of `row` surrounding our elements
+- 12 columns grid, `col s1` would be a col taking up 1 unit on small screen sizes and up.
+- every item within a row must have a `col` class.
+- The default behavior is sizing elements based on content, we can instead specify the size we want, `col s3` would mean an item taking up 3 columns in width (3 of 12) on small screen sizes and up.
+
+- What if we want to give different widths, say for small size and medium sizes? `col s6 m3`, will be 6 cols for small and up until it hits medium size screens which it will then be m3.
+- Better to work from the small screens upwards, starting with s sizes, 
+- we can do that for all sizes: `col s12 m6 l4`
+- for xl screens, we can make it two columns in width: `col s12 m6 l4 xl2`
+
+They don't have  to have the same number either.
+
+## Depth & Shadows
+We can control drop shadow using only one class, it's: `z-depth-1`, 1 is the smallest number. 4 and 5 get a little unreleastic looking, 1-3 are more functional.
+
+## Navbars 
+
+## Links
+- [NN: PWAs](/nn-pwa)
+
+## Summary Questions
