@@ -1,0 +1,70 @@
+---
+title: Understanding the Internet | Full Stack for Front-End Engineers
+date: 2020-03-23
+slug: fsfe-understanding-the-internet
+tags:
+  - servers
+  - JS
+  - backend
+  - full-stack
+  - http
+  - redis
+  - containers
+---
+
+## VIM Overview & Modes
+### VIM 
+- **VIM:** stands for Vi Improved
+    - its one of those meta definitions
+- it's a text editor on any servers
+
+- **insert mode**: text editing, `i`
+- **command mode**: Primary mode, `esc` 
+- **last line mode**: searching, saving, exiting, `:`
+
+How to quit VIM:
+`ESC :q!`
+
+VIM Cheatsheet: https://linuxmoz.com/vi-commands-cheat-sheet/
+
+## Server Exercise
+
+### What does a server do?
+- it serves content
+- it responds to request
+- just a computer
+- when you are doing local dev, your own computer is a server
+- anything that can essentially respond to requests/ server content is a server
+
+## Server Solution
+```js 
+const http = require('http');
+
+http.createServer(function (req, res) {
+        res.write('Hello, World!');
+        res.end();
+}).listen(3000);
+
+console.log('Server started! Listening on port 3000');
+```
+- The basics of every single node server you're ever going to use is this callback with request/response. It maybe you might be using promises, you must use `asyn`/`await`, but they are always going to be request/response, and a third paramter is usually next, which is used for creating middleware.
+
+- So again, basic pattern of node servers: resquest, response
+
+- Generally ports below 1000 are reserved
+- The internet runs over port 80
+- On HTTP the Internet runs over port 443.
+ 
+## Data Centers & the Cloud
+
+
+
+## Virtual Private Server Setup
+## Operating Systems
+## SSH
+## SSH Key Practice
+## Connecting to the Sever
+
+## Links 
+- [PREV ← | Understanding the Internet](/fsfe-understanding-the-internet)
+- [NEXT → | Servers ](/fsfe-servers)

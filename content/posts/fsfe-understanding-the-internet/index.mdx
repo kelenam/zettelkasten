@@ -1,0 +1,95 @@
+---
+title: Understanding the Internet | Full Stack for Front-End Engineers
+date: 2020-03-23
+slug: fsfe-understanding-the-internet
+tags:
+  - servers
+  - JS
+  - backend
+  - full-stack
+  - http
+  - redis
+  - containers
+---
+
+## Understanding the Internet 
+ 
+### How does the internet work?
+Good interview question. 
+- A bunch of computers talking to each other, a bundle of request and response to one another
+
+Internet: a system of globally interconnected devices
+Intranet: Private internet (LANs), or any other kind of closed connection of computers
+
+## IP Addresses & Protocols
+Collective agreements between humans on how to deal with things.
+**IP:** Internet Protocol
+**IP Address**: A label assigned to an internet connected device 
+ 
+**IPv4:** 8.8.8.8 (4.3 billion addresses, and we are well passed that)
+**IPv6:** 2001:3489:4423:8888 (340 quintillion?)
+
+This all runs on a different protocol called TCP.
+
+**TCP**: Transmission Control Protocol (loss-less, has to make sure a connection is met, negotiates connection)
+**UDP**: User Datagram Protocol (can leave connections open, one way blast of info outwards)
+
+`ping` is terminal command, you can just ping sites, hey, are you there? Useful to tell if your site is up and running and the round-trip time.
+
+## Domain Name System
+Notice we didn't `ping` an IP address, but instead a domain name.
+**DNS**: Domain Name System (intelligent internet phone book)
+    - maps domain names to ip addresses
+
+tld: top level domain, thigns like .com, .biz, .net, etc
+domain: is the main domain name
+subdomain: is like app, blog, `blog.jemyoung`.
+
+.com is the og, the first one.
+
+### Why use a subdomain instead of a path?
+- Allows you to partition your data more effectively, 
+- can have dedicated server per subdomain.
+- tells the user you are on a completely different part of the site, its still affiliated with the site but its probably a different application entirely.                          
+- Whereas with a path, you're still on the main site/domain but you're just on a different page/route on that site
+
+### Nameservers
+DNS resolve names to IP address, they do so with **nameservers**
+
+- **Nameserver**: Map domains to IP addresses 
+    - the entity that keeps the mapping, 
+    - record keepers of the internet.
+
+## Trace Routes Practice
+- `$ man traceroute` : Traceroute manual
+- `$ traceroute google.com` run traceroute 
+
+Instead of pinging the site directly, what it shows is every hop on the way. Remember the internet is built on trust and servers and nodes and switches.
+
+That is what we are doing with traceroute, we are mapping the path of every single server that we hit along the way.
+
+> `traceroute` is super useful in trying to diagnose network issues. IF you have a website and you see it dying on the first/second hop you know the ISP is not resolving, versus something closer to the server could be a load balance issue with the server itself.
+
+
+Traceroute and ping are both running a thing called **ICMP** (Internet Control Message Protocol) requests, essentially just health checks, as opposed to something like TCP.
+
+You can also configure a site not to respond to pings, this is called **black holing**. If you want to explicitly deny requests you can disallow pings.
+
+## Packets
+- a little bit of information, technically a bit is the smallest information you can transfer, but a **packet** is like an envelop of data, on it there is an address, where youre going/coming from and inside of that packet is information.
+- A packet manually contains metadata, metadata is usually in the form of headers, again the packet is not just one packet, its trillions of them and often using TCP.
+    - It's like hey, it's me an like 50,0000 other packets, and when they all arrive, they are put together in a checksum.
+    - **error correcting** is going back and saying like ,hey I got all packets except these two, and then that response goes back and it gets resolved. Difference of this and UDP, which is just broadcasting data.
+
+## Understanding Net Neutrality
+(Again) How does the internet work? 
+- The internet works over TC/IP which is a protocol that everybody agrees on  
+- And on the protocol are packets, and packets are this base unit of information that everybody knows how to communciate with and they know how to transfer data, send data, there are different types
+- It all works on a series of trusts, where guarantees are made when handoffs of data/packets are made. 
+- Handing something off to a DNS, there are nameservers that will resolve to a server somewhere.
+
+**Net Neutrality** is where ISPs can wedge themselves inbetween trust sytem and tax particular requests, charge you based on the data you request. 
+
+## Links 
+- [PREV ← | Introduction](/fsfe-intro)
+- [NEXT → | Servers ](/fsfe-servers)
