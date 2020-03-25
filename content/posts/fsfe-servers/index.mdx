@@ -1,7 +1,7 @@
 ---
-title: Understanding the Internet | Full Stack for Front-End Engineers
+title: Servers | Full Stack for Front-End Engineers
 date: 2020-03-23
-slug: fsfe-understanding-the-internet
+slug: fsfe-servers
 tags:
   - servers
   - JS
@@ -56,10 +56,28 @@ console.log('Server started! Listening on port 3000');
 - On HTTP the Internet runs over port 443.
  
 ## Data Centers & the Cloud
+- Typically servers are parts of stacks, and they are built in particular ways that consumer grade stuff is not, they are optimized for serving. Optimized for multithreading, forking, and high CPU/RAM stuff.
+- Servers typically live in data centers, lots of fans, super clean environment, high security.
+- Consume a ton of power.
+- **Data centers** are often shared between companies, can rent a fraction of their services, or own the entire center if you're a big enough company.
 
+### The Cloud
+Used to be companies ran their own servers, they were in charge of their own hardwaare/software.
+- Center could be anywhere in the world now, further away from server the more hops needed to get data.
+- least amount of hopes == less places/things to go wrong, and its faster
 
+The great thing about the cloud is : elastic computing.
+[**elastic computing**](), Scaling as needed, elastic. You provision for only things youre using/needing. Don't have to buy more and more hardware. Costs can adjust with allocation. Can scale up based on times of years. On demand capacity.
+
+We, as smaller cos/devs, likeyl only need a fraction of a fraction of a server. Today we'll just provision one core.
+
+**Process isolation** Is the idea that the slices of a server can't talk with one another, you wouldn't want knowledge/access to anyone elses slice of the server.
 
 ## Virtual Private Server Setup
+
+**VPS:**: Virtual Private Server (chunk of a box of a piece of server)
+
+
 ## Operating Systems
 ## SSH
 ## SSH Key Practice
@@ -67,4 +85,4 @@ console.log('Server started! Listening on port 3000');
 
 ## Links 
 - [PREV ← | Understanding the Internet](/fsfe-understanding-the-internet)
-- [NEXT → | Servers ](/fsfe-servers)
+- [NEXT → | Server Setup ](/fsfe-server-setup)

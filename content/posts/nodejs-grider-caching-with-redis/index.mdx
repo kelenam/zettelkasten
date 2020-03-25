@@ -129,7 +129,7 @@ Whenever an index is created for a mongo collection, an index targets an individ
 
 If we didn't write our queries correctly, we would run into performance issues where we make MongoDB do a *full collection scan*.
 
-### Two ways to solve possible property lookup perforamance issue
+### Two ways to solve possible property lookup performance issue
 There are two ways to solve this potential performance slowdown, here is the first...
 
 ![](adding-indicies.png)
@@ -141,10 +141,46 @@ There are two ways to solve this potential performance slowdown, here is the fir
         - finally, we might be making queries ahead of time where we can't figure out what indicies we need for it.
     - Because of the downsides, this approach isn't really tenable.
 
-
 ## Query Caching Layer
+- last section we talked about some performance concerns we might have with MongoDB.
+- One possible solution to this is setting up something called a **cache server**.
+
+### What is a caching layer?
+This is our app right now:
+![](our-app-before-caching-layer.png)
+- This is how our app is currently structured, a pretty common pattern.
+
+The [**cache server**]() is going to see if queries have been made before, if not it make the request to mongodb, that query is cached. If its made again, it doesn't send the query to mongdb and instead sends it back to mongoose.
+
+![](cache-server.png)
+
+This would a more detailed version...
+
+![](cache-server-2.png)
+
+We are looking for a query with an id of 123, it won't be found in the cache server, so it goes to mongodb, it goes immediately to mongoose, immediately after that, it will take that query that was made and then store the value associated with that query.
+
+Just a simple key-value look-up.
+
+The cache server is not used for any write actions, only for reading data.
+Any time we write to the db, we clear the cache of any related data to the updated query in the cache server.
+
 ## Redis Introduction
+Our caching server is going to be an instance of **Redis**. [**Redis**]()  is *an in-memory data store*, a tiny databse that runs in the memory of your machine and allows you to read and write data really quickly.
+
+Redis is a data store that operates only in memory, so that once it gets turned off the memory within it gets deleted and wiped, in practice we only use Redis for data that we feel we are okay with it disappearing.
+
+Redis is very fast.
+
+To interact with Redis, we are going to use a library called `node-redis`, in fact the library is only called `redis`, this is the node implementation of the library so we will refer to it as node-redis, so you know its the node library for redis.
+- **node-redis**: a js library that lets us interact with the redis server
+- The server itself is called Redis.
+
+The node-redis library or npm package has really bad documentation.
+
 ## Installing Redis on MacOS
+
+
 ## Redis on Windows
 ## Getting and Setting Basic Values
 

@@ -1,0 +1,63 @@
+---
+title: Code Structure | JavaScript.Info  
+date: 2020-03-24
+slug: jsinfo-js-code-structure
+tags:
+  - JS
+  - JS.Info
+  - web
+  - browser
+  - DOM
+--- 
+
+## Statements
+>[^ **What are statements?**]**Statements** are sytnax constructs and commands that perform actions.
+- We can have as many statements in our code as we want. Statements can be separated with a semicolon.
+
+For example...
+```js
+alert('Hello'); alert('World');
+```
+
+Usually statements are written on separte lines to make the code more readable.
+
+## Semicolons
+> [^ **Semicolons can be ommited in most cases when...**]A semicolon can be omitted in most cases when a line break exists.
+```js 
+alert('Hello')
+alert('World')
+```
+- In the above JS would consider the above an **implicit semicolon**. This is called [**automatic semicolon insertion**](https://tc39.github.io/ecma262/#sec-automatic-semicolon-insertion)
+
+**In most cases, a newline implies a semicolon. But "in most cases" does not mean "always"!**
+
+But there are situations where JavaScript “fails” to assume a semicolon where it is really needed.
+
+Errors which occur in such cases are quite hard to find and fix.
+```js 
+alert("There will be an error")
+
+[1, 2].forEach(alert)
+```
+>[^ **True/False: JavaScript assumes a semicolon before square brackets if it is on its own newline**] The error in the no-semicolon variant occurs because JavaScript does not assume a semicolon before square brackets [...].
+So, because the semicolon is not auto-inserted, the code in the first example is treated as a single statement. Here’s how the engine sees it:
+```js
+alert("There will be an error")[1, 2].forEach(alert)
+```
+But it should be two separate statements, not one. Such a merging in this case is just wrong, hence the error. This can happen in other situations.
+
+> We recommend putting semicolons between statements even if they are separated by newlines. This rule is widely adopted by the community. 
+
+## Comments
+- One-line comments start with two forward slash characters `//`.
+- Multiline comments start with a forward slash and an asterisk `/*` and end with an asterisk and a forward slash `*/.`
+- Nested comments are not supported!
+
+Please, don’t hesitate to comment your code.
+
+Comments increase the overall code footprint, but that’s not a problem at all. There are many tools which minify code before publishing to a production server. They remove comments, so they don’t appear in the working scripts. Therefore, comments do not have negative effects on production at all.
+
+## Links 
+
+
+## Summary Questions
