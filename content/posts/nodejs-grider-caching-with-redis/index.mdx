@@ -71,7 +71,7 @@ constructor(props) {
 - If you try logging in right now, it will fail because of mongodb instance is in readonly. 
 - Need to head over to `/config` , `dev.js` is where our keys are used for oauth flow, you want to add your own credentials.
 
-## MongDB Atlas Setup and Configuration
+## MongoDB Atlas Setup and Configuration
 Check out on Udemy for instructurions.
 
 ## Routes Walkthrough
@@ -84,7 +84,7 @@ All the code for handling these routes are in the `/routes` directory, in there 
 ## MongoDB Query Performance
 The first big thing we are going to be adding to our application is going to be **caching**.
 
-[^ **What is *caching* useful for?**]**Caching** greatly improves the read performance of an application that makes use of MongoDB. Caching can be used with any type of database, but we are specifically going to be focusing on caching with mongodb.
+> [^ **What is *caching* useful for?**]**Caching** greatly improves the read performance of an application that makes use of MongoDB. Caching can be used with any type of database, but we are specifically going to be focusing on caching with mongodb.
 
 If your go to dev.tools > console  with the application runningm, and click on XHR you can see `blogs` and `current_user` to see these request being made.
 
@@ -92,7 +92,7 @@ If your go to dev.tools > console  with the application runningm, and click on X
 
 The first steps are:  
 
-- Things start off when browser hits localhost:3000/blogs
+- Things start off when browser hits `localhost:3000/blogs`
 - React app loads in browser
 - React app makes a request to the backend to figure out who the current user is and also retrieve a list of blogs that belong to them.
 - The request is received by our express API, express takes that incoming request one for the currrent user and list of blogs and sends each of those off to their respective route handlers in our app
@@ -178,10 +178,150 @@ To interact with Redis, we are going to use a library called `node-redis`, in fa
 
 The node-redis library or npm package has really bad documentation.
 
-## Installing Redis on MacOS
+![](redis.png)
 
 
-## Redis on Windows
 ## Getting and Setting Basic Values
+Now that we have Redis installed locally, we can play around with it to get a better feel for how it stores data.
+- Let's start off by looking at how Redis stored data.
+
+![](redis-storage.png)
+This is a diagram of our redis instance. 
+
+- Redis is a key/value store so you can think of it storing data very similarly to how a JS object stores values.
+- we have keys and those keys represent different values
+- We are going to use `node-redis` library to set and get values.
+
+### setting data 
+- The most basic way to to set values is using the set function `set('hi, there')`
+  - the first value is the **key**, the second value we pass is the **value**
+
+### getting data 
+To retrieve values we can use the `get` function, again provided by node-redis.
+
+>[^ **How do we retrieve data from redis? What are the arguments we pass to the function, and why is the second one a callback?**]- The first argument to `get` is the key we want to retreive, notice in this case, whenever we are trying to retrieve a value out of redis that is an asynchronous operation, so we have to pass in a callback function as a second argument.
+
+This callback function, will eventually be called with the value that was stored at the key of `hi` inside of redis, so in this case if we tried with the argument `'hi'` our callback function would eventually be called with the value of `'there'`.
+
+### Getting practice
+let's go ahead and say `node` in the project directory and see if we can interact with our redis instance for practice.
+
+```js
+const redis = require('redis');
+
+```
+We now have to instruct this redis library how to connect to our client instance. We can do so first by defining a redis url. **redis url** is going to be the url at which our redis instance is running at... by default its going to be `redis://127.0.0.1:6379`
+
+We can then use the redis library to connect to the instance at this url and store the result on a variable called `client` by saying `redis.createClient(url to connect to)`
+
+```js
+const redis = require('redis');
+
+const redisURL = 'redis://127.0.0.1:6379'
+
+const client = redis.createClient(redisURL);
+```
+- this client thing that we get back is how we actually interact with our redis instance.
+- let's try and set a key/value like we did in our example with, `set('hi', 'there')`
+  - notice we get immediately returned to us, `true` this just means, we got it, we will try and set this value to you, a status message of sorts.
+
+- To retrieve the value of this we could say, `client.get('hi', (err,val) => console.log(val));` 
+  - remember this is error first. (**Error-first pattern** is when the first argument of our functons are going to be any error data we get back, the second one will be any data we actually care about.)
+
+> - An interesting thing we can do if we just want to print out the value, instead of writing a callback, we can just say, `client.get('hi', console.log)`, notice we don't have parens on the end of console.log, because we aren't trying to call it, we're just providing the log function as a callback. When we run this, console.log will be run automatically with the arguments of `err` and `value`.
+
+- `null` will be nothing went wrong, so there is no error, and then `there` is the value we want.
+
+## Redis Hashes
+We are going to look at a sem-complicated data structure that's going to be useful for our caching project. It's called a **nested hash**, you can think of it as being a nested JS object.
+
+![](redis-hash.png)
+
+At the top level you have a nested set of keys, except this time around, their values aren't simple strings, instead, the value that corresponds to the key of `spanish` is it's own nested object, or **nested hash** as we refer to it. 
+
+Another key within `spanish` points to red which points to the nested value rojo. 
+
+- We can have multiple hashs stacked like this within a single redis instance
+
+### Setting values in a nested hash 
+```js:title=setting-value-in-nested-hash
+hset('spanish', 'red', 'rojo');
+```
+- To set values in nested hashes we use a slightly different function, `hset`
+- `h` in `hset` stands for, you guesed, it, hash.
+- again a **hash** can be thought of as objects you are used to in JS.
+- The syntax in `hset` has 3 different parameters. The first is the overall key, like the master key that is managing the entire object.
+  - the second is modifiying the key inside of that hash
+  - the third is the setting the value inside of that nested hash
+  -⭐ You can think of the first two parameters as being kind of like lookups, and the third as being the value we actually want to set.
+
+### To retreieve values from a nested hash
+```js:title=getting-value-in-nested-hash
+hget('spanish', 'red', (err, val) => console.log(val));
+//-> rojo
+```
+Very similar to setting values, but in the way we are familiar with gets, with the value we're getting defined as callback.
+
+### Nested hashes at a more familiar angle
+Let's look at it in a format like a JS object...
+```js
+const redisValue = {
+  spanish: {
+    red: 'rojo',
+    orange: 'naranja',
+    blue: 'azul'
+  },
+  german: {
+    red: 'rot',
+    orange:, 'orange',
+    blue: 'blau'
+  }
+}
+```
+This entire object represents the data set we have inside of redis. Inside of there, is are keys pointing to their own nested hashes, and they both have their own set of keys/values.
+
+### Working with nested hashes
+- Remember, we can get a client back up and running if closed by...
+1. requiring redis, ...`require('redis')`
+2. grabbing the url and storing it in a variable: ...`'redis://127.0.0.1:6379'`
+3. setting up a client by passing in the url, with ...`redis.createClient(redisUrl)`
+```js
+const redis = require('redis');
+
+const redisURL = 'redis://127.0.0.1:6379';
+const client = redis.createClient(redisURL);
+
+client.hset('spanish' 'yellow', 'amarillo');
+client.hget('spanish', 'yellow', (err, val) => console.log(val));
+
+``` 
+Let's set a new hash, let's set a new spanish color, amarillo, for yellow.
+
+## One Redis Gotcha
+- Anytime we try to store data in Redis so far, it's been strings. 
+> - But any data we are storing in Redis can only be numbers and letters. 
+- We cannot store plain JS objects directly in redis... 
+```js:title=DOESNT-WORK 
+client.set('color', {red: 'rojo'})
+// -> [object, object]
+```
+
+To get around this we have to stringify those objects with `JSON.stringify().`....
+```js:title=DOES-WORK 
+client.set('color', JSON.stringify({red: 'rojo'}));
+client.get('colors', console.log)
+// -> null '{"red": "rojo"}' 
+```
+Now we just have to remember to parse this when we retrieve it b using `JSON.parse()`....
+```js:title=with-parsing  
+client.get('colors', (err,val) => console.log(JSON.parse(val)));
+// {red: 'rojo'} 
+```
+
+⭐ That's how we store JS objects, we first have to turn them into JSON and then we have to parse it when we retrieve.
+
+## Promisifying a Function 
+## Caching in Action 
+## Caching issues
 
 ## Links

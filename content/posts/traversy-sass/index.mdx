@@ -11,7 +11,7 @@ tags:
 ---
 
 ## What is Sass?
-- Stands for (Syntactically Awesome Stylesheets)
+>[^ **What is Sass?**]- Stands for (Syntactically Awesome Stylesheets)
 - CSS PreProcess / Extension
 - Let's you use features that do not exist in CSS
 - Sass (`.scss`) files are compiled to regular CSS
@@ -19,11 +19,12 @@ tags:
     - can use live-sass-compiler extension in vscode
 
 ### `.sass` vs. `.scss`
-- scss files are backwards compat with regular CSS (the one we stick with)
+> [^ **What is the difference between `.sass` files and `.scss` files, which do we prefer?**]- scss files are backwards compatible with regular CSS (the one we stick with)
 - sass has space indentation for sepeartors, no curly braces
+- My preference is for using `scss` as its more comprehensible to fellow devs not familiar with sass.
 
 ### Variables in CSS
-- regular CSS now has variables they are called custom properties, however the syntax isn't very pretty, Sass allows 
+- regular CSS now has variables they are called **custom properties**, however the syntax isn't very pretty, Sass allows 
 us to use variables in a more readable way:
 ```scss 
 $font-stack: Helveticca, sans-serif;
@@ -34,16 +35,16 @@ body {
     color: $primary-color;
 }
 ```
-- Prefixed with `$`
+[^ **How do you define variables in Sass? What are the benefits of using them?**]-Sass variables are prefixed with `$`
 - `$primary-color: blue`
 - Easier to read and write than CSS custom properties
 
 ### Nesting
 One of the main reasons to use CSS over CSS.
-- Allows you to nest child selectors within the parents curly braces, and these children only pertain as children of the parent 
+[^ **What is another great feature of sass when it comes to parent/child classes**]- Sass allows you to nest. Sass allows you to nest child selectors within the parents curly braces, and these children only pertain as children of the parent 
 
 ### Modules / Partials
-- Can break up your files into separate files, without making multiple http requests to separate css files
+[^ **How would you go about keeping seprate files in Sass? What are the benefits of this?**]- Can break up your files into separate files, without making multiple http requests to separate css files
 - Imports in Sass are handled entirely during compilation
 - this allows you to break up your files into components or pages
     - using a `_` underscore it, Sass will ignore it during compilation, but still allows you to use it in other files.
@@ -69,6 +70,8 @@ We can import the base file into the styles file
 ```
 
 ### Mixins & Functions
+
+> [^ **What do mixins and functions give us in Sass? What is a mixin?**]-[Mixins](https://sass-lang.com/documentation/at-rules/mixin): Mixins allow you to define styles that can be re-used throughout your stylesheet. They make it easy to avoid using non-semantic classes like .float-left, and to distribute collections of styles in libraries.
 - Elevates CSS to something closer to a programming language
 - Gives you the ability to pass things in as parameters/properties...
 
@@ -90,7 +93,7 @@ Versus in css...
     transform: rotate(30deg);
 }
 ```
-- Functions work in a similar way in that they actually return something, where as a **mixin** is just placing the css there, also with functions you don't have to the `@include`.
+> [^ **What is the primary difference between mixins and functions?**]- Functions work in a similar way in that they actually return something, where as a **mixin** is just placing the css there, also with functions you don't have to use the `@include`.
 
 ### Inheritance
 We can extend styles from other base styles...
@@ -121,8 +124,7 @@ We can extend styles from other base styles...
     border-color: yellow;
 }
 ```
-- makes it easier to create families of styles and extend functionality when more specific use case required.
-
+> -[] makes it easier to create families of styles and extend functionality when more specific use case required.
 
 ### Operators
 You can do calculations on things. Traversy doesn't use this too much.  
@@ -133,8 +135,330 @@ You can have logic, if/else statements... etc.
 - uses `@if` and `@else`
 
 ## Let's get Started
+Starting with a regular html file...
+To get started let's create a new folder called `scss`, in this folder we will create a file called `style.scss`
 
+- Any styles we can set into a variable.
+
+### Compiling your Sass
+Two ways, the first is going to be the npm route, the second with Vscode 
+1. `sudo npm i -g sass`
+    - From here you do `sass -watch scss/style.scss css/style.css`
+    - this will produce two files the output and the source/map map file (not really used)
+    - don't ever edit your css file directly.
+2. Vscode: live sass compiler 
+    - Now there is a watch sass button on the button of our editor 
+
+> [^ **How would you change how/where your sass->css dirctories/files are compiled?**] Ctrl+, for keyboard shortcut for settings, then go to `live-sass` or search it and edit the settings.json file.
+In our live-sass vscode settings we are using compresssed as the format (minified), and setting where we handle the extension and the save path. You could have a /dist/ folder if you want,
+```json 
+"liveSassCompile.settings.formats": [
+    {
+        "format": "compressed",
+        // "extensionName": ".min.css",
+        "savePath": "/dist/css"
+    }
+],
+"liveSassCompile.settings.generateMap": false,
+```
+
+### Our styles 
+```scss
+$light-color: #f4f4f4;
+$font-stack: Arial, Helvetica, sans-serif;
+$primary-color: #0E6cff;
+$secondary-color: #ff8700;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: $light-color;
+    font-family: $font-stack;
+    line-height: 1.6;
+}
+
+img {
+    width: 100%;
+}
+
+a {
+    text-decoration: none;
+}
+
+.showcase {
+    background-color: $primary-color;
+    color: #fff;
+    height: 600px;
+    /* going to nest the nav here to only pertain to nav */
+    nav {
+        display: flex;
+        align-items: cewnter;
+        justify-content: space-between;
+
+        ul {
+            display: flex;
+            list-style: none;
+        }
+
+        li {
+            padding: 15px;
+        }
+
+        a:hover {
+            color: $secondary-color;
+        }
+    }
+
+    a {
+        color: #fff;
+    }
+
+    /* the & is the name of the parent */
+    /* .showcase-content === &-content */
+    &-content {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 50%;
+        }
+
+        h1 {
+            font-size: 50px;
+            line-height: 1.2;
+        }
+
+        p {
+            margin: 20px 0;
+        }
+    }
+
+}
+
+.container {
+    /*we want to push everything to the middle*/
+    /*going to be on the root level, since you*/
+    /*might want to use this somewhere else*/
+    /*as a possible utility class */
+    max-width: 1100px;
+    padding: 0 30px;
+    margin: 0 auto;
+    overflow: auto;
+}
+```
+### Breaking up our files with *partials*
+It's a good pratice to separte your config files, things that would contain mixins, variables, functions whatever into their own file
+```scss:title=_config.scss
+$light-color: #f4f4f4;
+$font-stack: Arial, Helvetica, sans-serif;
+$primary-color: #0E6cff;
+$secondary-color: #ff8700;
+```
+
+```scss:title=main.scss 
+@import 'config';
+```
+> [^ **What is a partial? How do you import one from another file?**]- This isn't going to get compiled to a css file because the underscore tells Sass this is a partial. A [**partial**]() is just to be brought into another file, it's not to be compiled on its own.
+
+Now, in our "main" or more primary file we can just say `@import 'config';` to bring in our partial file. We don't have to say dot or underscore or anything.
+
+This is one of the big advantages of using Sass, is that we have this kind of central place for theming and breaking things up in separate classes.
+
+We can do the same thing with utilities styles, like our container style for example, buttons would be another utility.
+
+### buttons 
+- Creating a partial for buttons, here we can use inheritance, because with buttons, a lot of the times we will have the same shared base styles, but just have different colors or borders.
+
+```scss:title=_buttons.scss
+%btn {
+    display: inline-block;
+    border-radius: 5px;
+    padding: 8px 20px;
+    margin: 3px;
+
+    &:hover {
+        transform: scale(.98);
+    }
+
+    .btn-primary {
+        @extend %btn;
+        background-color: $primary-color;
+    }
+    .btn-secondary {
+        @extend %btn;
+        background-color: $secondary-color;
+    }
+}
+```
+- You can extend classes and ids, you don't have use the % syntax.
+- Now we want to extend that btn with our primary and secondary buttons, we do so with the `extend` keyword 
+- We can still use our variables, b/c remember this all gets compiled into one file.
+- As per the [docs](https://sass-lang.com/guide#topic-7), it seems like the `%` just represents styles to be extended, if they are never extended they are never applied.
+
+
+### ligten/darken functions
+> We can use the functions, `lighten([color], [percentage])` and `darken()` lighen and darken element by a certain percentage...
+
+```scss
+.btn-primary {
+    @extend %btn;
+    background-color: lighten($primary-color, 10);
+}
+``` 
+
+### Functions/Conditionals
+Lets write a function that detects background color, and makes the text color based on the lightness of the background. This is going to be a function so we can keep it in our `_config.scss` file.
+```scss:title=functions&conditionals 
+```
+- The parameter is going to be a variable so it needs the `$` sign. This param is just going to be the bg color we pass in,
+- we are using ligtness, and seeing if its lighter than 70 then we can do a return
+
+```scss:title=_config.scss {8-15}
+$light-color: #f4f4f4;
+$font-stack: Arial, Helvetica, sans-serif;
+//$primary-color: #0E6cff;
+$primary-color: #e0ffff;
+
+$secondary-color: #ff8700;
+
+// Set text color based on bg color
+@function set-text-color($color) {
+    @if (lightness($color) > 70) {
+        @return #333;
+    } @else {
+        @return #fff; 
+    }
+}
+
+```
+Now over in our style.scss file we can modify the showcase text color to use this function.
+`.showcase { ... color: set-text-color($primary-color); ... }`
+
+### Mixins 
+- Our mixin is like a function but it doesn't actually return anything, it lets use cute down on reusable code, by specifying snippets saved in one place.
+
+```scss:title=_config.scss {17-21}
+$light-color: #f4f4f4;
+$font-stack: Arial, Helvetica, sans-serif;
+//$primary-color: #0E6cff;
+$primary-color: #e0ffff;
+
+$secondary-color: #ff8700;
+
+// Set text color based on bg color
+@function set-text-color($color) {
+    @if (lightness($color) > 70) {
+        @return #333;
+    } @else {
+        @return #fff; 
+    }
+}
+
+// set background & text color 
+@mixin set-background($color) {
+    background-color: $color;
+    color: set-text-color($color)
+}
+```
+Now that we have our mixin, we can just replace the code in showcase....
+```scss:title=style.scss {2}
+.showcase {
+    /*background-color: $primary-color; */
+    /*color: set-background-color($primary-color); */
+    /* the above is replaced with the mixin below */
+    @incluce set-background($primary-color);
+    height: 600px;
+    /* ... */
+}
+```
+- To use the mixin we use the `@include` keyword.
+
+### Applying our mixin to buttons
+In _buttons.scss, we can just include our mixin.
+```scss:title=_buttons.scss
+/* ... */
+.btn-primary {
+    @extend %btn;
+    /* background-color: lighten($primary-color, 10); */
+    @include set-background(lighten($primary-color, 10));
+}
+.btn-secondary {
+    @extend %btn;
+    /* background-color: $secondary-color; */
+    @include set-background($secondary-color);
+}
+```
+It's still white because we set the `a` tag to be white in our main styles.
+
+Now we can go ahead and change the primary color back to the blue. So now, if we had something that changed the theme to be a light bg color, the text color will be set dynamically.
+
+### Loops
+If we wanted to have our margins or padding be settable by classes, something akin to how Materialize, Bootstrap, wor Tailwind handles it, saying things like `py-1` or `m-1`, we can recreate this using loops.
+- we wouldn't be doing this for a small project but if we had a larger project this might be more useful.
+
+Let's create a new variable, and set it to a new list....
+```scss
+$spaceamounts: (1,2,3,4,5);
+
+@each $space in $spaceamounts {
+    .m-#{space} {
+        margin: #{$space}rem;
+    }
+    .my-#{space} {
+        margin: #{$space}rem 0;
+    }
+    .p-#{space} {
+        padding: #{$space}rem;
+    }
+    .py-#{space} {
+        padding: #{$space}rem 0;
+    }
+}
+```
+- A list is set with parens, ()
+- to iterate over we use `@each`
+- just like a JS for...in loop 
+- going to loop through and give us access to each of these numbers, refered to by the label `$space`
+- the way we access each iteration in the @each loop is with `#{}`, kind of like a JS template literal.
+- we set the property we we want, and give it spacing corresponding with rems.
+
+Might be better suited in the utilities file since these are utility classes 
+
+### Mobile Responsive
+We can create a new file called `_mobile.scss`
+```scss:title=_mobile.scss
+@media(max-width:700px) {
+    .showcase {
+        height: 400px;
+
+        &-content {
+            text-align: cewnter;
+
+            img {
+                display: none;
+            }
+        }
+    }
+}
+```
+- We also then `@import` this at the bottom of our file where we normally put our media queries, wherever you put this is where ever it will show up in the compiled css.
+- maybe even just have everything but the config file at the bottom.
+
+Note: We don't include the scss file in our production builds.
+
+## Clarifications
+- I'm not too sure where you would use the `@use` instead of `@import`
+    - The docs says [this](https://sass-lang.com/documentation/at-rules/use
+    ): The @use rule loads mixins, functions, and variables from other Sass stylesheets, and combines CSS from multiple stylesheets together. Stylesheets loaded by @use are called "modules". Sass also provides built-in modules full of useful functions.
 
 
 ## Links 
+
+## Summary Questions
 

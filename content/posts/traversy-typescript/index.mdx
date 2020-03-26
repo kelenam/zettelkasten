@@ -341,9 +341,17 @@ mike.payInvoice();
 - We can also write an interface for this class as well.
 
 ## Key Insights
-- I'm not a bit unclear about interfaces, and using them with classes. On apperance, if I'm another dev, I can see the interface being a clear place to understand the class more quickly. However, it does redundant. 
+- I'm not a bit unclear about interfaces, and using them with classes.... 
+https://johnpapa.net/typescriptpost3/
+> Why we need a interface that match 1 on 1 with the class? :/
+> for decoupling your class from the caller, it allows you, for example, to unit test it by mocking the dependencies. It also allows you to change behavior of the implemnted class so you don't have to change the caller
+
 - Also, protected methods, can be used by a subclass, however, they can't be used by an instance of that subclass.
 - I'm also a bit unclear as to why we can't set the type of the properties directly in the constructor, like...
 `this.name: string = name`
+
+> TypeScript interfaces are very handy for defining contracts within our code. We can use it to designate types of variables and function parameters. They let us know what properties a variable can take on, and whether they’re required, optional, or read-only. We can define interfaces with the interfaces keyword, optional properties with the question mark after a variable name, and the readonly keyword for read-only properties. [source](https://levelup.gitconnected.com/introduction-to-typescript-interfaces-85303aede25d) 
+
+I think with the above, interfaces make a lot of sense, stil, using them with classes 
 
 ## Summary Questions
