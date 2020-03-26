@@ -1,0 +1,349 @@
+---
+title: TypeScript | Traversy
+date: 2020-03-25
+slug: traversy-typescript
+tags:
+  - JS
+  - TS 
+  - Traversy
+  - types
+---
+
+## What is TypeScript 
+- Superset of JavaScript developed by Microsoft
+- Inherits and extends features of JS
+- Compiles/trans-compiles to plain JS
+- Easily integrated into JS projects
+- designed for development of large applications
+
+## What does TypeScript Offer?
+- Static Type Checking
+    - JS is untyped/don't have to specific types, 
+- Class Based Objects
+- Modularity
+- ES6 Features
+- Syntax closer to other high level languages like Scala or JavaScript
+
+### Static Type Checking
+With TypeScript we can check and assign variable, parameter and function types.
+- It is completely optional
+- helpds us find and prvent bugs and stop future issues from happening
+- makes our code much more readable and descriptive 
+
+## TypeScript Types 
+- `String`
+- `Number`
+- `Boolean`
+- `Array`
+- `Any`: Any kind of type 
+- `Void`: no type returned 
+- `Null`
+- `Tuple`: An array with a fixed number of elements
+- `Enum` : Enumerated values
+- `Generics`: specify the type of constraint, great for reusable code
+
+## Class Based Objects
+- Object Oriented Programmign in JS!
+- No Prototypes
+- Encapsulation 
+- Inheritance (subclassing)
+- Modifiers (protected, private, public)
+
+## TypeScript Compiler (tsc)
+- Written in TypeScript itself
+- Compiles `.ts` files to `.js`
+- Installed as an NPM package (Node.js)
+- Supports ES6 syntax 
+
+## Let's get started
+
+### Strings 
+```ts:title=types.ts
+console.log('Hello from ts');
+```
+
+The command to compile typescript to js is this...
+`$ tsc.ts [filename]`
+
+- The `.js` file is the want you'd want to include in your project for dist usage.
+- Only want to touch the `ts` file.
+
+```ts:title=types.ts
+
+let myString: string;
+
+myString = "Hello World!";
+console.log(myString);
+```
+
+### watch mode 
+> it can get to be a pain, compiling each time, instead run with `-w` flag to watch the file for saved changed.
+> `tsc filename.ts -w`
+
+### booleans
+
+```ts:title=types.ts
+let myString: string;
+let myNum: number;
+let myBool: boolean; 
+myString = 'Hello'.slice(0,3);
+myNum = 22;
+myBool = false;
+ 
+
+console.log(myString);
+```
+- For nums: expressions, hex, negative, are all considered numbers
+- for strings: concat strings work, even String methods work on it, e.g. `'Hello'.slice(0,3);`
+
+### any 
+```ts:title=types.ts
+let myString: string;
+let myNum: number;
+let myBool: boolean;
+let myVar: any;
+
+myString = 'Hello'.slice(0,3);
+myNum = 22;
+myBool = false;
+myVar = 5;
+
+console.log(myString);
+```
+-`any` can be of any type
+
+### Arrays
+There are two ways to define arrays types...
+```ts:title=types.ts
+let myString: string;
+let myNum: number;
+let myBool: boolean;
+let myVar: any;
+
+let strArr: string[];
+let numArr: number[];
+
+myString = 'Hello'.slice(0,3);
+myNum = 22;
+myBool = false;
+myVar = 5;
+
+myArr = [1,2,3]
+console.log(numArr);
+```
+
+- `let strArr: string[];` is saying this has to be an array of strings.
+- The other way to define arrays, can be be like this `let strArr: Array<string>` 
+    - where we use the type name, `Array` and then following by angles brackets with the type inside
+
+### tuple 
+Next we are going to look at tuples, where we have to match type to the inputs.
+```ts:title=types.ts
+let strNumTuple: [string, number];
+
+strNumTuple = ['Hello', 4];
+```
+-  Tuples have to match the number of elements and the type specified
+
+### void, undefined, null 
+```ts:title=types.ts
+let myString: string;
+let myNum: number;
+let myBool: boolean;
+let myVar: any;
+let strNumTuple: [string, number];
+let myVoid: void = null; 
+
+let strArr: string[];
+let numArr: number[];
+
+myString = 'Hello'.slice(0,3);
+myNum = 22;
+myBool = false;
+myVar = 5;
+myArr = [1,2,3]
+
+let myVoid: void = null;
+let myNull: null = null;
+let myUndefined: undefined = undefined; 
+
+strNumTuple = ['Hello', 4];
+console.log(strNumTuple);
+```
+- we can set the type and the value on the same line like this `let myString: string = 'this is a string';`
+- `void` accepts `null` and `undefined` as types.
+- but there are also `null` and `undefined`, which also accept each others undefined and null values. 
+
+
+## functions
+Let's create a new file called `functions.ts`...
+```ts:title=functions.ts 
+function getSum(num1: number, num2: number):num  {
+    return num1+num2;
+}
+```
+- Going to be a simple function that gets sum of two numbers.
+> For functions we can add types to the functions parameter and return type.
+> we just add the return type of our function following parameters like `:type`
+
+```ts:title=functions.ts 
+function getSum(num1: any, num2: number):num  {
+    if (typeof num1 === 'string') {
+        num1 = parseInt(num1);
+    }
+    if (typeof num2 === 'string') {
+        num2 = parseInt(num2);
+    }
+    return num1+num2;
+}
+
+function getName(firstName:string, lastName?:string):string {
+    if(lastName == undefined) {
+        return firstName;
+    }
+    return firstName+' '+lastName;
+}
+```
+> We can use the `?` to make a parameter value optional, e.g. `lastName?:string`
+```ts:title=functions.ts 
+function getSum(num1: any, num2: number):num  {
+    if (typeof num1 === 'string') {
+        num1 = parseInt(num1);
+    }
+    if (typeof num2 === 'string') {
+        num2 = parseInt(num2);
+    }
+    return num1+num2;
+}
+
+function getName(firstName:string, lastName?:string):string {
+    if(lastName == undefined) {
+        return firstName;
+    }
+    return firstName+' '+lastName;
+}
+
+fucntion myVoid(): void {
+    return 3;
+}
+// --> This would err as 3 is not assignable to type void
+```
+
+### interfaces 
+```ts:title=intefaces.ts
+function showTodo(todo: { title: string, text: string}) {
+    console.log(todo.title+': '+todo.text);
+}
+let myTodo = {title: 'Trash', text: 'take out trash'};
+showTodo(myTodo);
+``` 
+
+Let's create an interface from this instead...
+```ts:title=intefaces.ts
+interface Todo {
+    title: string;
+    text: string;
+}
+
+function showTodo(todo: Todo) {
+    console.log(todo.title+': '+todo.text)
+}
+let myTodo = {title: 'Trash', text: 'take out trash'};
+showTodo(myTodo);
+``` 
+> - interfaces are basically letting us create our own type, 
+
+### Classes 
+```ts:title=intefaces.ts
+class User {     
+    public name: string;
+    public email: string;
+    public age: number;
+
+    constructor(name: string, email: string, age: number) {
+
+        this.name = name;
+        this.email = email;
+        this.age = age;
+
+        console.log('User created: '+this.name);
+    }
+    public register():any {
+        console.log(this.name+ ' is now regsitered');
+    }
+} 
+
+let Jon = new User('Jon Doe', 'jdoe@gmail.com', 23);
+
+Jon.register();
+
+``` 
+- classes can have properties and methods (functoins inside of the class)
+- Inside of classes you have something called a **constructor**, its a special type of method that runs when you instantiate with this class, when you create a User this is going to run.
+
+> We can make it so that we our properties can't be accessed outside of our class using an [**access modifier**]()...
+
+- `private` will make it so the specified properties are private and only accessible within class 'User'
+- `public`: will allow this to work
+- `protected` means we can't access it from outside of the class but we can access it from any class that inherits this one...
+- methods can be made private/public as well.
+
+
+### Inheritance 
+```ts:title=intefaces.ts
+interface UserInterface {
+    name: string;
+    email: string;
+    age: number;
+    register();
+    payInvoice();
+}
+
+class User implements UserInterface{     
+    public name: string;
+    public email: string;
+    public age: number;
+
+    constructor(name: string, email: string, age: number) {
+
+        this.name = name;
+        this.email = email;
+        this.age = age;
+
+        console.log('User created: '+this.name);
+    }
+    public register():any {
+        console.log(this.name+ ' is now regsitered');
+    }
+    payInvoice() { 
+        console.log(this.name+ ' paid invoice.');
+    }
+} 
+
+let Jon = new User('Jon Doe', 'jdoe@gmail.com', 23);
+
+class Member extends User {
+    id: number;
+
+    constructor(id: number, name: string, email: string, age: number) {
+        super(name, email, age)
+        this.id = id;
+    }
+    payInvoice() {
+        super.payInvoice();
+    }
+}
+
+
+let mike: User = new Member(1,'Mike Smith', 'mikesmith@gmail.com', 23);
+mike.payInvoice();
+``` 
+- We can also write an interface for this class as well.
+
+## Key Insights
+- I'm not a bit unclear about interfaces, and using them with classes. On apperance, if I'm another dev, I can see the interface being a clear place to understand the class more quickly. However, it does redundant. 
+- Also, protected methods, can be used by a subclass, however, they can't be used by an instance of that subclass.
+- I'm also a bit unclear as to why we can't set the type of the properties directly in the constructor, like...
+`this.name: string = name`
+
+## Summary Questions

@@ -1,0 +1,140 @@
+---
+title: Sass | Traversy
+date: 2020-03-25
+slug: traversy-sass
+tags:
+  - Sass
+  - CSS 
+  - Traversy
+  - webdev
+  - html
+---
+
+## What is Sass?
+- Stands for (Syntactically Awesome Stylesheets)
+- CSS PreProcess / Extension
+- Let's you use features that do not exist in CSS
+- Sass (`.scss`) files are compiled to regular CSS
+    - browswer doesn't read `scss` files, needs to be compiled down
+    - can use live-sass-compiler extension in vscode
+
+### `.sass` vs. `.scss`
+- scss files are backwards compat with regular CSS (the one we stick with)
+- sass has space indentation for sepeartors, no curly braces
+
+### Variables in CSS
+- regular CSS now has variables they are called custom properties, however the syntax isn't very pretty, Sass allows 
+us to use variables in a more readable way:
+```scss 
+$font-stack: Helveticca, sans-serif;
+$primary-color: #333;
+
+body {
+    font: 100% $font-stack;
+    color: $primary-color;
+}
+```
+- Prefixed with `$`
+- `$primary-color: blue`
+- Easier to read and write than CSS custom properties
+
+### Nesting
+One of the main reasons to use CSS over CSS.
+- Allows you to nest child selectors within the parents curly braces, and these children only pertain as children of the parent 
+
+### Modules / Partials
+- Can break up your files into separate files, without making multiple http requests to separate css files
+- Imports in Sass are handled entirely during compilation
+- this allows you to break up your files into components or pages
+    - using a `_` underscore it, Sass will ignore it during compilation, but still allows you to use it in other files.
+
+```scss:title=_base.scss 
+// _base.scss
+$font-stack: Helveticca, sans-serif;
+$primary-color: #333;
+
+body {
+    font: 100% $font-stack;
+    color: $primary-color;
+}
+```
+We can import the base file into the styles file 
+```scss:title=styles.scss 
+@use 'base';
+
+.inverse {
+    background-color: base.$primary-color;
+    color: white;
+}
+```
+
+### Mixins & Functions
+- Elevates CSS to something closer to a programming language
+- Gives you the ability to pass things in as parameters/properties...
+
+```scss
+@mixin transform($property) {
+    -webkit-transform: $property;
+    -ms-transform: $property;
+    transform: $property;
+}
+.box { @include transform(rotate(30deg));}
+```
+Now whenever you want to use this transform you just include the mixin without having to write the same 3 lines in your css every time you want to use the transform...
+
+Versus in css...
+```css
+.box {
+    -webkit-transform: rotate(30deg);
+    -ms-transform: rotate(30deg);
+    transform: rotate(30deg);
+}
+```
+- Functions work in a similar way in that they actually return something, where as a **mixin** is just placing the css there, also with functions you don't have to the `@include`.
+
+### Inheritance
+We can extend styles from other base styles...
+```scss 
+/* This CSS will print because %message-shared is extended. */
+%message-shared {
+    border: 1px solid #ccc;
+    padding: 10px;
+    color: #333;
+}
+
+.message {
+    @extend %message-shared;
+}
+
+.success {
+    @extend %message-shared;
+    border-color: green;
+}
+
+.error {
+    @extend %message-shared;
+    border-color: red;
+}
+
+.warning {
+    @extend %message-shared;
+    border-color: yellow;
+}
+```
+- makes it easier to create families of styles and extend functionality when more specific use case required.
+
+
+### Operators
+You can do calculations on things. Traversy doesn't use this too much.  
+`width: 400px / 905px * 100%;`
+
+### Conditionals
+You can have logic, if/else statements... etc.
+- uses `@if` and `@else`
+
+## Let's get Started
+
+
+
+## Links 
+
