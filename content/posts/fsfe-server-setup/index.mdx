@@ -8,8 +8,9 @@ tags:
   - backend
   - full-stack
   - http
-  - redis
-  - containers
+  - pm2
+  - Express
+  - nginx
 ---
 ## Buying a Domain Name
 So now that we have a server, we can do anything we want really.
@@ -25,7 +26,7 @@ Early we talked about how domains get resolved, via the **name servers**. But th
 ### DNS Records
 There are different types of DNS records depending on what you want to do....
 
-- [**A record**](): Maps name to IP address
+> - [**A record**](): Maps name to IP address
     - e.g: jemyoung.com --> 23.23.185.61    
 - [**CNAME**](): Maps name to name
     - e.g.: blogjemyoung.com  --> 23.23.185.61
@@ -320,6 +321,11 @@ But to make sure it restarts when the server restarts we can modify the pm2 star
 
 Turning your server off in DO won't stop you from getting billed but its a good way to check if pm2 handles restarts. 
 `pm2 save` is a commandthat saves the current process list.
+
+- **stopping your application**:  `sudo pm2 stop 0` 
+    - the 0 is the id of your process/application you can discover what yours is by running pm2 status.
+
+- Helpful article: http://www.augustkleimo.com/how-to-run-nodejs-using-pm2-on-amazon-ec2-linux/
 
 ## Version Control with git 
 - Our server is up and running we have it mapped to process and port. Now let's cover VC.
