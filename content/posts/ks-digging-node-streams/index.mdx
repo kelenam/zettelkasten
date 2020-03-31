@@ -1,0 +1,554 @@
+---
+title: Streams | Digging into Node.js 
+date: 2020-03-29
+slug: ks-digging-node-streams
+tags:
+    - JS
+    - Node
+    - command line
+    - streams
+    - webservers
+    - databases
+---
+## File Handling with Streams 
+We can just paste in work from ex1 to ex2.
+
+Let's talk for a moment about streams. There is a really great resource that talks about **node streams** that can be found [here](https://github.com/substack/stream-handbook). Highly recommend to read through this resource. There is also the FEM [course](https://frontendmasters.com/courses/networking-streams/).
+
+### Two types of simplex streams 
+> The basic idea to grasp onto here is that streams can be in two modes:
+
+> 1. a mode where you can read from them, meaning they are producing things that you can consume from them, you can read from them, thus they are called a **read stream**, or a [**readable stream**]().
+2.  The other mode is that they can be a [**writeable stream**](), meaning that they can receive inputs and you can write to them.
+> - These are both called **simplex streams** , meaning they're just unidirectional. You can either read from it or write to it.
+
+### Duplex stream
+There is a special type of stream called a **duplex stream** which can both be read to and written to, but that's not what we will cover here. 
+
+### Stream examples
+```js:title=streams 
+let stream1; //readable
+let stream2; //writeable
+
+stream1.pipe(stream2);
+```
+Say we want the output/read from stream1,  to a writeable stream2. It's literally like a garden hose. You just say `stream1.pipe(stream2);
+
+You call `.pipe` on a readable stream, and that hooks up a listener. 
+- Streams come in chunks of data, the default chunk size is 65,000 bytes. they are reading binary dat from a readable stream and pushing it to a writeable stream chunks at a time.
+- They stream very efficiently into one another using these binary buffers.
+
+- `.pipe` only available as method on [readable streams](https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options)
+- the mechanism pipe uses to attach to a writeable stream will only be available if you pass in a writeable stream.
+
+> If we wanted to find out what was coming out of the the process above, since these aren't duplex streams, they are more than not going to be simplex streams, we can't just read what is happening in stream2. **If we want to see what the contents are, you need to know that the return value from a `.pipe `call is another readable stream.**
+
+```js:title=streams streams
+let stream1; //readable
+let stream2; //writeable
+
+let stream 3 = stream1.pipe(stream2);
+```
+> The pattern here is : readable = readable`.pipe`(writeable) that means you can chain things.
+...
+```js
+var stream3 = 
+stream1
+.pipe(stream2)
+.pipe(stream3)
+.pipe(final)
+```
+This would just mean stream 1 would pipe into stream2, into stream3, into final and all that would be coming into stream3.
+
+> Understanding this that readable.pipe(writeable) gives you back a readable stream is about 80% of understanding how streams work.
+
+### So how are we going to use this?
+Let's go back to our ex1 project.
+
+Remember hwo we said that `getStdin` is a stream. Well we've been pulling files in as a string not a stream. What if we were to switch this to a streaming interface. Meaning we could get a stream for the standard in, and we could get a stream from our file so we could do the processing chunk by chunk.
+
+Switching to streams is much more efficient and typically how you should be doing things in Node.
+
+So we are going to comment out our usage of `getStdin` and use the straight up stdin... and change it to processFile, (process.stdin) because we are going to make `processFile` actually be able to handle a stream. 
+
+```js:title=ex2.js {25,27,28} 
+#! /usr/bin/env node
+
+"use strict";
+
+const util = require('util');
+const getStdin = require('get-stdin');
+const path = require('path');
+const fs = require('fs');
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help", "in"],
+    string: ["file"]
+});
+
+const BASE_PATH = path.resolve(
+    process.env.BASE_PATH || __dirname
+); 
+
+if (args.help) {
+    printHelp();
+} else if (
+    args.in || 
+    args._.includes("-")
+) {
+    processFile(process.stdin)
+} else if (args.file) {
+    const stream = fs.createReadStream(path.join(BASE_PATH, args.file));
+    processFile(stream); 
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+function processFile(inStream) { 
+    let outStream = inStream;
+    let targetStream = process.stdout;
+    outStream.pipe(targetStream);
+}
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file"); 
+    console.log("--in, -                   process stdin");
+    console.log(""); 
+}
+```
+
+### How would we do this with the filesystem?
+- We have a module that can give us a readable stream thats connected to a file, called `fs.createReadStream()`
+- So we've change processFile to take a readable stream as its input. 
+We could just do the below, without any mutation/uppercasing
+```js
+function processFile(inStream) { 
+    let outStream = inStream;
+    let targetStream = process.stdout;
+    outStream.pipe(targetStream);
+}
+```
+- Now if we run `$ ./ex2.js --file=files/hello.txt` We should see Hello World
+- So if we run this our output would appear the same, but underthehood the treatment of the data would be instead of holding it all in memory, the operation is processed via streams.
+
+- So for, what kind of through me was the way KS named the variables, especially outStream. What might make things clearer, is that you could just as easily pipe like this: `inStream.pipe(process.stdout)`. 
+- we are "creating" a write stream essentially by giving the `process.stdout` a binding in memory.
+- we are piping to to that out from the inStream, we have saved in another binding we will label as the outStream, 
+
+## Transform Stream
+We do want to modify our stream as it goes by and we do that by setting up a transform string.
+- Going to use the built it node module called `Stream`, going to pull off the Transform stream from it... `const Tranform = require('stream').Transform;`
+
+```js
+const Transform = require('stream').Transform;
+
+//...
+function processFile(inStream) { 
+
+    let outStream = inStream;
+
+    let upperStream = new Transform({
+        transform(chunk,enc,cb) {
+        }
+    })
+    let targetStream = process.stdout;
+    outStream.pipe(targetStream);
+}
+```
+- The reason we use a [**transform stream**]() is so that we can step in between the middle of a stream pipe, and item by item process what's going through it.
+- `const upperStream = new Transform({ transform(chunk,enc,cb) {...} })`
+- `Transform` takes an object that can have several configurations in it, the one we care about is that its needs a method called `transform()`
+    - this method, receives a `chunk`, an encoding (doesn't always know the encoding), then it receives a method to let us know its finished, a notifier that we finished, we'll call cb.
+- The way this transform works is basically kind of like an array, so if we want to push something into our stream from that chunk, we literally say `this.push` and give it something, we're not passing it to cb, but we do need to execute cb, so that this stream knows that this chunk has been processed and it can move on, this lets us do asynchronous processing if we need to.
+- Here we literally just want to take the chunk, turn it into a string and upper case it so....
+
+```js
+const Transform = require('stream').Transform;
+
+//...
+function processFile(inStream) { 
+
+    let outStream; 
+
+    let upperStream = new Transform({
+        transform(chunk,enc,cb) {
+            this.push(chunk.toString().toUpperCase());
+        }
+    });
+
+    outStream = inStream.pipe(upperStream);
+}
+```
+- `chunk` is a buffer so we run `toString` on it then `toUpperCase`
+- This pushes our transformed chunk into our `upperStream`, now we need to get `inputStream` into `upperStream`, upperStream is our writeable stream so we say...
+- This might make it more clear as to why we are using vars like `outStream`, right, because we want to keep future reference to the stream returned out. 
+- We could just have it like above, with outstream being declared and then assigning the result of the pipe into that binding, instead let's add an intermediary step...
+
+```js {6,14}
+const Transform = require('stream').Transform;
+
+//...
+function processFile(inStream) { 
+
+    let outStream = inStream;
+
+    let upperStream = new Transform({
+        transform(chunk,enc,cb) {
+            this.push(chunk.toString().toUpperCase());
+        }
+    });
+
+    outStream = outStream.pipe(upperStream);
+
+    let targetStream = process.stdout;
+    outStream.pipe(targetStream);
+}
+```
+- ...which is going to set us up for stuff we're doing later, when we assign outStream (our output stream) , we are just going to use that same name binding which is inStream when we pipe, to result in or overwrite outStream with the assignment of the result of the pipe.
+    - doing this is going to allow us to do a bunch of transformations that we'll get into later.
+    - we're just going to keep reassigning this variable, outStream is equal to outStream plus something else, so on an so forth, over and over again.
+- Finally we have a target stream to output the pipe to.
+
+#### Is it really streaming?
+If you want to check and see the data is actually coming in as streams, you could just do `setTimeout(cb,500)` and comment out the `cb()` so you can actually see that each chunk is processing every 500ms.
+- Proving that this is doing this internally, using internal buffer sizes to batch process these things in the default 65kb chunks.
+
+## Outputting a Stream to a File
+By default we've been printing to the standard out. Let's instead dump to a file, but through configuration dump to stdout if you want.
+
+We want for `OUTFILE` to be on the base path, whatever it is set to, concatenated with a file name out `out.txt`....
+- If we add a flag, a boolean, flag we can handle the out flag that will let us, in our processFile function handle the stdout for the `--out` flag
+
+### Making a write stream 
+Making our output stream or our write stream is pretty straighforward, `fs.createWriteSream(wheretoPipe)`
+
+- Now we take intruction on where to pipe to via cli args. 
+```js:title=ex2.js {12,20,50-54} 
+#! /usr/bin/env node
+
+"use strict";
+
+const util = require('util');
+// const getStdin = require('get-stdin');
+const path = require('path');
+const fs = require('fs');
+const Transform = require('stream').Transform;
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help", "in", "out"],
+    string: ["file"]
+});
+
+const BASE_PATH = path.resolve(
+    process.env.BASE_PATH || __dirname
+); 
+
+const OUTFILE = path.join(BASE_PATH, "out.txt");
+
+if (args.help) {
+    printHelp();
+} else if (
+    args.in || 
+    args._.includes("-")
+) {
+    processFile(process.stdin)
+} else if (args.file) {
+    const stream = fs.createReadStream(path.join(BASE_PATH, args.file));
+    processFile(stream); 
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+function processFile(inStream) { 
+
+    let outStream = inStream;
+
+    let upperStream = new Transform({
+        transform(chunk,enc,cb) {
+            this.push(chunk.toString().toUpperCase());
+        }
+    });
+
+    outStream = outStream.pipe(upperStream);
+
+    let targetStream;
+    if (args.out) {
+        targetStream = process.stdout; 
+    } else {
+        targetStream = fs.createWriteSream(OUTFILE);
+    }
+    outStream.pipe(targetStream);
+}
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file"); 
+    console.log("--in, -                   process stdin");
+    console.log("--out                     print to stdout");
+    console.log(""); 
+}
+```
+Then we can also update our help as well with `--out`.
+
+Getting an issue, if we run `BASE_PATH=files/ ./ex1.js --file=lorem.txt`, we won't get an `out.txt` file, if we run `./ex1.js --file=files/lorem.txt`, I'm silly, it's outputing to our base path within files since we set that with BASE_PATH. I feel dumb!
+
+## gzip Compress with zlib
+What would be more interesting than just uppercasing our files. 
+- A common encoding on files you may encounter is gzip, compressed, you may want to unzip them process them and rezip them. This happens a lot when youre downloading a big file from an FTP site processing it and reziping to pass along.
+
+- gzipping and g-un-zipping built into node. 
+- There is a stream implementation of the gzip algorithm and it's called [**zlib**](). 
+
+Let's say we want to put an option in for compressing our files, so let's add a flag and update our  help.
+
+```js:title=ex2.js {9} 
+#! /usr/bin/env node
+
+"use strict";
+
+const util = require('util');
+const path = require('path');
+const fs = require('fs');
+const Transform = require('stream').Transform;
+const zlib = require('zlib');
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help", "in", "out", "compress"],
+    string: ["file"]
+});
+
+const BASE_PATH = path.resolve(
+    process.env.BASE_PATH || __dirname
+); 
+
+const OUTFILE = path.join(BASE_PATH, "out.txt");
+
+if (args.help) {
+    printHelp();
+} else if (
+    args.in || 
+    args._.includes("-")
+) {
+    processFile(process.stdin)
+} else if (args.file) {
+    const stream = fs.createReadStream(path.join(BASE_PATH, args.file));
+    processFile(stream); 
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+function processFile(inStream) { 
+
+    let outStream = inStream;
+
+    let upperStream = new Transform({
+        transform(chunk,enc,cb) {
+            this.push(chunk.toString().toUpperCase());
+        }
+    });
+
+    outStream = outStream.pipe(upperStream);
+    
+    if (args.compress) {
+        let gzipStream = zlib.createGzip();
+        outStream = outStream.pipe(gzipStream);
+        OUTFILE = `${OUTFILE}.gz`;
+    }
+
+    let targetStream;
+    if (args.out) {
+        targetStream = process.stdout; 
+    } else {
+        targetStream = fs.createWriteSream(OUTFILE);
+    }
+    outStream.pipe(targetStream);
+}
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file"); 
+    console.log("--in, -                   process stdin");
+    console.log("--out                     print to stdout");
+    console.log("--compress                gzip the output");
+    console.log(""); 
+}
+```
+So, here in our `processFile`, we need to setup a streaming gzip transform stream basically. It's easier than it sounds.
+- How do we define a gzip stream? It's as easy as saying ... `zlib.createGzip();`
+    - this command makes us a transform stream, kind of like the one we did manually and this stream already understands the gzip protocol.
+    - fyi, the gzip protocol was actually designed for streaming.
+- Now if we're gzipping an ouput file, we might want to change the file extension from `.txt` to having like the `.gz` extension because thats a common convention for gzip file names....
+    - `OUT = OUTFILE+"" + ".gz";` (not im not using temp literals just because of markdown, so much easier to use temp lits)
+
+Now if we run `./ex1.js --file=files/hello.txt --out --compress --out`, we can see the compressed gzip output, if we leave out the `--out` flag, we can actually see the `out.txt.gz` file created. What's super intersting to note is that vim by default can see that if you are running `.txt.gz` it will actually g-unzips it for you when you open it so you can see it in plaintext.
+ 
+## gzip Uncompress with zlib
+Now let's handle uncompress, add a boolean flag, and add it to our help....
+```js:title=ex2.js {9} 
+#! /usr/bin/env node
+
+"use strict";
+
+const util = require('util');
+const path = require('path');
+const fs = require('fs');
+const Transform = require('stream').Transform;
+const zlib = require('zlib');
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help", "in", "out", "compress"],
+    string: ["file"]
+});
+
+const BASE_PATH = path.resolve(
+    process.env.BASE_PATH || __dirname
+); 
+
+const OUTFILE = path.join(BASE_PATH, "out.txt");
+
+if (args.help) {
+    printHelp();
+} else if (
+    args.in || 
+    args._.includes("-")
+) {
+    processFile(process.stdin)
+} else if (args.file) {
+    const stream = fs.createReadStream(path.join(BASE_PATH, args.file));
+    processFile(stream); 
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+function processFile(inStream) { 
+
+    let outStream = inStream;
+
+    if (args.uncompress) {
+        let gunzipStream = zlib.createGunzip();
+        outStream = outStream.pipe(gunzipStream);
+    }
+    let upperStream = new Transform({
+        transform(chunk,enc,cb) {
+            this.push(chunk.toString().toUpperCase());
+        }
+    });
+
+    outStream = outStream.pipe(upperStream);
+    
+    if (args.compress) {
+        let gzipStream = zlib.createGzip();
+        outStream = outStream.pipe(gzipStream);
+        OUTFILE = `${OUTFILE}.gz`;
+    }
+
+    let targetStream;
+    if (args.out) {
+        targetStream = process.stdout; 
+    } else {
+        targetStream = fs.createWriteSream(OUTFILE);
+    }
+    outStream.pipe(targetStream);
+}
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file"); 
+    console.log("--in, -                   process stdin");
+    console.log("--out                     print to stdout");
+    console.log("--compress                gzip the output");
+    console.log(""); 
+}
+```
+- Now we are able to unzip on the inbound, zip on the outbound, and mix and match with inputs from filesystem or from stdin.
+- if we run `./ex1.js --file-out-.txt.gz --uncompress --out` 
+
+- Internally all these streams are using binary buffers, they are just moving buffers along from pipe to pipe to pipe.
+
+## Determining End of Stream
+One of the nice parts about working with a stream, is that we kind of just fire these off and let them finish whenever. So how could we wait before doing something like printing a complete message since our streams are all asynchronous?
+
+Well what we are going to need to do is to treat `processFile` like a function that can signal to use when its has completed it's work.
+
+One way of thinkign about doing this is making it to be an async function so it gives us a promise back. We then listen for that promise...
+and then print the complete message on complete, don't forget to add a `.catch`
+```js
+else if (args.file) { 
+    const stream = fs.createReadStream(path.join(BASE_PATH, args.file));
+    processFile(stream).then(function() {
+        console.log("Complete!");
+    })
+    .catch(error);
+}
+//...
+async function processFile(inStream) {  
+    //...
+}
+```
+So how do we make `processFile` wait for the commpletion of all this streaming stuff?
+- We don't have to turn off 
+
+## Asynchronous Cancellation & Timeouts
+
+> [^ **What is one of the problems with using promises to model asynchronous behavior?**]One of the problems with using promises to model asynchrony is that they're kind of a black box from the outside, once you have a promise you have no eway of telling processFile or any of our streams, we have no way of telling them to stop doing what they're doing, like in the instance of a timeout or something. So for that reason, there's a tool KS built that will let us use asynchrony but with cancellation.
+
+## Asynchronous Q&A
+
+## Links 
+- [fsfe: Basic Basics](/fsfe-bash-basics)
+---
+**Nav**:
+- [🏠 MAIN](/)
+- [PREV ← | Introduction](/ks-digging-node-intro)
+- [NEXT → | Command Line Scripts ](/ks-digging-node-command-line-scripts)
+
+## Summary Question

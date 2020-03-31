@@ -1,0 +1,594 @@
+---
+title: Command Line Scripts | Digging into Node.js 
+date: 2020-03-28
+slug: ks-digging-node-command-line-scripts
+tags:
+    - JS
+    - Node
+    - command line
+    - streams
+    - webservers
+    - databases
+---
+
+## Setting up a Command Line Script
+We are going to set out to make a shell script, we want to write a script and actually have it execute similar to if it was a bash script (this differs between linux and windows machines)
+
+> But one of the standard conventions (if unix system) is using the **shebang comment**, `!` at the top of a file and that will tell the shell environment that when it starts to execute it, it knows what program to hand that execution off to instead of trying to interpret it as a bash script it will handle it off to something else.
+
+This is also called the **hashbang comment**, because it start with the hash `#!`
+
+> [^ **What is a trick, in Unix environments, to generically specify where to look for if you give it an  "interpreter" to find when trying to read your executable script?**]We give the hashbang a file to use for the interpretation, so we want ours to be interpreted by Node so we can give it the full path to our node program but it turns out there are differences where node gets installed, we can be a little agnostic about it by using this trick called `env`, which will be included in all of your unix distros. You give env an executable and it finds where that is for you...  
+
+`#! /usr/bin/env node` 
+
+This is saying, go find node wherever it is in my system, and use node to interpret the rest of our program.
+
+Don't forget use strict mode: `"use strict";` Usually this is always at the top, but by the time this runs, the hashbang stuff will have been stripped from the file.
+
+>[^ **What is a _shebang comment, or the _hashbang comment**?]The shebang comment sometimes also known as the hashbang comment, is always at the top of a file and that will tell the shell environment that when it starts to execute it, it knows what program to hand that execution off to instead of trying to interpret it as a bash script it will handle it off to something else.
+
+
+### Making our file an executable 
+```js
+#! /usr/bin/env node
+
+"use strict";
+
+```
+So now that we have it interpreable by the shell environment, what we want to dod is actually make it an executable.
+
+So in a unix environment, you can use the command `ls -la` to see the file permissions/descriptors within your directory. Will look something like this...
+```
+C:\Users\k\projects\digging-into-node\exercises>ls -la
+total 39
+drwxr-xr-x    5 k        Administ     4096 Mar 28 08:39 .
+drwxr-xr-x    4 k        Administ     4096 Mar 28 08:39 ..
+-rw-r--r--    1 k        Administ     6148 Mar 28 08:39 .DS_Store
+-rw-r--r--    1 k        Administ       93 Mar 28 09:18 ex1.js
+-rwxr-xr-x    1 k        Administ     1339 Mar 28 08:39 ex4.js
+-rwxr-xr-x    1 k        Administ     1967 Mar 28 08:39 ex5.js
+-rwxr-xr-x    1 k        Administ     2261 Mar 28 08:39 ex6.js
+-rw-r--r--    1 k        Administ      223 Mar 28 08:39 ex7-child.js
+-rwxr-xr-x    1 k        Administ      410 Mar 28 08:39 ex7.js
+drwxr-xr-x    2 k        Administ        0 Mar 28 08:39 files
+-rw-r--r--    1 k        Administ      302 Mar 28 08:39 mydb.sql
+drwxr-xr-x  165 k        Administ    49152 Mar 28 08:39 node_modules
+drwxr-xr-x    3 k        Administ     4096 Mar 28 08:39 web
+``` 
+If you look at `ex1` you'll notice that that it's missing the `x`, which means its can't be executed as a user, so if you don't have it you can say...
+
+> [^ **What do you need to do to make sure a file is executable?**]- **Changing permissions and making a file executable**: `chmod u+x ex1.js`. You can first check the file permissions with `ls -la` and look for the x in rwxr. 
+
+Once you have that file permission on your `ex1.js`, instead of saying `node .ex1.js` you can just say `./ex1.js` similar to how to might run any other program that might be installed on your computer. It's not an executable script.
+
+> The other thing we want to do write off the bat when working with a node/shell script is having good clean help output for these things.
+
+### Adding help output
+```js:title=ex1.js
+#! /usr/bin/env node
+
+"use strict";
+
+printHelp();
+
+// ********************
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --help");
+    console.log("");
+    console.log("--help              print this help");
+    console.log("");
+}
+
+```
+- However you want it to read, just something for you or future you who wants to use this file. Define this function and then call it.
+
+## Command Line Arguments 
+First thing we want to do is get some input into our program, but we aren't going to be using stdin yet, so the easiest way is using command line parameters. eg. `ex1.js --hello=world`
+
+We want access to those command line parameters. First thing to do this is use another of the exposures of the POSIX which is `process.argv`
+
+-`process.argv`: will be an array of all of the arguments that were passed in from the executing shell
+    - argv is the traditional name from C programming, argv for the list of arguments, and argc for the count
+
+Those first two things in this array by default are:  the location where node is installed, and then the fully qualified path to our file, so normally we don't care about those so we just slice those off...
+
+```js:title=ex1.js {5}
+#! /usr/bin/env node
+
+"use strict";
+
+console.log(process.argv.slice(2));
+// -> ['--hello=world']
+//printHelp();
+
+// ********************
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --help");
+    console.log("");
+    console.log("--help              print this help");
+    console.log("");
+}
+```
+This will give us our parameter in an array.
+
+### Using minimist 
+> [^ **What problem does the package, _minimist_, help solve for us?**]There are a bunch of different conventions for how command line arguments get specified, e.g. (two dashes) --longparamname, (one dash) -shortparamname, there is single dash with space in between, a bunch of different ways that parameters get specified. You'll notice our command line args aren't getting parsed by node, and while we could come up with regex to parse this, but instead lets just use a package called minimist.
+
+```js:title=ex1.js {5}
+#! /usr/bin/env node
+
+"use strict";
+
+const args = require("minimist")(process.argv.slice(2));
+console.log(args);
+
+// ********************
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --help");
+    console.log("");
+    console.log("--help              print this help");
+    console.log("");
+}
+```
+> - **minimist** is a package and it comes in as a function, so we can add `()` to execute that function, and we are going to tell it what array to parse which is the command line arguments. 
+
+- What comes back from that function call is our actual object that has all our args in it...
+- If we ran: `./ex1.js --hello=world -c9` we would see ... `{ _:[], hello: 'world', c:9}`
+- If you notice, it recognizes 9 is a number thats because of conventions that determines this.
+> - the underscore in the object is the overflow if there is anything else on the line, that minimist couldn't figure out what to do with. 
+
+### Passing configuration to _minimist_
+- Our config goes in as an object as the second arg to the minimist function.
+- going to let us control some of the guesses that minimist makes, e.g. things like types....
+
+```js:title=ex1.js {5-8}
+#! /usr/bin/env node
+
+"use strict";
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help"],
+    string: ["file"]
+});
+console.log(args);
+
+// ********************
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --help");
+    console.log("");
+    console.log("--help              print this help");
+    console.log("");
+}
+```
+- so by saying boolean and then giving it an array of parameters we're expecting (don't need dashes), any parameter that is called `help` just assume that's always a boolean even if it comes in with a value or not
+- We might have a different one for file parameters...
+- Now if we run something like `./ex1.js --help=foobar --file`, what we get out would be boolean for help... `{ _: [], help: true, file: ''}`
+- file comes in as an empty string
+
+## Argument Handling 
+We want to do something useful for these inputs, so let's write some logic....
+```js:title=ex1.js {10-16,20-26}
+#! /usr/bin/env node
+
+"use strict";
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help"],
+    string: ["file"]
+});
+
+if (args.help) {
+    printHelp();
+} else if (args.file) {
+    console.log(args.file);
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --help");
+    console.log("");
+    console.log("--help              print this help");
+    console.log("");
+}
+```
+-- Now, if there is a `--help`, anywhere in there even if there is other stuff it overrides everything and it says we definitely want to see the help.
+- Then, if we have something is specified as a file lets do something with that file, for now lets just print it out.
+- lastly we want to define an error condition because you didn't do whats required, let's write an error function that will handle it, and give us the option to print help with a second arg which defaults to false.
+
+### Making our `help` more useful
+```js:title=ex1.js {4,7}
+//...
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file");
+    console.log(""); 
+}
+```
+Note: Minimist has no dependencies but is relied upon by many. Barebones and gets the job done, if you want something more full featured you can use [yargs](http://yargs.js.org/), it wraps on minimist, but it can do things like auto generate your help output.
+
+## Reading Files with Path & FS Modules 
+So now that we know we can specify files as strings, well we want to treat them as files, and we know we need the full path name if we are going to do something with this file. So let's pull in another package, from node, called `path`.
+
+- minimist would be from node modules
+- path is built into node.
+
+```js:title=ex1.js {5}
+#! /usr/bin/env node
+
+"use strict";
+
+const path = require('path');
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help"],
+    string: ["file"]
+});
+
+if (args.help) {
+    printHelp();
+} else if (args.file) {
+    let filePath = path.resolve(args.file);
+    console.log(args.file);
+} else {
+    error("Incorrect usage.", true);
+}
+```
+- path has a number of different methods, we want to look at `path.resolve`
+- it will print this out, if we said `./ex1.js --file=hello`, its implying there should be a file at this absolute location, not whether or not the file actually exists....  
+`/Users/getify/Desktop/digging-into-node/exercises/hello`
+- The default behavior of path, is that if we give it a relative path it tries for the absolute path of that file. 
+- ⚠️ Notice this is just a string operation, doesn't actually tell us if the file exists or not.
+
+- Another property to look at is `__dirname` it's a magical variable that is available in all our node programs and it tells us the current directory of the current file we are accessing it in. So `path.resolve` is saying, if you don't give me something that is absolute, I'm gonna go ahead and make ti relative to current `__dirname`.
+
+If we give it an absolute path like `/tmp/hello` it doesn't use `__dirname`, it only uses dirname if we give it a relative path.
+
+### Accessing a file 
+So now that we have a path, we can access a file, but we first need a module, the fs module.
+`var fs = require('fs');`
+
+```js:title=ex1.js {6,16,23-25}
+#! /usr/bin/env node
+
+"use strict";
+
+const path = require('path');
+const fs = require('fs');
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help"],
+    string: ["file"]
+});
+
+if (args.help) {
+    printHelp();
+} else if (args.file) {
+    processFile(path.resolve(args.file));
+    console.log(args.file);
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+function processFile(filepath) {
+    const contents = fs.readFileSync(filepath);
+    console.log(contents);
+}
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file");
+    console.log(""); 
+}
+```
+So what do we want to do with our file path? We want to get the contents of the file.
+
+- `var contents = fs.readFileSync(filepath);`
+    - notice sync we are making this synchronous
+- `console.log(contents);`
+
+If you run this you will not see the contents of the file but instead, the stringification of a binary buffer....  
+`<Buffer 48 29 f9 d2 92 fd 0a ...>`
+
+- That's because by default, the readFile and most other I/O commands they're assuming these low level binary buffers, not assuming you want to reresent things as strings.
+
+If instead we said something like, `process.stdout.write(contents)`, now we're passing not a stream but a buffer direclty to `process.stdout.write`, and if we run this, you see that we pass the binary buffer directly to the shell, the shell knew what to do with those bytes, and it translated them into characters.
+
+The reason that the previous example didn't work is that by the time it got to the shell, console log, had already stringified it into those characters that you say, it wasn't passing along a buffer, it was passing along a string of charcters that said 'Buffer 48 29' whatever.
+
+> So when we want to pass along a buffer we've got to make sure we are actually dealing with a buffer and not something that's going to turn it into a string first.
+
+That's why when we were talking about console.log earlier in how its different, this is one of those ways, it trys to do some processing on these values. Console.log does a lot of extra value processing, and when we don't want a lot of that extra processing thats when we want `process.stdout.write`. In this case is what we want.
+
+Another thing we could have done, is specify the type of encoding in the readFile...  
+`fs.readFileSync(contents, 'utf-8');`
+
+> [^ **What is something to keep in mind when dealing with input/output of data, as an example using encoding types when we are reading a file and then ultimately trying to write to stdout?**]If we run this, nothing really changes, however there is a slight performance difference, because now what we've handed over to our Node program to the shell environment, is a pre-processed string, which is slightyly less efficient by like microseconds, then handing it a stream of binary data.
+
+## Asynchronous `readFile` 
+>- Notice we are using `readFileSync`, synchronous is really easy to use, but one of the reasons Node was designed was to be asynchronous as much as possible (not entirely true since from the beginning, Node has a synchronous require).
+
+> The truth is that Node kind of says, everything that is not part of the startup should be asynchronous. But in a command line script, everything is part of the startup basically. So technically it doesn't matter if we stay synchronous in this exercise. The chances of us running thousands of instances of our cl script all at the same time all against the same file system and blocking each other are pretty slim.
+
+Let's get practice writing asynchronous code, we can do so by just taking off the `Sync` part...
+
+```js
+function processFile(filepath) {
+    const contents = fs.readFile(filepath, function onContents(err, contents) {
+        if (err) {
+            error(err.toString())
+        } else {
+            contents = contents.toString().toUpperCase();
+            process.stdout.write(contents);
+        }
+    });
+    console.log(contents);
+}
+```
+- asynchronous form expects a callback, node also uses a standard for callback sigatures that the first parameter of any callbacks is the error parameter, typically named err. And we always need to check to make sure there wasn't an error.
+- Notice, `err` here is going to be another object, so we need to call `toString()` on it to get something readable. 
+
+## Processing File Contents 
+Now dumping the contents of a file isn't particularly interesting, so we want to do something more interesting with it, so let's uppercase everything.
+
+Remember, that `contents` is going to be a buffer and we can't exactly uppercase a buffer, we have to first turn it into a string.
+```js
+contents = contents.toString().toUpperCase();
+```
+You can even do the 1MB file of lorem ipsum text. Think about what happens, we are pulling that whole file as a binary buffer turned it into a string, and then we made a third representation of it by uppercasing it, and then we wrote a string out which had to abstract it as a string back into binary buffer to go out to the POSIX system. Not very efficient, foreshadowing to streams. You don't want to be pulling everything into memory all at once, you want to be processsing things a little bit at a time.
+ 
+## Processing Input from `stdin` 
+Let's add two packages, a built in node one: util and a package called get-stdin.
+```js
+const util = require('util');
+const getStdin = require('get-stdin');
+```
+So we want to be able to support not only telling you a file by name, but also we want our program to receive the file inputs on the stardard in stream.
+
+We need some way of indicating this to our program on a command line paramter we need some flag to tell it, hey get your stuff from stdin instead of trying to look for it in the file, so add a boolean flag: in.... `boolean: ["help", "in"],`
+and then we will handle in with another `else if`.
+
+
+You'll notice that we want to call processFile, but we might want to pass it something not just a string path, we might want to pass it the contents of the file, as we now have two possible sources:  the file or from stdin.
+
+We are going to move most of the logic out of our `processFile` funtion into the `else if`...
+
+```js:title=ex1.js {5,6,11,17-19,21,23-28,36,37,54}
+#! /usr/bin/env node
+
+"use strict";
+
+const util = require('util');
+const getStdin = require('get-stdin');
+const path = require('path');
+const fs = require('fs');
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help", "in"],
+    string: ["file"]
+});
+
+if (args.help) {
+    printHelp();
+} else if (
+    args.in || 
+    args._.includes("-")
+) {
+    getStdin().then(processFile).catch(error);
+} else if (args.file) {
+    fs.readFile(path.resolve(args.file), function onContents(err, contents) {
+        if (err) {
+            error(err.toString())
+        } else {
+            processFile(contents.toString()); 
+        }
+    }); 
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+function processFile(contents) { 
+    contents = contents.toUpperCase();
+    process.stdout.write(contents);
+}
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file"); 
+    console.log("--in, -                   process stdin");
+    console.log(""); 
+}
+```
+- This should work the same as before 
+- In our else if handling stdin, we are going to calle the function `getStdin`, and this is a promise returning mechanism. So our first look at asynchrony without callbacks, it's going to resolve a promise with all the contents, that it got from the stardard in, it'll capture it and resolve it.
+- `getStdin().then()`
+    - in our `then` we will know we have our contents at this point (not exactly, but helpful to think of it like in this synchronous manner)... 
+        - `getStdin().then(processFile).catch(error)`
+
+### Handling `-` as additional stdin 
+One other common convention within "parameter speak", is that if you have a hypen a single hypen at the end of the line, that's a way of saying, hey I want standard in to handle the rest of the inputs, we want to handle that and we know that minimist doesn't know how to process this single hypen so we will... say this....
+```js
+else if (
+    args.in ||
+    args._.includes("-")
+) { 
+    getStdin().then(processFile).catch(error);
+}
+```
+### Update `--help` to include `in` and `-`
+Let's also update our `--help`
+```js 
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file");
+    console.log("--in, -                   process stdin");
+    console.log(""); 
+}
+```
+So running this again it should work as expected. However, let's try it with stdin...  
+`$ cat files/hello.txt | ./ex1.js --in`  
+`--> HELLO WORLD` 
+
+Let's use the built in command `cat` which is going to grab the contents of the hello.txt file, then we are going to pipe that information using the `|` operator into our executable and give it the flag telling it to expect from stdin and now it works, same as if we had a single hypen at the end.
+
+### So what is `stdin`?
+> [^ **⭐ What is `stdin`**?]What is **standard in**?   
+> ⭐ If `stdout` is our output stream where we're pushing from our program back out to the shell. Standard in, `stdin`, is the stream of any contents that are currently in the buffer of our shell that are going to go into the next program. So when we do a pipe command, here is, anything that this `cat` command created as a *standard output*, it would normally just be dumped into the shell, but if we pipe it, that's saying, turn the ouput into an input stream, and we're basically saying take that input stream and pipe it directly into this program (ex1, which we now have code for how to handle stdin.).
+
+ 
+## Environment Variables
+So far we've seen input coming in from files and from stdin. There is another way we can get inputs and that is from **environment variables**. This is one of the ones that can change if youre using unix/windows system.
+
+If you want to set an [**environment variable**](), it's a variable that would be automatically available to a program, which is kind of like a global variable.
+
+But if you want to set env var on a per command basis, you basically just prefix something, `HELLO=WORLD ./ex1.js`, this would set an environemnt variable for our shell environment called HELLo with the value WORLD, but only for this command and then it goes away.
+
+Now these are typically used to configure a develoment versus a production environmentor paths or things like that, but there are a lot of different ways you might want to configure a program via environment variables.]
+
+If we ran that `HELLO=WORLD` bit our program right now, it won't do anything... let's handle that in an if statement...
+```js
+if (process.env.HELLO) {
+    console.log(process.env.HELLO);
+}
+```
+- Now if we run `HELLO=WORLD ./ex1.js` it will print out WORLD.
+
+For our case, we can use this to configure a base file path.
+
+We want a default base path to `__dirname` unless this process.env has been set, so...
+```js
+const BASE_PATH = path.resolve(
+    process.env.BASE_PATH || __dirname
+);
+```
+
+Then over in our `else if (args.file)` instead of using `path.resolve` we will use `path.join`, which will take any number of inputs, and use the appropriate directory separator given your platform (/ or \ for windows). 
+
+Now we can say `fs.readFile(path.join(BASE_PATH, args.file),...)`
+
+So if we say... `BASE_PATH=files/ ./ext1 --file=hello.txt`
+So now it will know to look for the `hello.txt` file in the base path we provided. 
+
+```js:title=ex1.js {15-17,27}
+#! /usr/bin/env node
+
+"use strict";
+
+const util = require('util');
+const getStdin = require('get-stdin');
+const path = require('path');
+const fs = require('fs');
+
+const args = require("minimist")(process.argv.slice(2), {
+    boolean: ["help", "in"],
+    string: ["file"]
+});
+
+const BASE_PATH = path.resolve(
+    process.env.BASE_PATH || __dirname
+); 
+
+if (args.help) {
+    printHelp();
+} else if (
+    args.in || 
+    args._.includes("-")
+) {
+    getStdin().then(processFile).catch(error);
+} else if (args.file) {
+    fs.readFile(path.join(BASE_PATH, args.file), function onContents(err, contents) {
+        if (err) {
+            error(err.toString())
+        } else {
+            processFile(contents.toString()); 
+        }
+    }); 
+} else {
+    error("Incorrect usage.", true);
+}
+ 
+// ********************
+function processFile(contents) { 
+    contents = contents.toUpperCase();
+    process.stdout.write(contents);
+}
+
+function error(msg, includeHelp = false) {
+    console.error(msg);
+    if (includeHelp) {
+        console.log("");
+        printHelp();
+    }
+}
+
+function printHelp() {
+    console.log("ex1 usage:")
+    console.log("   ex1.js --file={FILENAME}");
+    console.log("");
+    console.log("--help                    print this help");
+    console.log("--file={FILENAME}         process the file"); 
+    console.log("--in, -                   process stdin");
+    console.log(""); 
+}
+```
+
+## Links 
+- [fsfe: Basic Basics](/fsfe-bash-basics)
+- [Traversy Node](/traversy-nodejs-crash-course)
+---
+**Nav**:
+- [🏠 MAIN](/)
+- [PREV ← | Introduction](/ks-digging-node-intro)
+- [NEXT → | Streams ](/ks-digging-node-streams)
+
+## Summary Questions

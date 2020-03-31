@@ -1,0 +1,149 @@
+---
+title: 📑 Introduction | Digging into Node.js 
+date: 2020-03-28
+slug: ks-digging-node-intro
+tags:
+    - JS
+    - Node
+    - command line
+    - streams
+    - webservers
+    - databases
+---
+
+## Course Summary 
+Node.js has taken the JavaScript world by storm, but where do you start when all you see are tens of thousands of packages/frameworks on npm? The best place to start is always at the foundation, and that's what this course focuses on. In this course, you’ll get to know the fundamental concepts in Node.js: CLI programming, file system access, asynchrony, streams, HTTP servers & routing, database persistence, and child processes.
+
+Published: July 9, 2019
+
+## Contents
+- [Introduction]()
+- [Command Line Scripts](ks-digging-node-command-line-scripts)
+- [Streams]()
+- [Database]()
+- [Web Servers]()
+- [Child Process]()
+- [Debugging]()
+
+## Introduction 
+- Node helps with reducing context switching and the mental energy that goes into switching between languages for the front and backend.
+- Why were we building systems where the backend determines/limits what you can do in the frontend. 
+    - KS provides form submit example, where Django didn't expect arrays.
+
+## The Middle End
+- The idea of KS, the DMZ between the frontend and backend.
+- All the stuff that sits between the browswer and the server. 
+- These were the thoughts of KS in 2008-2009, wanted to put JS on the server, pre-Node, (Bike-chain was his kind of version of Node)
+> - I think the important perspective here is thinking of Node as a kind of Middle End right. Because itself, Node isn't dealing with full back / bare-metal management. It needs V8 to write the bindings and provide the space between. In a way, Node is that kind of Middle-end. We aren't writing cypto/network/io operations ourselves we are getting "facade" functions as WS likes to say, for manipulating those operations in the flavor of JS. 
+ 
+## Node Perspective
+If you thinkf of Node as just server-side JS, that sort of betrays its history.
+
+- Back in 2008 early repo history wasn't even "Nodejs".
+- Ryan set out to build high-throughput, low-latency socket servers, his idea what we might call liek nano or microservices. His idea of system architecture was that you had a bunch of tiny single purpose socket services that all communicated to each other through very efficient network communications.
+- He originally built it in Ruby, but quickly realized he needed the concept of an Event Loop to make it all work
+- He tried to build an event loop in Ruby, realized he could get it for free in JS. Rewrote everything in JS.
+
+The reason Node is so compelling it was the first time we got a really strong argument for how asynchronous communication (i/o bound tasks) should be modeled, and specifically they should be modeled with JavaScript.
+
+> When we talk about [**I/O bound tasks**](), we are talking about tasks that use the I/O subsystems of the computer, for example, reading/writing from a disk, making network connections, that sort of thing. i/o bound tasks usually 3x-5x times slower than CPU bound tasks.
+
+As opposed to **CPU bound tasks** which are literally just in the CPU. 
+
+The prevailing idea was the way you handle concurrency was with threads.
+
+Well threads are pretty good for modeling things that are CPU bound tasks, that can take advantage of massive parallelism across a bunch of cores. 
+
+KS believes, because of Node that the asynchronous event loop is a much more compelling model for i/o bound tasks.
+
+> This is the reason, that KS believes why Node took off and had companies rewrite with Node, was that there are some really compelling benefits when you think about modeling *high throughput, low-latency I/O communications* the way Node does it.
+
+Could you do a lot of CPU bound tasks with Node? Sure, but if you're doing a lot of computation heavy work, then Node probably isn't the right choice for job, but again, if you're doing a lot of *high-thoroughput, low-latency I/O tasks, and you're not using Node, then you might be doing it wrong*. 
+
+KS believes Node's best adoption into an existing stack is to be used as a middle-end proxy, a touch point between any front end and whatever your back end system is.  
+
+## Console Log & Process stdout 
+KS go to when needing to write bash/system level scripts is to just write in JS and run it with Node, which is where we are going to start.
+
+### How do we get information in/out of our program?
+- Node is all about modeling i/o in an efficient way, that means we need to understand i/o.
+
+- to get 'hello world', we could do console.log, but how does that even get printed to the screen?
+ 
+We're going to go deeper than just an API, console.log, we need to understand a standard for I/O and system integration and system level task calling , called **POSIX**. 
+
+> [^ **What is _POSIX_?**][**POSIX**](): The Portable Operating System Interface (POSIX) is a family of standards specified by the IEEE Computer Society for maintaining compatibility between operating systems. POSIX defines the application programming interface (API), along with command line shells and utility interfaces, for software compatibility with variants of Unix and other operating systems. 
+
+> [^ ⭐**What is POSIX in relation to programs/applications we might write?**]⭐POSIX is essentially the way that C-style programs integrate with Linux-style operating systems.  
+
+So when talk aboue POSIX, the main things we're talking about is the **standard I/O subsystem**. [**Standard I/O**]() is a set of three streams that model input and ouput to a program. 
+
+If you've ever written a C program, you might remember reading and writing from file descriptors like 0,1,and 2. That's the POSIX subsystem being exposed to your C program by way of these file identifiers or file descriptors: 0 being stdin, 1 being stdout, 2 being stderr. 
+
+So we have these **file descriptors** that reference input, output, and a second channel of output called error.
+
+### So how would we access those I/O streams that are exposed to our Node program? 
+(Because Node made the choice to expose most of the systems level connections through a POSIX-like interface).
+> [^ **How do we access those I/O streams that are exposed to our Node program?**]Well the main touch point that we're going to access them on is called `process`.
+
+> - `process` is an object that's available in all of your Node programs. And they hang a bunch of stuff off of process that are connections to your overall hosting system. 
+
+BTW, we keep saying this I/O thing b/c we have to deal with POSIX. You should be aware that the reason we have Node choosing to do with POSIX, but we don't write something like `process` in the browser, is b/c JS does not have anything in the spec for I/O. Console.log is not the JS spec (its in a secondary spec of its own). **JS is agnostic to I/O**. KS posits the reason JS is so successful across multiple platforms is for the fact that it is I/O agnostic and leaves it up to the environment to decide that.
+
+It makes sense Node went with a POSIX like interface, b/c we are typically going to be using it in POSIX like environemnts, with processes and process ids. 
+
+console.log is implemented differently in the browswer, than node, and its a difference based on hosting environment exposing the I/O.
+
+### stdout 
+> So to access the stream for standard output we can say, `process.stdout`
+
+> [^ **What are streams?**]And [**streams**]() are a first-class citizen, they are an actual kind of data structure in Node that we're going to get more familiiar with throughout the day.
+
+> [^ **What is the command for writing to a stream?**]Our first exposure to it is, if you want to write some content to a stream you call `.write`... 
+```js
+process.stdout.write("Hello world")
+
+//console.log('Hello world');
+```
+If we compare these two, you might notice a difference, and that is that `process.stdout.write('Hello world')` didn't include a trailing newline. 
+
+So one way you might think of it is that `console.log()` is a wrapper around `process.stdout.write()` that throws on a newline, that's not actually accurate as its doing a bunch of other things, but in a simple way we can think of it as being similar. 
+
+The reason to make the point about accessing these output streams in a bare way, is that the whole point of Nose using this asynchronous I/O model is so that that I/O can happen as efficiently as possible. And the least efficient way for I/O to happen is for you to print character strings directly to some stream. So `process.stdout.write` is the least efficient way for that to possibly happen. Because it has to go through some layers of translation to end up in the shell and being printed, there are layers of abstraction converting it.
+ 
+- prefer Binary buffer streams over character encoding since our goal is efficiency.
+ 
+## Console Error & Process stderr 
+```js
+console.log("Hello world");
+console.error("Oops");
+```
+We also have `console.error`.
+- log and error are going to direct themselves to two different i/o streams, one to stdout and the other to stderr.
+If we run this program, they seem to output the same as we'd expect.
+- But they are actually different, we can prove this by running file redirection with `>`.
+```bash 
+$ node ex1.js 1>/dev/null 
+```
+- we are going to redirect a file descriptor, let's redirect the 1(stdout) descriptor to `/dev/null/` (a thing on linux/mac which is basically a bit trashcan, everything that goes there just gets thrown away), so if we say `1>/dev/null`. You'll notice Hello world doesn't get printed, if you did `2>/dev/null` it will print Hello world and not Oops.
+
+Under the hood a lot of these redirets are happening to different log files.
+
+### Input streams
+We've looked at out and err, the other is in, the input stream.
+
+We could in theory access that stream, by saying `process.stdin.read` and read a character off the bit stream. Input streams are much more finicky that output streams, they are effected by a ton of other things, variables. 
+
+## Key Insights
+- Really intersting to get a bit of the history of RD writing Node in Ruby but also understanding the key feature of making things work being the Event Loop.
+
+- Helpful to get clarity on POSIX being the go-between set of standards for communicating between linux/OS systems related processing and our C-flavored language which would sit above this.
+
+## Links 
+- [fsfe: Basic Basics](/fsfe-bash-basics)
+---
+**Nav**:
+- [🏠 MAIN](/)
+- [NEXT → | Command Line Scripts ](/ks-digging-node-command-line-scripts)
+
+## Summary Questions 
