@@ -1,0 +1,205 @@
+---
+title: Databases | Digging into Node.js 
+date: 2020-03-31
+slug: ks-digging-node-databases
+tags:
+    - JS
+    - Node
+    - command line
+    - streams
+    - webservers
+    - databases
+---
+## Database & Exercise Setup
+Here, we'll be working on ex4, and our goal here is to use a DB to store data and pull some data out. 
+- We are going to be using sqlite3, the reason for this is we don't have to run a separate server for this.
+- our sqlite "file" is maintained directly by our application
+- keeps our data in flat binary file format right where we are working, locally. 
+- it's not the kind of db where youre going to run on a separate machine, and have 15 different master/slave, replications, whatever, but if you just need to build an application, and persist a little data and have some relational SQL access to it then sqlite is actually a strong powerful option.
+- Browsers actually have sqlite built into them, and its a tool the can be used in production based on use case/needs.
+
+Command to install is : `npm install sqlite3`
+
+Note: I was having an issue with this running on bash subshell. Removed an installation of node-pre-gryp and it fixed it. Another note on `console.table`, Node 10+ has this by default, if you this isn't working b/c of a lower version of node, then just `require('console.table')`
+
+In our `mydb.sql` file is our schema, so uncomment this out so that it runs this sql statements and save it.
+
+Then over in ex4.
+```js:title=ex4.js
+#!/usr/bin/env node
+
+"use strict";
+
+var util = require("util");
+var path = require("path");
+var fs = require("fs");
+
+var sqlite3 = require("sqlite3");
+// require("console.table");
+
+
+// ************************************
+
+const DB_PATH = path.join(__dirname,"my.db");
+const DB_SQL_PATH = path.join(__dirname,"mydb.sql");
+
+var args = require("minimist")(process.argv.slice(2),{
+	string: ["other",],
+});
+
+main().catch(console.error);
+
+
+// ************************************
+
+var SQL3;
+
+async function main() {
+	if (!args.other) {
+		error("Missing '--other=..'");
+		return;
+	}
+
+	// define some SQLite3 database helpers
+	var myDB = new sqlite3.Database(DB_PATH);
+	SQL3 = {
+		run(...args) {
+			return new Promise(function c(resolve,reject){
+				myDB.run(...args,function onResult(err){
+					if (err) reject(err);
+					else resolve(this);
+				});
+			});
+		},
+        //These are all callback expection functions wrapped with promisify
+		get: util.promisify(myDB.get.bind(myDB)),
+		all: util.promisify(myDB.all.bind(myDB)),
+		exec: util.promisify(myDB.exec.bind(myDB)),
+	};
+
+	var initSQL = fs.readFileSync(DB_SQL_PATH,"utf-8");
+	// TODO: initialize the DB structure
+
+
+	var other = args.other;
+	var something = Math.trunc(Math.random() * 1E9);
+
+	// ***********
+
+	// TODO: insert values and print all records
+
+	error("Oops!");
+}
+
+function error(err) {
+	if (err) {
+		console.error(err.toString());
+		console.log("");
+	}
+}
+```
+- Line 46 is interesting in that it's using a native module, that promisifies, a callback expecting function to make it instead a promise, so it can have a promise interface.
+- So in these lines we are essentially just making promise based interfaces around our sqlite 3 apis
+
+The first thing we need to do is load initSQL, that file we need to load it because we're just going to do a single file we're using Sync.
+- We need to init that SQL against our database... `await SQL3.exec(initSQL);`, we have to add await since its in an async function.
+
+## Read & Write from Database 
+- `other` is just going to be a text base command line argument we supply 
+- `something` will be a random number generated. 
+
+The first thing we want to do is check of that `other` that we have been provided is already in the database or not. If its not we need to insert it, if it is we need to get its ID.
+
+Let's make a function called, `insertOrLookupOther(other)`. This is going to be an asynchronous operation, so we have to prefix `async` on it, and the thing we're going to be getting back is the `otherID`, whether we have to make a new record or we just looked it up.
+
+```js:title=ex4.js
+#!/usr/bin/env node
+
+"use strict";
+
+var util = require("util");
+var path = require("path");
+var fs = require("fs");
+
+var sqlite3 = require("sqlite3");
+// require("console.table");
+
+
+// ************************************
+
+const DB_PATH = path.join(__dirname,"my.db");
+const DB_SQL_PATH = path.join(__dirname,"mydb.sql");
+
+var args = require("minimist")(process.argv.slice(2),{
+	string: ["other",],
+});
+
+main().catch(console.error);
+
+
+// ************************************
+
+var SQL3;
+
+async function main() {
+	if (!args.other) {
+		error("Missing '--other=..'");
+		return;
+	}
+
+	// define some SQLite3 database helpers
+	var myDB = new sqlite3.Database(DB_PATH);
+	SQL3 = {
+		run(...args) {
+			return new Promise(function c(resolve,reject){
+				myDB.run(...args,function onResult(err){
+					if (err) reject(err);
+					else resolve(this);
+				});
+			});
+		},
+        //These are all callback expection functions wrapped with promisify
+		get: util.promisify(myDB.get.bind(myDB)),
+		all: util.promisify(myDB.all.bind(myDB)),
+		exec: util.promisify(myDB.exec.bind(myDB)),
+	};
+
+	var initSQL = fs.readFileSync(DB_SQL_PATH,"utf-8");
+	// TODO: initialize the DB structure
+
+
+	var other = args.other;
+	var something = Math.trunc(Math.random() * 1E9);
+
+	// ***********
+
+	// TODO: insert values and print all records
+
+	//error("Oops!");
+}
+
+async function insertOrLoopupOther(other) {
+
+}
+
+function error(err) {
+	if (err) {
+		console.error(err.toString());
+		console.log("");
+	}
+}
+```
+
+
+## Insert into Database Exercise
+## Insert into Database Solution
+## Get Database Records
+## Links 
+- [fsfe: Basic Basics](/fsfe-bash-basics)
+---
+**Nav**:
+- [🏠 MAIN](/)
+- [PREV ← | Stream ](/ks-digging-node-streams)
+- [NEXT → | Databases ](/ks-digging-node-databases)
+
+## Summary Question
