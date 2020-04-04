@@ -1,0 +1,27 @@
+---
+title: pipeLog - JavaScript helper function (30 seconds of code)
+date: 2020-02-17
+slug: 30sec-js-pipelog
+tags:
+  - 30soc
+  - JS
+  - Math
+---
+
+## `pipeLog`
+`pipeLog` is a function that logs a value and returns it.
+
+Use the `console.log` to log the supplied value, combined with the `||` operator to return it.
+
+```js
+const pipeLog = data => console.log(data) || data;
+
+// Examples
+pipeLog(1);
+// logs 1 and returns 1 
+```
+
+## Thoughts
+This works because `console.log` itself returns `undefined`, since we are using it primarily for it's side effect of logging something to the console. The `or` operator defaults to the returning the data since this is an arrow function with one line.
+
+
