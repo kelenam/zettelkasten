@@ -1,0 +1,525 @@
+---
+title: Golang Crash Course | Traversy
+date: 2020-04-07
+slug: traversy-golang-crash-course
+tags:
+  - Golang
+  - Basics
+---
+
+## Installing
+https://golang.org/dl/
+
+- Pretty optinated for code organization/workspace
+- typically keep all go code in a single workspace 
+- `go get` is the dependency manager/command for go packages 
+
+### Workspaces
+- workspaces should have a `src` and a `bin` folder.
+```
+go (workspace)
+    - bin
+    - src   
+        - github.com
+            traversy    
+                -go_project_1
+                    #project files
+                -go_project_2
+                    #project files
+    -pkg
+```
+- within src, is going to be whatever version control of your choice, beneath, that is your git username, and below that projects and their corresponding files.
+- When you install a package if its hosted on github it will actually be put into this github folder.
+
+### Creating a workspace
+`go env` will show us our environment, look at the GOPATH, which by default will be your home dir, you can change it to whatever, but you need to make sure you set the GOPATH for a specific workspace origin.
+
+In your root, make new dir, call it whatever, then within `mkdir bin src` and within src create `github.com` dir, then make a dir with your username, then cd into it to create our project.mkdir go_crash_course. 
+
+### Using `go get`
+- Go over to godocs.org, and grab, the aws package as an example.
+- `go get github.com/aws/aws-sdk-go/aws` as an example, it's like an npm install
+- doesn't matter where you are in the terminal, you can run this from anywhere.
+
+If we go to our workspace you'll notice that it created a pkg folder, but if we look in `src` , we also have that `aws` package that we installed. Because it came from github it's going to be put into the github folder. The structure is very opinionated.
+
+Now in our project folder, go ahead and create folder called 01_hello, and then a file `main.go`.
+
+- `main` is the common convention for the entry point for the main file, it's like index.html.
+- once in this file you can see thewre might be some package recommendations, if not click analysis tools missing in the bottom right of vscode editor, and install those packages that will help us out.
+
+## Hello World
+Creating our first file. In go you have a function called `main` and it runs automatically, kind of like Java/C#.
+
+- To use `main` have to do `package main` at the top of the file.
+- We have to declare the function with `func main()`, and this will run automatically.
+- To print something, we actually need to import a package called `fmt`, that gives us a few methods for printing things to the screen: `import "fmt"`
+    - ⭐ Whenever you are importing, you want to use double quotes, you'll get an error if you use single quotes.
+- Print will just do an inline, won't linebreak, so let's use Println to get that linebreak, then in there let's put our hello world. 
+```go
+package main
+
+import "fmt"
+
+main() {
+    fmt.Println("Hello world")
+}
+```
+Now to run this (we need to be in the right dir), and run the `go run [filename]`, which in our case is going to look like `go run main.go`. 
+
+### Compiling and creating a binary
+> So to get an executable binary, all we need to do is run `go install`, we won't get any output in our project dir, but if go over to our workspace and into the go folder, in that `bin` dir, there will be a 01_hello file that we can actually run from the terminal with `./01_hello`. 
+
+It's that easy to create and compile and executable with go.
+
+## Variable & Types
+So let's create a new folder 02_vars and talk a bit about data types.
+Here is a quick overview of most of the types in Go
+```
+// MAIN TYPES 
+// string
+// bool
+// int 
+// int8 int16 int32 int64
+// uint uint8 uint16 uint32 uint64 uintptr 
+// byte - alias for uint8
+// rune - alias for int32
+// float32 float64
+// complex64 complex128
+```
+- float64 is the one we usually use for floats
+- uints are just unsigned (non negative) values
+- and complex are for really large numbers
+
+### Creating variables
+There are a few ways to create variables, the first is using `var` keyword.  
+`var name string = "Brad"`
+- ⭐Use double quotes, no semicolons
+- green underline means type inferred, so we don't need `string`
+- we will error out if we never use a variable that was declared
+
+### Getting the typ
+- `fmt.Printf("")`, Printf will take a format receiver, we can use "verbs"/format pointers like `%T` to find the type of a value, `fmt.Printf("%T\n", name)`
+```go
+package main
+
+import "fmt"
+
+func main() {
+    var name = "Brad"
+    var age int = 37
+    fmt.Println("%T\n", name)
+    // --> string
+}
+```
+
+### `const`
+`const` is a constant, that can't be reassigned, very much like in ES6.
+
+### Other way to declar variables
+This is the shorthand method and **can only be used within a function**
+- Note: you can declare global variables outside the `main` function.
+
+The shorthand for variable declaration that only works inside functions looks like this...
+```go
+func main() {
+    //shorthand 
+    name := "Brad"
+
+    size := 1.3
+
+    var size float32 = 2.3
+
+    name := "Brad"
+    email := "Brad@gmail.com"
+
+    name, email := "Brad", "Brad@gmail.com"
+    //...
+
+}
+```
+- floats default to 64 unless you specify
+- we can make our shorthand even shorter, if we are declaring two things at the same time separated by commas like name and email above.
+
+## Packages 
+- ⭐If you're importing more than one package, you want to wrap your import in parens, `import ("fmt" "math")`
+    - no commas to separate packages, but spaces instead, and the convention is to have each package be newlined.
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+func main() {
+    fmt.Println(math.floor(2.7))
+    // 2
+    fmt.Println(math.Ceil(2.7))
+    // 3
+    fmt.print(math.Sqrt(16))
+    // 4
+}
+```
+
+### Creating our own packages
+We can create our own packages, create a new folder called `strutil` and a new file called `reverse.go` which will be a function that returns a reversed string...
+```go
+package strutil
+
+func Reverse(s string) string {
+    runes := []rune(s)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    return string(runes)
+}
+```
+Now we should be able to import this homemade package, we want to start from the src folder so `"github.com/username/go_crash_course/03_packages/strutil"`, now in our main.go file...
+```go:title=04_functions/main.go 
+package main
+
+import (
+    "fmt"
+    "math"
+    "github.com/username/go_crash_course/03_packages/strutil"
+)
+
+func main() {
+    fmt.Println(math.floor(2.7))
+    // 2
+    fmt.Println(math.Ceil(2.7))
+    // 3
+    fmt.Println(math.Sqrt(16))
+    // 4
+    fmt.Println(strutil.Reverse("olleh"))
+    // hello 
+}
+```
+You can also use `go get` to install packages and import them the same way we've done above.
+
+## functions
+```go
+package main
+
+import "fmt"
+
+func greeting(name string) string {
+    return "Hello " + name 
+}
+
+func getSum(num1 int, num2 int) int {
+    return num1 + num2
+}
+
+func main() { 
+    fmt.Println(greeting("Brad"))
+    fmt.Println(getSum(3,4 ))
+}
+```
+- similar to js for function declarations and string concat. 
+- we specify parameter type and return type.
+- we have to wrap in Println since this function is just returning a value
+
+We can use a shorthand for params if they share the same type: `func getSum(num1, num2 int)`
+
+## Arrays / Slices
+In Go, your arrays have to be a fixed length and you have to name the types as well.
+```go:title=05_arrays_slices/main.go 
+package main
+
+import (
+    "fmt" 
+)
+
+func main() {
+    // Arrays
+    var fruitArr [2]string 
+
+    // Assign values
+    fruitArr[0] = "Apple"
+    fruitArr[1] = "Orange"
+    fmt.Println(fruitArr)
+}
+```
+You might not always know the # of values will be in our array which is where slices come in, [**slices**]() are basically arrays that don't have a fixed number of values.
+
+If we want to specify a certain index we of course can do something like, `fruitArr[1]`
+
+- Arrays are 0 based in Go.
+
+### Array shorthand
+We can also declared and assign arrays at the same time...
+```go:title=05_arrays_slices/main.go 
+package main
+
+import (
+    "fmt" 
+)
+
+func main() {
+    // Arrays
+    // var fruitArr [2]string 
+
+    // // Assign values
+    // fruitArr[0] = "Apple"
+    // fruitArr[1] = "Orange"
+    // fmt.Println(fruitArr)
+
+    //Declare and assign
+    fruitArr := [2]string{"Apple", "Orange"}
+    fmt.Println(fruitArr)
+}
+```
+- The shorthand makes use of curly braces following type declaration
+
+### Slices
+Slices are pretty much the same thing minus the count of values so `[]` instead of `[2]`
+```go:title=05_arrays_slices/main.go 
+package main
+
+import (
+    "fmt" 
+)
+
+func main() {
+    fruitSlice := []string{"Apple", "Orange", "Grape"}
+    fmt.Println(fruitSlice)
+
+    fmt.Println(len(fruitSlice))
+    // --> 3
+    fmt.Println(fruitSlice[1:2])
+    // Orange 
+}
+``` 
+You can count the number of values in a slice with `len`...
+
+If you want to get a range, you can do `fruitSlice[1:2]`, and this will return `Orange`, thats because it starts at the specified index 1 and stops before the second index, if we did `fruitSlice[1:3]` we would get `[Orange Grape]`
+
+## Conditionals 
+- Very similar to other C-based langs.
+- ⭐ Common practice to not use parens for `if` statements. 
+```go:title=06_conditionals/main.go 
+package main
+
+import (
+    "fmt" 
+)
+
+func main() {
+
+    // if else 
+    x := 5 
+    y := 10
+    if x < y {
+        fmt.Printf("%d is less than %d\n", x, y)
+        // -> x is less than y
+    }
+    
+	// else if 
+	color := "red"
+
+	if color == "red" {
+		fmt.Println("Color is red")
+	} else if color == "blue" {
+		fmt.Println("Color is blue")
+	} else {
+		fmt.Println("Color is not blue or red")
+	}
+    
+    // Switch
+    switch color {
+        case "red": 
+            fmt.Println("color is red")
+        case "blue":
+            fmt.Println("color is blue")
+        default: 
+            fmt.Println("color is NOT blue or red")
+    }
+}
+```
+- %d is used for base-10 ints, which x and y are, so these act as like placeholders, 
+- the first %d is a placeholder for x and the second is placeholder for y 
+- You can use || and && for more condtionals as well in GO 
+
+## Loops
+```go 
+package main
+
+import "fmt"
+
+func main() { 
+    // Long method
+    i := 1
+    for i <= 10 {
+        fmt.Println(i)
+        i = i + 1
+    }
+
+    // Short method
+    for i := 1; i <= 10; i++ {
+        fmt.Printf("Number is %d\n", i)
+    }
+}
+```
+- There is a long way and a short way for loops,
+- `i++` works as well
+
+
+### FizzBuzz
+Here is what I came up with, if I remember the the prompt correctly
+```go
+package main
+
+import "fmt"
+
+func main() { 
+	// Long method 
+	// i := 1
+    // for i <= 10 {
+    //     fmt.Println(i)
+    //     i = i + 1
+	// }
+
+	// Short Method 
+	// for i := 1; i <= 10; i++ {
+    //     fmt.Printf("Number is %d\n", i)
+	// }
+	
+	//FizzBuzz 
+	for i := 1; i <= 40; i++ {
+		if i % 3 == 0 && i % 5 == 0 {
+			fmt.Println("FizzBuzz")
+		} else if i % 3 == 0 {
+			fmt.Println("Fizz")
+		} else if i % 5 == 0 {
+			fmt.Println("Buzz")
+		} else {
+			fmt.Printf("%d\n", i)
+		}
+	}
+ 
+}
+``` 
+## Maps
+Maps are key value pairs
+```go
+package main 
+
+import "fmt"
+
+func main() {
+    // Define map
+    emails := make(map[string]string)
+
+    // Assign kv
+    emails["bob"] = "bob@gmail.com"
+    emails["sharon"] = "sharon@gmail.com"
+    emails["mike"] = "mike@gmail.com"
+
+    fmt.Println(emails)
+    // --> map[bob:bob@gmail.com sharon:sharon@gmaiil.com mike:mike@gmail.com]
+
+    fmt.Println(emails["bob"])
+    // --> bob@gmail.com
+
+    // Delete from map
+    delete(emails, "bob")
+    fmt.Println(emails)
+    // --> would just be sharon and mike
+
+    // Declare map and add key values
+    emails := map[string]string{"Bob":"bob@gmail.com", "Sharon":"Sharon@gmail.com"}
+}
+```
+- Defiing a map we use the `make` keyword and then `map` to specify we are making a map, then the type of a the key in square bracets, and the type outside of the square bracets is the type of the value. 
+- You'd probably have an id for the map, but specifying by the name is just an example of getting values by key
+- You can also use `len` to see the length of the map
+- You can use `delete` and specify the map as the first arg and the key/value to remove by specifying the key as the second arg.
+
+You can also use the shorthand syntax of declaring and defining the map
+
+## Range 
+Used to loop through arrays/slices/Maps
+```go
+
+func main() {
+    ids := []int{33,76,54,12,11,1}
+
+    // Loop through ids
+    for i, id := range ids {
+        fmt.Printf("%d - ID: %d\n", i, id)
+    }
+
+    // Not using index
+    for _, id := range ids {
+        fmt.Printf("ID: %d\n", id)
+    }
+
+    // Add ids together
+    sum := 0
+    for _, id := range ids {
+        sum += id
+    }
+    fmt.Println("Sum", sum)
+
+    // Range with map
+    emails := map[string]string{"Bob": "bob@gmail.com", "Sharon": "sharon@gmail.com", "Mike": "mike@gmailcom"}
+
+    for k, v := range emails {
+        fmt.Printf("%s: %s\n", k,v)
+    }
+
+    // Can also just grab keys
+    for k := range emails {
+        fmt.Println("Name: " + k)
+    }
+}
+```
+- `range` keyword and specify the thing we are looping through
+- ⭐  Use `_` instead of `i` if we aren't making use of the variable
+
+## Pointers 
+```go:title=pointers
+package main 
+
+import "fmt"
+
+func main() {
+    a := 5
+    b := &a 
+
+    fmt.Println(a,b)
+    // --> 5 0xc0000012078 
+    fmt.printf("%T\n", b)
+    // --> *int because the * represents a pointer 
+
+    // Use * to read val from address
+    fmt.Println(*b)
+    // -> 5
+    fmt.Println(*&a)
+    // -> 5
+}
+```
+- Pointers let you point to the memory address of a value thats in a variable 
+- The way we do this is using `&`, in the above we are assigning b to the a pointer of a, and what we will get back is the memory address of a.
+- If we wanted to check the type of it we could use the %T as we do above 
+- If we wanted to read the value from the adddress we use the *.
+
+### Changing the value with a pointer
+We can even change the value with the pointer... `*b = 10` , we didn't set a to explictly be 10 but instead set b to be a pointer to that value and then we change it with the asterisks to be 10.
+
+The above isn't a great practical example of pointers. 
+The reason you would use pointers is because you might have to pass a lot of data stored at an address and if you choose to pass the address instead of the data it can increase performance and make things faster, it's also used to change values at specific locations.
+
+> Everything in Go is passed by value.
+
+[Left off at 1:07:51]
+
+## Closures
+## Structs
+## Interfaces
+## Web
+## Links 
+
+
