@@ -4,6 +4,7 @@ date: 2020-04-07
 slug: traversy-golang-crash-course
 tags:
   - Golang
+  - Go 
   - Basics
 ---
 
@@ -98,7 +99,7 @@ There are a few ways to create variables, the first is using `var` keyword.
 - green underline means type inferred, so we don't need `string`
 - we will error out if we never use a variable that was declared
 
-### Getting the typ
+### Getting the type
 - `fmt.Printf("")`, Printf will take a format receiver, we can use "verbs"/format pointers like `%T` to find the type of a value, `fmt.Printf("%T\n", name)`
 ```go
 package main
@@ -514,12 +515,175 @@ The reason you would use pointers is because you might have to pass a lot of dat
 
 > Everything in Go is passed by value.
 
-[Left off at 1:07:51]
-
 ## Closures
-## Structs
-## Interfaces
-## Web
-## Links 
+Go can support anonymous functions which can form closures. We can define a function inline without having to name it.
+We will create a function called `adder` which we can set a variable to and we can put it a loop and have it increment iterations contained in the closure.
+```go:title=closures 
+package main
 
+import "fmt"
+
+func adder() func(int) int {
+	sum := 0
+	return func(x int) int {
+		sum += x 
+		return sum 
+	}
+}
+func main() {
+	sum := adder() 
+	for i := 0; i < 10; i++ {
+		fmt.Println(sum(i))
+	}
+
+}
+```
+## Structs
+One of the most important parts of Go. They are basically like claseses. However...
+
+>- There are no classes in Go. You basically create structs for everything, and structs can have properties and methods associated with that struct.
+- There are two different types of methods: (1)**pointer receivers** and (2)**value receivers**
+- Syntax for declaring uses the keywords `type` and `struct`... `type Person struct { }`
+- We initialize a struct by creating a variable and assigning it to the struct name curly braces containing property names and values. 
+
+```go:title=structs 
+package main
+
+import (
+	"fmt"
+	"strconv"
+)
+// Define person struct
+type Person struct {
+	// firstName string 
+	// lastName string 
+	// city string
+	// gender string
+    // age int 
+    firstName, lastName, city, gender string
+    age                               int 
+}
+
+func (p Person) greet() string {
+	return "Hello, my name is " + p.firstName + " " + p.lastName + " and I am " + strconv.Itoa(p.age)
+}
+
+func (p *Person) hasBirthday() {
+	p.age++
+}
+
+func main() {
+	person1 := Person{firstName: "Samantha", lastName: "Smith", city: "Boston", gender: "f", age: 25}
+	person1.hasBirthday()
+	fmt.Println(person1.greet())
+}
+```
+- You can also assign without property name...	`person1 := Person{"Samantha", "Smith", "Boston", "f",25}`
+- Between the two ways, the more descriptive version can be preferred.
+- If we want to grab a single field we can access values like we would on key/values pairs on JS objects
+- You can also change values in structs like JS objects, e.g. `person.age++`
+
+### struct methods
+We have two kinds of methods: value receivers and pointer recievers. 
+- **value receivers**: are for methods that do calculations and things, they don't actually change anything.
+- **pointer recievers**: are for when you are actually changing things.
+
+> Note: our methods don't actually go inside a struct like they would a class.
+The syntax for a method is you just say, `func (p Person)`, where p is simply an identifer, it can be anything, following by the struct name, in our case Person.
+- Then we give that method a name, we'll call it greet and a return value.
+- Now the way that you access this struct instance, in this case a person, is you would use the identifier we provided, `p`, so to get the firstName of the person instance we would say `p.firstName`, `p` is a kind of stand-in for the instance like `this` would be in JS.
+- So if we tried this line, `return "Hello, my name is " + p.firstName + " " + " and I am " + p.age` we will get an error because we are getting mismatched types with our age being in int, so we can bring in a package that will convert this to a string.
+- `strconv` is the package, and the method is `Itoa` to convert ints to strings. 
+
+- The reason this method would be considered a value receiver is because we didn't change anything in our code, all we did was takes and print some values. 
+
+### pointer reciever
+Let's now write a method to change something, say like the age, let's call it `hasBirthday`
+
+It's the same idea/similar, except the syntax requires a `*` pointer specifier then the struct name so `func (p *Person)` 
+- No return value since we aren't returning anything just modifying the age. 
+
+### Shorter struct properties
+What you could do is take all the same properties types and put them all on one line ....
+` firstName, lastName, city, gender string` and then on a new line do `age int` 
+
+## Interfaces
+> [**Interfaces**]() are basically data types that represent a set of method signatures for structs, you can define an interfaces so that multiple structs can make use of the same/modified method. 
+
+```go:title=interfaces
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+// Define interface 
+type Shape interface {
+    area() float64 
+}
+
+type Circle struct {
+    x, y, radius float64 
+}
+
+type Rectangle struct {
+    width, height float64
+}
+
+func (c Circle) area() float64 {
+    return math.Pi * c.radius * c.radius 
+}
+
+func (r Rectangle) area() float64 {
+    return r.width * r.height 
+}
+
+func getArea(s Shape) float64 {
+    return s.area()
+}
+
+func main() { 
+    circle := Circle{ x:0, y:0, radius:5}
+    rectangle := Rectangle{ width:10, height:5}
+	fmt.Println("Circle Area: %f\n", getArea(circle))
+	fmt.Println("Circle Area: %f\n", getArea(rectangle))
+}
+
+
+```
+- You put all the methods you want to implement within the interface, in our case `area()`, 
+- Once we've created the interface you still have to create the corresponding stuct methods for both circle and rectangle.
+- So that is an interface, basically just a list of methods you can use on different structs
+
+## Web
+```go
+package main
+
+import (
+    "fmt"
+    "net/http"
+)
+
+func index(w http.ResponseWrite, r *http.Request) {
+    fmt.Fprintf(w, "<h1> Hello World </h1>")
+} 
+
+
+func main() { 
+    http.HandleFunc("/", index)
+    http.ListenAndServe(":3000", nil)
+}
+```
+- For web we are going to bring in another package called net/http
+- Then we can call `HandleFunc` on http, which is kind of like a router, it takes in a route and we can pass in a route then a function to that route, in our case it will be index.
+- we then write that index function which takes in two special parameters that have to do with that HTTP module, we'll call it w and it takes a type called `http.ResponseWriter`, then it takes a response which takes a pointer, `r *http.Request`
+
+- Then if we want to open something to the browser, we can use `fmt.Fprintf` then whatever, like Hello World
+- In order for this to work, this has to be served, we can call http with the ListenAndServe method, kind of like Express does app.listen, this takes a port, so we can say, port 3000 and then nil for the second arg. 
+- We can even add return html in our `Fprintf`  
+- This is basically a web server, if we navigate to localhost:3000 you'll see our served content.
+- We can even add more routes, just as simply as we did our index.
+
+Go is really good for building REST APIs and microservices.  
 
