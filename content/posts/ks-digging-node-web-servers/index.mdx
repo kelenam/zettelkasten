@@ -1,0 +1,216 @@
+---
+title: Web Servers | Digging into Node.js 
+date: 2020-04-09
+slug: ks-digging-node-web-servers
+tags:
+    - JS
+    - Node
+    - command line
+    - streams
+    - webservers
+    - databases
+---
+
+## Creating a Web Server
+We are still working with SQLite, but also with HTTP.
+
+Our web server is going to have an API endpoint that is going to server up our database records to a webpage.
+
+- First thing that we need to do is pull in the HTTP module.
+- We are also going to be using a package called `node-static-alias` which is a wrapper around a more commonly known package called node static. It handles all to the MIME type handling and content link calculation, all the stuff we don't really want to do and node-static is great for this, `node-static-alias` is a wrapper around it which gives us a bit more declarative alias URL routing.
+
+Line 45 is how we make a new server.
+
+So we need to listen on that port, we do so by calling `.listen` on our server and provide a port: `httpserv.listen(HTTP_PORT)` 
+
+When we are writing our `handleRequest` function, it takes as arguments, a `req` and a `res` these are both streams, the are HTTP streams, but work like we've previously seen.
+
+- We can make this a function an `async` one to better handle asynchronous operations to handle our incoming requests.
+- We can all `res.end` to make sure the stream is "flushed" or finished, but since we are only passing in one string with write, our Hello World, we can actually just pass it directly to end like so.... `res.end("Hello World")`  
+
+### A Note on Node Web Frameworks
+All things like Express,Hapi, Sails, etc, all these router frameworks really they boil down to a series of if statements they have very fancy APIs and lots of complexity but what they really boil down to is a set of if statements, like we could technically just do something like this ...
+
+```js
+async function handleRequest(req, res) {
+    if (req.url === "/hello") {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("Hello World")
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+}
+```
+It really doesn't get any more complicated of a series of matching decisions that you can model with a series of if statements. You might match on whether or not the request method was a GET / POST or if there are cookies/the right headers.
+
+## Routing & Serving Static Files
+You might wonder, well to serve up some files, could we, like use file streams? We learned about them already. So what if we were to open up a read stream to an HTML file and then pipe that read stream to our writeable stream? Well its true that the content would make its way to the web browswer, but we would by missing, chunking/encoding, gzip, headers, etc, content length, all the important stuff a static file server would handle for us.
+
+This is why we are going to use `node-static-alias`
+ 
+- We give it a `WEB_PATH` which is essentially going to be the document root, which protects against someone looking up some other relative path elsewhere on our filesystem. We can set up aliases to have regular expressions 
+
+- `force: true` tells it that it has to find a match to the regex, or it will throw a 404 
+```js {7,10,42-61,73,80}
+#!/usr/bin/env node
+
+"use strict";
+
+var util = require("util");
+var path = require("path");
+var http = require("http");
+
+var sqlite3 = require("sqlite3");
+var staticAlias = require("node-static-alias");
+
+
+// ************************************
+
+const DB_PATH = path.join(__dirname,"my.db");
+const WEB_PATH = path.join(__dirname,"web");
+const HTTP_PORT = 8039;
+
+var delay = util.promisify(setTimeout);
+
+// define some SQLite3 database helpers
+//   (comment out if sqlite3 not working for you)
+var myDB = new sqlite3.Database(DB_PATH);
+var SQL3 = {
+	run(...args) {
+		return new Promise(function c(resolve,reject){
+			myDB.run(...args,function onResult(err){
+				if (err) reject(err);
+				else resolve(this);
+			});
+		});
+	},
+	get: util.promisify(myDB.get.bind(myDB)),
+	all: util.promisify(myDB.all.bind(myDB)),
+	exec: util.promisify(myDB.exec.bind(myDB)),
+};
+
+var fileServer = new staticAlias.Server(WEB_PATH,{
+	cache: 100,
+	serverInfo: "Node Workshop: ex5",
+	alias: [
+        {
+            match: /^\/(?:index\/?)?(?:[?#].*$)?$/,
+            serve: "index.html",
+            force: true,
+		},
+		{
+			match: /^\/js\/.+$/,
+			serve: "<% absPath %>",
+			force: true,
+		},
+		{
+			match: /^\/(?:[\w\d]+)(?:[\/?#].*$)?$/,
+			serve: function onMatch(params) {
+				return `${params.basename}.html`;
+			},
+		},
+		{
+			match: /[^]/,
+			serve: "404.html",
+		},
+	],
+});
+
+var httpserv = http.createServer(handleRequest);
+
+main();
+
+
+// ************************************
+
+function main() {
+    httpserv.listen(HTTP_PORT);  
+    console.log(`Listening on http://localhost:${HTTP_PORT}...`);
+}
+
+function handleRequest(req, res) {
+//   res.writeHead(200, { "Content-Type": "text/plain" });
+//   res.end("Hello World");
+    fileServer.serve(req,res)
+}
+// *************************
+// NOTE: if sqlite3 is not working for you,
+//   comment this version out
+// *************************
+async function getAllRecords() {
+	var result = await SQL3.all(
+		`
+		SELECT
+			Something.data AS "something",
+			Other.data AS "other"
+		FROM
+			Something
+			JOIN Other ON (Something.otherID = Other.id)
+		ORDER BY
+			Other.id DESC, Something.data
+		`
+	);
+
+	return result;
+}
+
+// *************************
+// NOTE: uncomment and use this version if
+//   sqlite3 is not working for you
+// *************************
+// async function getAllRecords() {
+// 	// fake DB results returned
+// 	return [
+// 		{ something: 53988400, other: "hello" },
+// 		{ something: 342383991, other: "hello" },
+// 		{ something: 7367746, other: "world" },
+// 	];
+// }
+
+```
+
+## Serving API Endpoints
+Not that we are serving up files, the next question might be, how could I respond to AJAX requests? How can we have an API endpoint for our code?
+
+So back on over to our handle request function we are going to set an `if` statemetn, that if the incoming request looks like an API request we're going to handle it manually, otherwise for every other request we are going to hand it off to the file server.
+
+```js:title=handle-API-endpoint
+async function handleRequest(req, res) {
+    if (req.url === "/get-records") {
+        let records = await getAllRecords();
+         
+         res.writeHead(200, { 
+             "Content-type:" "application/json",
+             "Cache-Control": "no-cache"
+        });
+        res.end(JSON.stringify(records));
+    } else {
+        filesServer.serve(req,res);
+    }
+}
+```
+- So we already have that `getAllRecords` function, 
+- So how are we going to send out a JSOn response? Well it's similar to what we did before... with `res.writeHead`
+- Because we don't want our JSON to be cached we send down a cache control header that says no-cache.
+- Then we res.send by stringifiying that json
+
+So now this means, from our web page side, we can make an AJAX cal and get that data and print it.
+
+## Fetch Exercise
+Now if we go over to our Ex5 web file. 
+
+## Express JS Routing 
+
+## Serving Static Files with Express
+## Custom Routing Middleware
+
+
+## Links 
+- [fsfe: Basic Basics](/fsfe-bash-basics)
+---
+**Nav**:
+- [🏠 MAIN](/)
+- [PREV ← | Streams ](/ks-digging-node-streams)
+- [NEXT → | Web Servers ](/ks-digging-node-web-servers)
+ 
