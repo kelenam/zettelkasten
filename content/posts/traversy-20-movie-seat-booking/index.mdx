@@ -108,28 +108,92 @@ Or more explicitly wrap it in a `parseInt()`
 we can check if the classlist contains seat (so that its a seat that was clicked) and that it was not a seat that is occupied, also checking with contains and an ! inversion prefix.
 
 > - We use `classList.toggle` to toggle on and off a class. 
+
 ```js 
 function updateSelectedCount() {
     const selectedSeats = document.querySelectorAll('.row .seat.selected');
     const selectedSeatsCount = selectedSeats.length;
-
     count.innerText = selectedSeatsCount;
     total.innerText = selectedSeatsCount * ticketPrice;
 }
-
 container.addEventListener('click', (e) => {
-    if (e.target.classList.contains('seat') $$ !e.target.classList.contains('occupied')) {
-
+    if (e.target.classList.contains('seat') 
+        && !e.target.classList.contains('occupied')
+    ) {
         e.target.classList.toggle('selected')
         updateSelectedCount();
     }
 })
 ```
+
 ### Movie select listener
 > So instead of a click event since this is a dropdown, we listen for a change event.... `movieSelected.addEventListener('change' e => {})`
+
+## Save Data to Local Storage
+So how do we save our seats now? Right, we need to hold on to our list of selected seats somehow. To do so we need 3 things:
+1. Copy selected seats into array
+2. map through array
+3. Return a new array of indexes
+
+Going to use the **spread operator** `...`, to copy the elements of our Nodelist into an array using the spread operator. That's what the spread operator does is it copies the elements of an array.
+
+```js:title=spread-operator-example 
+const arr = [1,2,3];
+const arr2 = [...arr,4,5];
+console.log(arr2);
+// --> [1,2,3,4,5]
+```
+
+We want to use `map` to map over our spread out array, to return a new array, we want for each seat to return the index of the seats that are selected. We use the spread operator again on all of the seats stored in `seats` const, and use the `indexOf` of the current seat. 
+
+- `indexOf(value)` is just an Array method that will give you the index of an element, if its not found you get back `-1`.
+- So now we should have 
+
+### local storage
+So over in our `updateSelectedCount` function we will add function
+
+So `localStorage` is available to us as a Browser API, no need for an import. Just as simple as referencing `localStorage` and using the `setItem` property on `localStorage`, which take a key value pair.... `localStorage.setItem('selectedSeats', JSON.stringify(seatsIndex));`
+- Since `seatsIndex` is an array we need to wrap it in `JSON.stringify`
+
+**Let's save the movie selected and the price**
+Over in our movieSelect event handler we'll handle storage of our selected movie index and price. 
+
+We can use the `selectedIndex` property on our dropdown, to get the index of item selected within the nodeList of options.
+- We can also grab the value, the price of the movie using `e.target.value`
+- So we can store those things in localStorage using a function we will create called `setMovieData`
+
+### `setMovieData`
+This will be the function that we will call in our movieSelect event handler to store data in local storage. The function will take in two things: the index of the selected movie and the value of the target, aka the price of the selected movie.
+
+## Populate UI with Saved Data
+Right below our variable declarations at the top we will call a function called `populateUI()` , we'll actually write out that function right above our click handlers.
+
+It's going to be a function that gets data from localstorage and populates UI.
+
+>- We use the `.getItem` method on `localStorage` to retrieve an item from `localStoage` where the thing we specify as an argument to getItem is the thing we want to retrieve.
+
+```js
+// Get data from localstorage and populate UI
+function populateUI() {
+    const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats'));
+}
+```
+- Remember we JSON stringified the array, now we need to parse it to get it back to an array.
+- Once we have selected seat retrieved some local storage we are going to need check if there are selected seats, and then if there are, add selected class to those selected seats in the UI.
+- We can check if something is not in localstorage by checking if its a null value, `selectedSeats !== null`, we will also want to check to make sure the array is not empty, `&& selectedSeats.length > 0`
+    - now we can loop through all our seats, using for each, and pass in, not only our seats, but our index as well. 
+    - ⭐ We use `indexOf` again to see if the currenty index of the seat is within the selected seats array by seeing that the value returned is greater than 1. Remember, if it's found it returns the indexOf the matched value, if not it returns -1. `selectedSeats.indexOf(index) > -1`
+    - Then we set the `seat.classList.add('selected')` to update the seat UI.
+
+### Addressing seats and prices
+Under the if statement where we did the `selectedSeats` stuff we can handle the film selection, grabbing from localStoage, checking if its null, if not set the `.selectedIndex` of the movie to the right selectedMovieIndex we stored in a variable when we retrieved it from local storage.
+
+Now if you notice, our movie prices and seat numbers don't update, and that's because we have that added to our `updateSelectedCount` function. So what we can do is, at the end of our file just called `updateSelectedCount()` outside of any event handler to update the any values we might have received from localStorage.
 
 ## Key Insights
 - Using `nth-of-type()` and `last-of-type()`
 - Also using `border-top-radius-right` and left for shaping the individual corners.
 - using `:not(.className):hover` to control hover on things not of the specified type, in our case  
 - using `perspective` property combined with rotateX to give a 3d-effect for the screen.
+- I ran into a slight "bug" where we didn't have a fixed width for the container, making it grow/contract based on length of our p tag, so I added a min-width to the container.
+- `localStorage` is quite simple to use, `setItem` and `getItem` for setting and getting values from localStorage. `localStorage.clear()` to clear all records stored.
