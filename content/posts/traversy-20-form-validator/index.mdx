@@ -6,6 +6,7 @@ tags:
   - JS
   - HTML
   - CSS 
+  - Projects
 ---
 
 For this project, I'll be using Sass and TS instead of vanilla JS and CSS. No frameworks though otherwise.
@@ -54,8 +55,90 @@ For this project, I'll be using Sass and TS instead of vanilla JS and CSS. No fr
 </html>
 ```
 
+## Styling 
+
+- We position the `form-control` position `relative` because we will be positioning the `small` tag, that error message, absolute within the form-control.
+> - If you want to position something absolute within another element that parent element has to be relative. 
+
+- `label` tags are display `inline` by default , so we specify block to make sure they go on their own line.
+
+- Controlling the input box when selected is managed in `input:focus`, the `outline` property here controls 
+
+### Styling based on success/fail
+We can style the input border, by adding/removing success classes, we will add success / error classes to control to help indicate input success/failure.
+
+### visibility:hidden vs display: none
+>- display:none will collapse anything around it 
+- visibility: hidden just makes it hidden 
+
+
+## JavaScript
+We are going to do this in two ways, the first approach is the "unrefactored" a lot of if statement approach.
+
+
+### First Approach
+1. The first thing we do is bring in all elements, the form and all fields by id,
+> The ts type for html elements is `HTMLElement` 
+
+2. The next thing we are going to do is add an event listener. Remember, the event we are listening for gets passed automatically in as a paramter to the function, our second arg.
+    - We want to prevent the default action on the submit, 
+
+3. if statements to check if the field is empty, then it calls a function, we have yet to create that takes two args, the first is the actualy element/input, in this case the username, the second is the error message.
+
+4. Building our error function we need assign our error class on our form-control div, so to get access to that element we can create a new selector to grab it. form-control is the parent of the input, so we can use `parentElement` like so `const formControl = input.parentElement;`. We then override the class for this element using `className`
+    - If try to submit we get the error styling, but we want the right error message. 
+    - To do this we just create a new element for the small tag. `formControl.querySelector('small')`
+        - `querySelector` can take in a tag itself, a class, a id, whatever.
+        - We then change the `innerText` on the small to the message we pass in.
+
+5. So, now with this approach, we'd have to do more if/elses for every other input. 
+
+6. We'll have to validate the email, let's just grab a regex from stack overflow.
+https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
+
+```js
+function isCalidEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+     return re.test(String(email).toLowerCase());
+}
+```
+
+### Second Approach
+We are going to refactor our check if required, if statement blocks using functions. This is what I came up with. I didn't want to include the email validation in a function called `checkRequired`, so I just kept in in the event listener for now.
+
+```ts
+function checkRequired(...fields: any): void { 
+    fields.forEach(field => {
+        if (field.value.trim() === '') {
+            showError(field, `${getFieldName(field)} is required`);
+        } else {
+            showSuccess(field);
+        }
+    });
+}
+
+// Get field name and uppercase
+function getFieldName(input: any): string {
+    return input.id.charAt(0).toUpperCase() + input.id.slice(1);
+}
+
+// Event Listners
+form.addEventListener('submit', function(e: any): void {
+    e.preventDefault();
+
+    checkRequired(username,
+                  email,
+                  password,
+                  password2
+                 );
+
+    if (!isEmailValid(email)) {
+        showError(email, "Email is not valid")
+    }     
+}); 
+```
 ## Key Insights
-- Just working to get things center aligned vertically and horizontally is as easy as making the parent container a flex container. Then setting both align items and justify content to center, but in addition to doing so, making sure that the height of the thing we want vertically centered to have a height set to the full height we'd want to center within. 
+- Getting things center aligned vertically and horizontally is as easy as making the parent container a flex container. Then setting both align items and justify content to center, but in addition to doing so, making sure that the height of the thing we want vertically centered to have a height set to the full height we'd want to center within. 
     - This woud look look like this:
     ```css
     .container {
@@ -66,5 +149,8 @@ For this project, I'll be using Sass and TS instead of vanilla JS and CSS. No fr
     }
     ```
     - I don't know why I keep finding this perplexing. 
+- If you want to position something absolute within another element that parent element has to be relative. 
 
+- Traversy prefers convention of having event listeners lower in the code file.
 
+- Regular expressions have a `.test` method: The [**`test()`**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test) method executes a search for a match between a regular expression and a specified string. Returns true or false.

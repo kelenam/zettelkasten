@@ -198,19 +198,155 @@ async function handleRequest(req, res) {
 So now this means, from our web page side, we can make an AJAX cal and get that data and print it.
 
 ## Fetch Exercise
-Now if we go over to our Ex5 web file. 
+Now if we go over to our Ex5 file in the /web folder
+await fetch(url)
+
+You can either do `res.ok` or `res.status === 200` to check for the response headers. `res.ok` works just fine. 
+
+An interesting thing about `fetch` is that it first does a request and then you have to wait for the body of the response, and that allows you to do somet streaming processing on a response body if it were large.
+
+We only care about a JSON response, so we can say `let recoreds = await res.json()` this parses the body and gives us json back. So if records and records.length is greater than 0 then what we want to do is call render records with it.....
+```js
+async function getRecords() {
+	const res = await fetch('/get-records');
+	if (res && res.ok) {
+		let records = await res.json(); 
+		if (records && records.length > 0) {
+			renderRecords(records);
+		}
+	}
+}
+```
+We can go back and make one last change to our server, let's simulate our results coming back slower. let's insert a delay in our response from the database.
 
 ## Express JS Routing 
+Express is one of the more well known frameworks, and sinc in Ex5 we kind of were doing things manually, we'll not take a look at with Express.
+
+The way Express works, is that you call the express function... the name you give this thing is almost always called  `app`
+```js
+var app = express();
+```
+So what is `app` exactly, what is the thing returned to us? Is it an instantiated class, an object? Well let's see how we actually use it.
+Well we atually use it by passing it to our http server instance: `var httpserv = http.createServer(app)`, if you remember previously we passed the function `handleRequest` to the function that we defined, so in other words, `app` is an automatically generated handle request function that receives requests and response streams and handles them. And in fact if you were to open up that `app` function, under the hood it would just be a fancy for loop with some if statemetns in it.
+
+We won't define a `handleRequest` function, but we will need to configure Express so that it knows which routes to use, we will use a function for this.
+- Don't forget to call defineRoutes() in our main function.
+```js
+function defineRoutes() {
+
+	app.get("/get-records" (req,res) => {
+		var records = await getAllRecords();
+		res.writeHead(200, {
+			"Content-Type": "application/json",
+			"Cache-Control": "no-cache"
+		});
+		res.end(JSON.stringify(records));
+	})
+}
+```
+So we need to set up the equivalent to our alias routes, by doing so with Express, this is accomplished with things called **middleware**. [**Middleware**]() is just a fancy way of basically just saying a function that gets called if the incoming request matches some particular criteria, so we are going to setup a couple of different middlewares equivalent to the routes we were handling.
+
+- we use `app.get` to tell Express to handle get requests, and we give it a url. and if it matches it we are going to receive, req and res.
+
+So notice, we are essentially repeating this JSON handler portion, there are some things Express provides to make its own version of this, but you may find out that Express needs its own set of plugins for some very basic things, which is why, for the sake of our learning here we are just going to repeat it.
+
+The point with the code above, is that we aren't using if statements, but instead declaratively state the route by calling `app.get`, and Express just handles the matching for us.
 
 ## Serving Static Files with Express
+Now we also want to route for our static file handling requests...
+```js
+function defineRoutes() {
+	app.get("/get-records" (req,res) => {
+		var records = await getAllRecords();
+		res.writeHead(200, {
+			"Content-Type": "application/json",
+			"Cache-Control": "no-cache"
+		});
+		res.end(JSON.stringify(records));
+	});
+
+	
+	var fileServer = express.static(WEB_PATH,{
+		maxAge: 100,
+		setHeaders(res){
+			res.setHeader("Server","Node Workshop: ex6");
+		}
+	});
+
+	app.use(fileServer);
+
+	app.get(/\.html$/,function friendly404(req,res,next){
+		req.url = "/404.html";
+		fileServer(req,res,next);
+	});
+}
+```
+- For this we use `app.use` this is the general form of middleware. 
+- `app.get` it's specifically for GET requests. `app.use` is for all incoming requests. For it we can call `express.static`, and we are going to configure it to use our web path as the doc route + some other options which aren't strictly necessary.
+- This `setHeaders` function is called whenever we have an outbound request and we need to add custom headers with Express.
+
 ## Custom Routing Middleware
+KS couldn't find any decent Express plugin for handling url rewrites. So we end up just keep using regex.
+```js {11-25}
+function defineRoutes() {
+	app.get("/get-records", async (req,res) => {
+		var records = await getAllRecords();
+		res.writeHead(200, {
+			"Content-Type": "application/json",
+			"Cache-Control": "no-cache"
+		});
+		res.end(JSON.stringify(records));
+	});
+
+	app.use(function(req, res, next) {
+		if (/^\/(?:index\/?)?(?:[?#].*$)?$/.test(req.url)) {
+			req.url = "/index.html";
+		}
+		else if (/^\/js\/.+$/.test(req.url)) {
+			next();
+			return;
+		}
+		else if (/^\/(?:[\w\d]+)(?:[\/?#].*$)?$/.test(req.url)) {
+			let [,basename] = req.url.match(/^\/([\w\d]+)(?:[\/?#].*$)?$/);
+			req.url = `${basename}.html`;
+		}
+
+		next();
+	})
+
+	var fileServer = express.static(WEB_PATH,{
+		maxAge: 100,
+		setHeaders(res){
+			res.setHeader("Server","Node Workshop: ex6");
+		}
+	});
+
+	app.use(fileServer);
+
+	app.get(/\.html$/,function friendly404(req,res,next){
+		req.url = "/404.html";
+		fileServer(req,res,next);
+	});
+}
+```
+> - What you should pay attention to if you're using your own middleware is that if they're going to be asynchronous then you want to include a third parameter you have to call as the callback (often called `next`), you have to execute `next` to tell Express that it should move on to the next route. If you don't call `next()` it will assume you completely handled the response, but if you want it to flow to the next thing you need to call `next`
+
+So we should point out that what is happening here is that these middleware calls, are adding these functions that you've defined into an internal array, and what Express does anytime a request comes in, is to loop over that array calling a function and seeing whether or not that function fully handles the response or not, if so then its done, if not then it moves on to the next one in the for loop, and the next one and next one.
+
+It's a top down ordering, and the order in which you define these routes matter. If you define a general more catchall route earlier, its going to catch all of them and never get to the specific one, so you end up defining this by specific first back down to general. 
+
+So our strategy is just replacing the req url so that when it gets to express static file server it knows to just go and find the appropriately named file.
+
+### Reason for usign Express
+- large community
+- tons of documentation
+- huge ecosystem
+- every job posting for Node, they want you to know Express
 
 
 ## Links 
-- [fsfe: Basic Basics](/fsfe-bash-basics)
----
 **Nav**:
-- [🏠 MAIN](/)
+- [🏠 MAIN](/ks-digging-node-intro)
 - [PREV ← | Streams ](/ks-digging-node-streams)
-- [NEXT → | Web Servers ](/ks-digging-node-web-servers)
+- [NEXT → | Child Process ](/ks-digging-node-child-process)
  

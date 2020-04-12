@@ -1,0 +1,135 @@
+---
+title: Movie Seat Booking | Traversy 20
+date: 2020-04-11
+slug: traversy-20-movie-seat-booking
+tags:
+  - JS
+  - HTML
+  - CSS 
+  - Projects
+  - DOM
+  - Local Storage
+---
+
+Going to cover local storage in this project.
+
+## HTML 
+- We are using a `select` tag with the children being `option` tags, the `value` property of the option tags will be the price. 
+
+### Showcase / seat-legend
+- Under this is going to be the "showcase" our seat legend. Its going to show the seats for the movie. It's going to be an unordered list with a class of showcase. 
+    - In each `li`, we will have a `div` with a class of `seat`, and a small tag beneath it saying N/A. We will have this three times, for each seat "state"
+    - I'm going to change how Traversy set it up and make it that N/A representssetas not available, where white open/able to be selected. 
+
+### Screen/Seat "Visuals"
+First we'll wrap everything in a container class, called container.
+- then we add a div with a class of screen.
+
+- Add the `screen` class as a div.
+- Then create a div with a class of `row` that will have 8 seats in a row.
+- Neat Trick, remember if you're making a div and giving it a class the Emmet shortcut is simply saying `.class` and hitting tab.
+> - Another trick is that if we want 8 repetitions of the same tag, says 8 divs with a class of `seat` we simply say: `.seat*8` and hit enter and we will get that
+
+We will need 6 rows, so copy this down. 
+
+We can make some of these seats occupied, by adding the occupied classes.
+
+Then we'll have a p tag with a class of text summarizing seat selection. In there we will have a span tag with an id of `count` specifying the number of seats selected.
+
+
+## CSS 
+- Going to import Lato from google fonts
+- box sizing reset 
+- 
+
+### Using a mixin for the vendor prefix
+> So, I was trying to do something like a generic `vendor-prefix` mixin but kept running into the issue of the prefixes needing to end with `:`, I suppose when looked at, at least through VSCode, the pre-processing can't resolve the argument at time of processing, even if its later specified when its used with @include. 
+I know there is a better way for writing this, since it wouldn't make any sense to have to do this with every vendor-prefix, so I'll look into this later, for now this will work for case, unless we are using another style that requires prefixing.
+
+```scss 
+/* Mixins */
+@mixin appearance($value) {
+    -webkit-appearance: $value;
+    -moz-appearance: $value;
+    -ms-appearance: $value;
+    appearance: $value;
+}
+
+//...
+
+.movie-container {
+
+    select {
+        @include appearance(none); 
+        padding: 5px 15px 5px 15px;
+    }
+}
+
+```
+### Seat Shapes
+- To get the styling on the seats, for that shape we can use the property `border-top-left-radius` and give it a value of 10ps and do that that as well with `border-top-right-radius`.
+
+We can mimic rows in the theater by using a pseudo select, the second row in... `.seat:nth-of-type(2)` and give it a margin right of 18px and do the same on the other side, except `nth-last-of-type(2)`
+
+### Hover Effect on Seats not showcase 
+Creating a hover effect for our open seats, with the `:not(className)` pseudo selector, and transforming it up by scaling it by 1.2 
+using `:not(.className):hover` to control hover on things not of the specified type, in our case 
+
+We use this same approach, to address turning the hover effect off for the seats in our showcase, where we set the cursor and transform to the `default` and `1` values.
+
+### Showcase styling
+Let's add a bg color with rgba, and give it a 0.1 transparency
+- add some padding and border-radius and make the text darker
+- display flex, justify between.
+- remove list style type
+
+### Screen styling
+- `box-shadow: 0 3px 10px rgba(255,255,255,0.7);` to give the glow/blur screen effect
+- We also are using a transform and rotateX by -45 degrees, this will shrink the screen, to give it the kind of 3d effect of the titled screen, we can give a property to the `.container` class and use `perspective` property and set it to 1000px as well as give the margin-bottom 30px. 
+
+
+### Making spans colored
+Giving our amounts , our span tags a color, `p.text span` setting the color to that blue.
+
+
+## JavaScript
+First thing we do is bring in our DOM elements that we will be using: container, 
+
+> We want to grab all our seats so we use querySelectorAll, `const seats: any = document.querySelectorAll('.seat');` to put them all into a Nodelist, which is like an array.
+
+> We also want to select only the seats in a row (not our showcase), so we can specify further,... `('.row .seat')`, and we can even grab the ones NOT occupied like we did with the css... `const seats: any = document.querySelectorAll('.row .seat:not(.occupied)');`
+
+> Since we want to be doing an operation on our ticket prices/values, we need to turn the value in our span into a number as its currently a string. We can do so with type coercion:  `const ticketPrice = +movieSelected.value;` by adding a `+`. 
+Or more explicitly wrap it in a `parseInt()`
+
+### Adding Events
+> So there are a few ways we could make our seleted seats have the seleted class, since seats is a nodelist we could foreach and loop through it, but a better way a more performant way is adding the event listener to the container and check that its a seat being clicked...
+
+we can check if the classlist contains seat (so that its a seat that was clicked) and that it was not a seat that is occupied, also checking with contains and an ! inversion prefix.
+
+> - We use `classList.toggle` to toggle on and off a class. 
+```js 
+function updateSelectedCount() {
+    const selectedSeats = document.querySelectorAll('.row .seat.selected');
+    const selectedSeatsCount = selectedSeats.length;
+
+    count.innerText = selectedSeatsCount;
+    total.innerText = selectedSeatsCount * ticketPrice;
+}
+
+container.addEventListener('click', (e) => {
+    if (e.target.classList.contains('seat') $$ !e.target.classList.contains('occupied')) {
+
+        e.target.classList.toggle('selected')
+        updateSelectedCount();
+    }
+})
+```
+### Movie select listener
+> So instead of a click event since this is a dropdown, we listen for a change event.... `movieSelected.addEventListener('change' e => {})`
+
+## Key Insights
+- Using `nth-of-type()` and `last-of-type()`
+- Also using `border-top-radius-right` and left for shaping the individual corners.
+- using `:not(.className):hover` to control hover on things not of the specified type, in our case  
+- using `perspective` property combined with rotateX to give a 3d-effect for the screen.

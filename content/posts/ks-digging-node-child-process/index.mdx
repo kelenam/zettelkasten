@@ -1,0 +1,289 @@
+---
+title: Child Process | Digging into Node.js 
+date: 2020-04-10
+slug: ks-digging-node-child-process
+tags:
+    - JS
+    - Node
+    - command line
+    - streams
+    - webservers
+    - databases
+---
+
+## Child Processes
+Ex7 , going back to the command line, and we will be looking at dealing with multiple process instances.
+
+```js
+#!/usr/bin/env node
+
+"use strict";
+
+var util = require("util");
+// var childProc = require("child_process");
+
+
+// ************************************
+
+const HTTP_PORT = 8039;
+// const MAX_CHILDREN = 5;
+
+var delay = util.promisify(setTimeout);
+
+
+main().catch(console.error);
+
+
+// ************************************
+
+async function main() {
+    // console.log(`Load testing http://localhost:${HTTP_PORT}...`);
+    var child = childProc.spawn("node", ["ex7-child.js"]);
+    child.on("exit", function(code) {
+        console.log("Child finished",code);
+    });
+}
+
+```
+We're going to be starting off with the built in Node child process module...`var childProc = require('child_process');`
+
+This is how we can spin off a child process. 
+In exercise 7, now that we have a web server, we'll be essentially makign a load tester.
+
+The basics concept behind a **child process** is that you end up spinning up this separate thing, and you get back up an object that has standard IO streams on it. Thats how you know what input you might send to the child process and what what output you might be getting back from the child process.
+
+> So we're going to end up calling a method called `spawn` on this childProc module. This will end up creating us an object that represents the child. The executable we pass it is actually node itself, and the paramters we want are... `["ex7-child.js"]`
+
+Now child has elements on it where we can listen to an event for it and read/write from its standard I/O. In our case we just want to see if its finished, so on exit, callback to a console.log the code that finished. 
+
+#### What goes into the process (ex7-child.js)?
+For now let's just add a long running for loop into our main function...
+```js:title=ex7-child.js
+async function main() {
+    var x = 0;
+    for (let i = 0; i < 1000000000; i++) {
+        x = i + 1;
+    }
+}
+```
+Now if we run node ex7.js it will wait a little before telling us the child has finished.
+
+## Exit Codes
+So notice that we are getting returned back to us a 0. 
+>- 0 is the default exit code when a process finishes with success. 
+
+We can test this over in our `ex7-child.js` file if at the end of our for loop we said `process.exitCode = 1`, and rerun ex7 we will get back a code of 1.
+
+- In POSIX standard convention, a 0 exit code means everythign was fine, anything non-zero means something went wrong. 
+
+In our example we will be using exit codes as our communication instead of worrying about stdin/out. The parent (ex7) will listen for exit code 0 to see if it was successful or not.
+
+### fetching from child process 
+So we don't want a for loop, we instead want to make an AJAX request. So make sure to import it....
+```js:title=ex7-child.js-fetching 
+"use strict";
+
+var fetch = require("node-fetch");
+
+
+// ************************************
+
+const HTTP_PORT = 8039;
+
+
+main().catch(() => 1);
+
+
+// ************************************
+
+async function main() {
+	try {
+		var res = await fetch(`http://localhost:${HTTP_PORT}/get-records`);
+		if (res && res.ok) {
+			let records = await res.json();
+			if (records && records.length > 0) {
+				process.exitCode = 0;
+				return;
+			}
+		}
+	}
+	catch (err) {}
+
+	process.exitCode = 1;
+}
+```
+- This is the same thing we did in the web browser, we are just now doing it on the server. This is how you handle making outbound requests, just using `fetch` just as we would in a browser, just instead, here in node.
+
+- If we run this again, we won't get any indication of our exit code. So how can we test from the command line what the exit code is, we can't really see it, we can however implicitly determine it, is...
+> **the reason for exit codes is because the way the command line works, if you're doing multiple commands, if any command fails and gives a non-zero exit code, it stop the rest of the processing from happening**
+
+So we can test this by saying `node ex7-child.js && ls -la`, this will list files if we got a 0 exit code. If we went and stopped our server, we would get nothing because listing never happens.
+
+## Child Processes Solution 
+The effort of this execise, is to spin up multiple child processes, using a for loop within a while loop spinning up child instances up until MAX_CHILDREN, with a 500ms delay after each attempt, we will only continue if we are getting 0 exit codes on previous processes being run. 
+
+```js:title=ex7.js
+#!/usr/bin/env node
+
+"use strict";
+
+var util = require("util");
+var childProc = require("child_process");
+
+
+// ************************************
+
+const HTTP_PORT = 8039;
+const MAX_CHILDREN = 5;
+
+var delay = util.promisify(setTimeout);
+
+
+main().catch(console.error);
+
+
+// ************************************
+
+async function main() {
+	console.log(`Load testing http://localhost:${HTTP_PORT}...`);
+
+	while (true) {
+		process.stdout.write(`Sending ${MAX_CHILDREN} requests...`);
+
+		let children = [];
+
+		for (let i = 0; i < MAX_CHILDREN; i++) {
+			children.push(
+				childProc.spawn("node",["ex7-child.js"])
+			);
+		}
+
+		let resps = children.map(function wait(child){
+			return new Promise(function c(res){
+				child.on("exit",function onExit(code){
+					if (code === 0) res(true);
+					res(false);
+				});
+			});
+		});
+
+		resps = await Promise.all(resps);
+
+		if (resps.every(Boolean)) {
+			console.log(" success!");
+		}
+		else {
+			console.log(" failures.");
+		}
+
+		await delay(500);
+	}
+}
+```
+So one way of handling this is by setting up an array that will be filled by our for loop.
+
+What we are doing is essentially jsut pushing that spawned child into that array, so by the end of the for loop we should end up with 5 child processes spawned. Next we will need to turn that list of child processes into proimses that will resolve after those processes have finished whether or not they are successful or not.
+
+So we can turn that array into an array of responses. We can resolve them either either boolean true/false, so we will end up an array of boolean responses, a list of true/falses. 
+
+Now we need to wait for all the promises to resolve in whatever order they finish in, so we can say, `resps = await Promise.all(resps);`
+
+Then we need to figure out if resps was all true, otherwise it was a failure. We can do that with `if (reps.filter(Boolean).length === MAX_CHILDREN)` or just user `if (resp.every(Boolean))`
+
+## Debugging
+As you write more and more Node, you're going to have more and more bugs. And you might find it challenging to try and debug in CLI env, and it can get difficult to debug.
+
+Here, will look at how you might use Chrome dev tools for debugging remotely for your node process.
+Let's revist ex7 and insert a little bug to create an exception and we are going to run it with the devTools listening. 
+We'll insert a counter, increment in the while loop, and if x exceeds a number we can throw an exception.
+
+```js:title=ex7-debugging {25,28,48-50}
+#!/usr/bin/env node
+
+"use strict";
+
+var util = require("util");
+var childProc = require("child_process");
+
+
+// ************************************
+
+const HTTP_PORT = 8039;
+const MAX_CHILDREN = 5;
+
+var delay = util.promisify(setTimeout);
+
+
+main().catch(console.error);
+
+
+// ************************************
+
+async function main() {
+    console.log(`Load testing http://localhost:${HTTP_PORT}...`);
+    
+    var x = 0;
+
+	while (true) {
+        x++;
+		process.stdout.write(`Sending ${MAX_CHILDREN} requests...`);
+		
+		const children = [];
+
+		for (let i = 0; i < MAX_CHILDREN; i++) {
+			children.push(
+				childProc.spawn("node", [ "ex7-child.js" ])
+			);
+		}
+
+		let resps = children.map(function wait(child) {
+			return new Promise(function c(res) {
+				child.on("exit", function(code) {
+					if (code === 0) res(true);
+					res(false);
+				});
+			});
+        });
+        
+        if (x > 5) {
+            foo();
+        }
+
+		resps = await Promise.all(resps);
+		
+		if (resps.filter(Boolean).length === MAX_CHILDREN) {
+			console.log("Sucess!");
+		} else {
+			console.log("failures.");
+		}
+		await delay(500); 
+	}
+}
+```
+### Debugging with Chrome
+> The way we debug with Chrome DevTools is two-fold. The first thing you do is open: `chrome://inspect` and it detects devices, no target for localhost by default.
+- Note that the: `Open deciated DevTools for Node` button doesn't work/do anything useful so says KS.
+- The second thing we do is we add a `--inspect` when we run our file in node, it's listening protocol on that specific port should now show up in devTools: so run `node --inspect ex7.js`
+- Now we can see in chrome dev tools what is happening in our node process.
+
+- [NDB](https://github.com/GoogleChromeLabs/ndb) is package that is just a bundling of Chrome's dev tools, a lot of people swear by it.
+
+## Wrapping Up 
+So this was just an intro into some of things you can do with Node, probably the most important of it is getting a better handle on streams so check out that stream handbook https://github.com/substack/stream-handbook .
+
+## Terminology
+Since I was kind of curious to see why AJAX as a term isn't heard as frequently these days, here is a refresher on AJAX...
+
+[**Asynchronous JavaScript and XML**](https://developer.mozilla.org/en-US/docs/Web/Guide/AJAX), while not a technology in itself, is a term coined in 2005 by Jesse James Garrett, that describes a "new" approach to using a number of existing technologies together, including HTML or XHTML, CSS, JavaScript, DOM, XML, XSLT, and most importantly the XMLHttpRequest object.
+When these technologies are combined in the Ajax model, web applications are able to make quick, incremental updates to the user interface without reloading the entire browser page. This makes the application faster and more responsive to user actions.
+
+Although X in Ajax stands for XML, JSON is used more than XML nowadays because of its many advantages such as being lighter and a part of JavaScript. Both JSON and XML are used for packaging information in the Ajax model.
+
+## Notes
+Just remember that if you're fetching or making async requests, that the data is subject to changed/streamed/chunked in, so it may be better to use `let` or `var` if you're unsure.
+
+## Links 
+**Nav**:
+- [🏠 MAIN](/ks-digging-node-intro)
+- [PREV ← | Web Servers ](/ks-digging-node-web-servers) 
+ 
