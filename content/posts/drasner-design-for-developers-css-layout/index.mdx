@@ -1,0 +1,165 @@
+---
+title: CSS Layout | Design for Developers
+date: 2020-04-14
+slug: drasner-design-for-developers-css-layout
+tags:
+  - CSS
+  - Web
+  - Layout
+  - HTML
+  - Design 
+  - Sarah Drasner
+---
+
+## Layout in CSS
+Fantastic reference: https://gridbyexample.com/
+Really amazing content and patterns for design/grid. Great place to get started and learning.
+
+### Experimental Layout Lab
+- https://labs.jensimmons.com/ 
+- Explore these projects in the dev tools for grid, you can really start seeing the break-down of the grid.
+
+### Grid Garden
+- http://cssgridgarden.com/
+- Fun game to learn grid
+
+There is a lot to learn in Grid, but the basics can get you far. 
+
+- https://cssgrid-generator.netlify.com/
+- Fun interactive grid 
+
+## CSS Grid Demos
+
+Extension to preview Codepens: 
+https://chrome.google.com/webstore/detail/codopen/agnkphdgffianchpipdbkeaclfbobaak?hl=en
+
+1fr is a fraction of a thing. 
+```html 
+<section>
+  <div class="item item-a"></div>
+  <div class="item item-b"></div>
+  <div class="item item-c"></div>
+  <div class="item item-d"></div>
+  <div class="item item-e"></div>
+  <div class="item item-f"></div>
+  <div class="item item-g"></div>
+  <div class="item item-h"></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</section>
+```
+CSS corresponding to style the grid
+```css
+section {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr); 
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  justify-items: center;
+}
+
+div {
+  background: grey;
+  width: 100px;
+}
+```
+## Grid Naming Example
+You can name areas with CSS Grid. 
+https://codepen.io/sdras/pen/f79830e540a17a3690ab9a9e103b5256
+
+CSS Grid 4
+https://codepen.io/sdras/pen/74d210572cdd934e60982fa742243ebd
+
+What if we want this teal one to be somewhere else, where we can specify where its start and end. we can also say `span 2` to span 2 columns.
+
+There is a shorthand:
+`grid-area: 2 / 3 / span 3 / span 2;`
+```css
+
+.item-a {
+  background: teal;
+  /* grid-column-start: 3; */
+  /* grid-column-end: span 1; */
+  /* grid-row-start: 2; */
+  /* grid-row-end: span 3; */
+  
+  grid-area: 2 / 3 / span 3 / span 2;
+}
+```
+- For grid area, it goes: sthe start of the row / the start of the column / followed by end of the row / then end of the column.
+> - Again, in browsers, its always x and then y and then x and then y. If you think about how things are grabbed in the DOM, those boxes are always xy xy xy so it follows that same kind of standard, start at 2 start at 3, span 3 span 2. row/column, row/column.
+
+### `minmax`
+https://codepen.io/sdras/pen/2c40c78b80eda0f03010a6182376f29e
+> A way to say where we want things to start and end without media queries. 
+
+## CSS Flexbox
+https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+
+There are ways to make shapes and diagnols we'll go over in a sec. Here is an example Sarah did: https://webanimationworkshops.com/. Doesn't work in FF, but in chrome it does, uses a css property: `shape-outside: circle(70%)` to get the cool effect of wrapping text around the circles.
+
+## Using ClipPath & Other Masking Tools
+
+![](diagnols.png)
+
+Think of an SVG as an infinite canvas where you can specify the "window" or camera/viewable content with a specified viewBox size.
+
+> Sarah does the diagnols by using an SVG for the diagnol. Just make the hero a certain color and just draw the SVG a certain path value that has the secret-sauce: `preserveAspectRatio=none`, will make this shape scale to the width and height of the container no matter how big or small it is. 
+
+SVG is great for drawing and its built with math. It's not a hack. SVG is built for drawing on the web.
+
+### Clippy
+https://bennettfeely.com/clippy/
+- Using CSS 
+- A cool tool for clipping paths, not super well supported in all browsers though. 
+
+### CSS and SVG Masks
+https://codepen.io/yoksel/pen/fsdbu
+- Shows all kinds of masks/support and its live.
+
+### Example 1
+https://codepen.io/sdras/full/XdgBOa
+- An example by Sarah, which is really cool.
+
+## CSS Writing Mode
+- CSS `writing-mode` , for vertical text, great for international, not as well supported as transforming though.
+- https://24ways.org/2016/css-writing-modes/
+
+### Example
+CSS Writing Mode for the side navs...
+https://dribbble.com/shots/3925911-Visual-exploration
+
+## Grid By Example Demo
+Again, a good place to start is https://gridbyexample.com/ and modify ones that are closest to what we have.
+- https://codepen.io/rachelandrew/pen/GJVgOV 
+- we can use `calc` to give "padding" on the sides of centered elements, e.g. `width: calc(100vh - 80px);`
+
+## Layout Exercise
+Take one of the compositions that you've made and try to recreate it with code.
+
+## Layout Q&A
+- Can you nest grids one in another, yes.
+- Just like you can put flexbox in grid so can you put grid within grid. 
+    - keep in mind maintenance of that design for other developers.
+
+## Links 
+- [MAIN](/drasner-design-for-developers-main)
+- [PREV ← | CSS Layout](/drasner-design-for-developers-css-layout)
+- [NEXT → | Color Theory ](/drasner-design-for-developers-color-theory)
