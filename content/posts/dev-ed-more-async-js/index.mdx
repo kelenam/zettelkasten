@@ -1,0 +1,303 @@
+---
+title: More Async JS (callbacks, promises, async/await) | Dev Ed
+date: 2020-04-15
+slug: dev-ed-more-async-js
+tags:
+  - JS
+  - callbacks
+  - promises
+  - async/await 
+  - Dev Ed
+---
+
+## What is AJAX?
+- **AJAX** - stands for Asynchronous JavaScript and XML.
+- AJAX allows us to make requests/data from a server in the background so we get a kind of live-update view when a request is made.
+- Dynamic data we get back from the server 
+
+## Sync code example 
+
+```js 
+// Sync code example 
+function otherFunc() {
+    console.log('we are in another func');
+    console.log('do some stuff');
+}
+
+console.log('Start');
+
+otherFunc()
+
+console.log('End');
+```
+Will just procede through the code as expected.
+
+
+## Async Example 
+
+```js 
+// Sync code example 
+function otherFunc() {
+    console.log('we are in another func');
+    console.log('do some stuff');
+}
+
+console.log('Start');
+
+setTimeout(() => {
+    console.log('we are in setTimeout');
+}, 2000);
+
+console.log('End');
+```
+- `setTimeout` is asynchronous so we will see start, end then our timeout, its non-blocking.
+- It operates outside of our single-thread, its a browser API feature 
+- The browser is the thing that will keep track of the actually timer.
+
+### event listeners
+>- Click listeners are also passed under web-apis and it keeps track of our clicks and then runs its callbacks by putting the cb on the callstack.
+
+## Simulating server data 
+
+```js
+console.log('Start');
+
+function logInUser(email. password) {
+    setTimeout(() => {
+        return {userEmail: email};
+    }, 1500); 
+}
+
+// We can't do something like const user = loginUser('dev@mail.com', 123456);
+console.log(user);
+//--> undefined 
+
+console.log('Finished');
+```
+- In the above we can't write synchronous code without first waiting for the data to come back, instead we could do so with a callback function,
+
+```js
+console.log('Start');
+
+function logInUser(email. password, callback) {
+    setTimeout(() => {
+        console.log("Now we have the data");
+        return {userEmail: email};
+    }, 1500); 
+}
+
+const user = loginUser('dev@mail.com', 123456, user => {
+    console.log(user);
+});
+
+console.log('Finished');
+
+//-> Start
+//-> Finish
+// -> Nowe we have the data
+// --> { userEmail: dev@maila.com }
+```
+
+## Callback hell
+```js
+console.log(`Start`);
+
+function loginUser(email, password, callback) {
+    setTimeout(() => {
+        console.log("Now we have the data");
+        callback({userName: email})
+    }, 3000);
+}
+
+function getUserVideos(email, callback) {
+    setTimeout(() => {
+        callback(['video1', 'video2', 'video3']);
+    }, 1000);
+}
+
+function videoDetails(video, callback) {
+     setTimeout(() => {
+        callback('KickPuncher 2');
+    }, 2000);
+}
+
+const user = loginUser('devedf@goomail.com', 123456, user => {
+    console.log(user);
+    getUserVideos(user.userEmail, (videos) => {
+        console.log(videos);
+        videoDetails(videos[0], (title) => {
+            console.log(title);
+        });
+    });
+});
+
+console.log('Finish');
+```
+The problem with the this approach, is that in order to keep extending functionality witht multiple callbacks calls, we will run into nested callbacks, in callback hell.
+
+## Promises 
+- A **promise** is just an object that gives us back the success of an asynchronous operation or a failure of an asynchronous operation.
+```js:title=resolve
+const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        console.log('got the user');
+        resolve({ user: 'ed' })
+    }, 2000);
+});
+
+promise.then(user => {
+    console.log(user);
+});
+```
+- Promises have two steps, Setting up the promise and "consuming" the promise by setting up the follow-up functionality using `.then`
+- A much cleaner syntax.
+
+```js:title=reject
+const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        console.log('got the user');
+        reject(new Error('User not logged in'));
+    }, 2000);
+});
+
+promise.then(user => {
+    console.log(user);
+}).catch(err => {
+    console.log(err);
+});
+``` 
+- We can just chain any error catchign with `.catch` 
+
+### Refactoring callback hell 
+Just get rid of the callbacks in our functions, we don't need them, and instead return a new promise.
+Pass the whole setTimeout in the body of the promise, now if we get the data back we resolve the promise 
+```js:title=refactor-with-proimse
+console.log(`Start`);
+
+function loginUser(email, password) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log("Now we have the data");
+            resolve({userEmail: email});
+        }, 1000);
+    })
+}
+
+function getUserVideos(email) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(['video1', 'video2', 'video3']); 
+        }, 500);
+    });
+}
+
+function videoDetails(video) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+           resolve('KickPuncher 2');
+       }, 1000);
+    })
+}
+
+loginUser('ed', 'deved')
+.then(user => getUserVideos(user.userEmail))
+.then(videos => videoDetails(videos[5]))
+.then(detail => console.log(detail));
+
+console.log('Finish');
+```
+- When you request data from an API, you aren't typically even writing the function handlers, we'll instead just be getting a promise back anyways.
+- So when we are consuming a promise, we just call the function and throw on a `.then` to handle
+- much nicer but what if there was an even nicer way of writing this to get your code to look almost synchronous, like wouldn't it be nice to be able to write something that looks like this: `const user = loginUser('ed', 'sdf')`?...
+
+### Promise.all 
+Before we get to async/await. In our previous example we were chaining functions based on the dependent data. Well what if we wanted to make two requests at the same time for data that wasn't dependent on each other, say from fb and youtube ...
+```js:title=promise.all
+const yt = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        console.log('getting stuff from youtube');
+        resolve({ videos: [1,2,3,4,5] });
+    }, 2000);
+});
+
+const fb = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        console.log('getting stuff from facebook');
+        resolve({ user: "Name" });
+    }, 2000);
+});
+
+Promise.all([yt,fb]).then(result => console.log(result));
+```
+If we want to get both of these at the same time we run something called `Promise.all` and then we pass in the array of the promises, then we call `.then` on the result of that to handle their returns. However, the request duration depends on the slowest request. It will only resolve after the slowest does, then the data can be processed.
+
+## async/await
+Async/await is syntactic sugar on top of our proimses that allows us to write asynchronous code in a way that appears/reads synchronous.
+
+Let's just take our promise handling from before...
+And we'll just write out synchronous looking function handling...
+
+```js:title=synchronous-style
+loginUser('ed', 'deved')
+.then(user => getUserVideos(user.userEmail))
+.then(videos => videoDetails(videos[5]))
+.then(detail => console.log(detail));
+
+// SYNC 
+function displayUser() {
+    const loginUser = loginUser('ed', 12345);
+    const videos = getUserVideos(loginUser.userEmail);
+    const detail = videoDetails(videos[0]);
+    console.log(detail);
+}
+
+displayUser()
+
+```
+
+All we do is just use the `await` keyword, to await the returned promise. And we also have to specify that this function is an async one, so we prefix it with `async`.
+```js {8,9}
+loginUser('ed', 'deved')
+.then(user => getUserVideos(user.userEmail))
+.then(videos => videoDetails(videos[5]))
+.then(detail => console.log(detail));
+
+// SYNC 
+async function displayUser() {
+    const loggedUser = await loginUser('ed', 12345);
+    const videos = await getUserVideos(loggeedUser.userEmail);
+    const detail = await videoDetails(videos[0]);
+    console.log(detail);
+}
+
+displayUser()
+```
+
+### error handling
+So instead of doing `.catch`, we use try/catch blocks.
+```js:title=error-handling 
+loginUser('ed', 'deved')
+.then(user => getUserVideos(user.userEmail))
+.then(videos => videoDetails(videos[5]))
+.then(detail => console.log(detail));
+
+// SYNC 
+async function displayUser() {
+    try {
+        const loggedUser = await loginUser('ed', 12345);
+        const videos = await getUserVideos(loggeedUser.userEmail);
+        const detail = await videoDetails(videos[0]);
+        console.log(detail);
+    } catch (err) {
+        console.log("We could not get the videos");
+    }
+}
+
+displayUser()
+```
+
+## Resource 
+https://www.youtube.com/watch?v=_8gHHBlbziw
+
+## Links 
+- [Traversy Async JS](/traversy-async-js)
