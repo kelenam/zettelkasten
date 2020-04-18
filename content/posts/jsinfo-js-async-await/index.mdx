@@ -1,0 +1,165 @@
+---
+title: Async/await | JavaScript.Info  
+date: 2020-04-16
+slug: jsinfo-js-async-await
+tags:
+  - JS
+  - JS.Info
+  - async/await
+  - asynchronous 
+--- 
+
+There’s a special syntax to work with promises in a more comfortable fashion, called “async/await”. It’s surprisingly easy to understand and use.
+
+## Async functions 
+As simple as placing the `async` keyword in front of a function.
+```js 
+async function f() {
+  return 1;
+}
+```
+> [^ **⭐ The `async` keyword before a function means one thing, which is...**]⭐The word 'async' before a function means one thing: the specified function always returns a proimse. Other values are wrapped in a resolved promise automatically.
+
+For instance, this function returns a resolved promise with the result of `1`; let’s test it:
+```js 
+async function f() {
+  return 1;
+}
+
+f().then(alert); // 1
+``` 
+
+…We could explicitly return a promise, which would be the same:
+
+```js:title=resolve-promise-equivalent
+function f() {
+    return Promise.resolve(1);
+}
+
+f().then(alert); //--> 1
+```
+- Aside: We can immediately present a resolved proimse like so `Proimse.resolve(1)`
+
+So, `async` ensures that the function returns a promise, and wraps non-promises in it. Simple enough, right? But not only that. There’s another keyword, `await`, that works only inside async functions, and it’s pretty cool.
+
+## Await 
+The syntax:
+```js:title=await-syntax
+// works only inside async functions
+let value = await promise;
+```
+>[^ **What does the `await` keyword do? Where can it be used?**] The keyword `await` makes JavaScript wait until that promise settles and returns its result. It works only inside async functions.
+
+Here’s an example with a promise that resolves in 1 second:
+
+```js
+
+async function f() {
+    let promise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve("done!")
+        }, 1000);
+    });
+
+    let result = await promise; // wait until the proimse resolves (*)
+
+    alert(result); // "done!"
+}
+
+f(); 
+
+``` 
+The function execution “pauses” at the line (*) and resumes when the promise settles, with result becoming its `result`. So the code above shows `“done!”` in one second.
+
+> Let’s emphasize: `await` literally makes JavaScript wait until the promise settles, and then go on with the result. That doesn’t cost any CPU resources, because the engine can do other jobs in the meantime: execute other scripts, handle events, etc.
+
+It’s just a more elegant syntax of getting the promise result than promise.then, easier to read and write.
+
+We will get this error if we do not put `async` before a function. As said, `await` only works inside an async function.
+
+### `await` won't work in the top-level code 
+People who are just starting to use await tend to forget the fact that we can’t use await in top-level code. For example, this will not work:
+```js
+// syntax error in top-level code
+let response = await fetch('/article/promise-chaining/user.json');
+let user = await response.json();
+``` 
+But we can wrap it into an anonymous async function, like this:
+```js
+(async () => {
+  let response = await fetch('/article/promise-chaining/user.json');
+  let user = await response.json();
+  ...
+})();
+``` 
+### `await` accepts “thenables”
+Like `promise.then`, await allows us to use thenable objects (those with a callable `then` method). The idea is that a third-party object may not be a promise, but promise-compatible: if it supports `.then`, that’s enough to use it with `await`.
+ 
+```js 
+class Thenable {
+  constructor(num) {
+    this.num = num;
+  }
+  then(resolve, reject) {
+    alert(resolve);
+    // resolve with this.num*2 after 1000ms
+    setTimeout(() => resolve(this.num * 2), 1000); // (*)
+  }
+};
+
+async function f() {
+  // waits for 1 second, then result becomes 2
+  let result = await new Thenable(1);
+  alert(result);
+}
+
+f();
+```
+If `await` gets a non-promise object with `.then`, it calls that method providing the built-in functions `resolve` and `reject` as arguments (just as it does for a regular Promise executor). Then `await` waits until one of them is called (in the example above it happens in the line `(*)`) and then proceeds with the result.
+
+### Async class methods
+```js:title=async-methods 
+class Waiter {
+  async wait() {
+    return await Promise.resolve(1);
+  }
+}
+
+new Waiter()
+  .wait()
+  .then(alert); // 1
+```
+
+## Error Handling 
+> [^ ****]If a promise resolves normally, then `await` promise returns the result. But in the case of a rejection, it throws the error, just as if there were a `throw` statement at that line.
+
+This code:
+```js
+async function f() {
+  await Promise.reject(new Error("Whoops!"));
+}
+``` 
+…is the same as this:
+```js 
+async function f() {
+  throw new Error("Whoops!");
+}
+``` 
+In real situations, the promise may take some time before it rejects. In that case there will be a delay before `await` throws an error.
+
+We can catch that error using try..catch, the same way as a regular throw:
+```js 
+async function f() {
+
+  try {
+    let response = await fetch('http://no-such-url');
+  } catch(err) {
+    alert(err); // TypeError: failed to fetch
+  }
+}
+
+f();
+``` 
+
+
+## Summary Questions

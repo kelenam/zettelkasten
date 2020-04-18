@@ -17,10 +17,197 @@ tags:
 - Then a select then a bunch of options/ 
     - just grab the options from the existing repo
 - For the inputs `<input type="number" id="amount-one" placeholder="0" value="1">` 
-
 - In between the two currency classes is going to be a div with a class of `swap-rate-container`
     - it will hold a button with a class btn and an id of rate. The inner text will be Swap
     - Below that button will be an empty div with a class and id of `rate`. Nothing will go in here, it will just be generated dynamically.
-
 - This should be it for the HTML. 
 
+## Styling
+1. set primary color
+2. box sizing 
+3. body Styling: we just manage flex styoling here in the body, giving it height of 100vh. Also give padding to entire body
+4. h1 tag 
+5. p tag
+6. btn styling, color, curosor, border radius
+7. image styling width 150 
+8. currency class, padding 
+9. currency select: padding, setting default appearance to none , setting border lighter color.
+10. Use an svg for the arrow
+11. style the currency input, setting background tranaprent, making font size 30, text align right
+12. swap-rate-container, to make it align horizontally and get it over to the right, using space-between
+13. rate styling, primary color, font-size 14, padding 0 10px
+14. **hanging the focus state from that ugly default**: `select:focus`, `input:focus`, `button:focus` : `outline: 0`
+15. Media query for 600px or less, toe change currency input styling.
+
+
+### svg as background for button
+
+```css 
+  select {
+        padding: 10px 20px 10px 10px;
+        margin: 30px 0;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        border: 1px solid #dedede; 
+        font-size: 16px;
+        background: transparent;
+        background-image: url('data:image/svg+xml...');
+        background-position: right 10px top 50%, 0, 0;
+        background-size: 12px auto, 100%;
+        background-repeat: no-repeat;
+     }
+```
+- We have to add additional styling to the svg to get it to appear correctly.
+
+## JSON & `fetch` API
+- `fetch` is used to make HTTP requests either to your backend, or to fetch from third-party APIs, like the one we will be using the Exchange Rate API. 
+- This third-party API has an **endpoint** that we can hit, and we can hit specific RESTfully established URLs to get specific responses.
+
+### Practicing JSON
+We can also make requsts to file themselves.
+- JSON object is very similar to a JS object. Basically just key/value pairs
+>- The difference between JSON and regular JS objects is that they key and any string values are going to have double-quotes. 
+```json:title=items.json
+{
+  "id": 1, 
+  "text": "Item One"
+}
+```
+- We can also have JSON Arrays
+```json:title=items.json
+[
+ { "id": 1, "text": "Item One" }, 
+ { "id": 2, "text": "Item Two" }, 
+ { "id": 3, "text": "Item Three" }
+]
+```
+
+Using our JSON example. Let's make a new file to consume that JSON file.
+```js:title=script.js
+function calculate() {
+  fetch('items.json')
+    .then(res => res.json())
+    .then(data => console.log(data););
+}
+
+calculate();
+```
+- `fetch` is built into the browser, we don't need to install it or anything. 
+  - Inside of fetch, if we are making a GET request, because there are a bunch of different types of HTTP requests. GET/POST/PUT/DELETE, etc.
+  - if we are just getting data, we can simply put the path in as a string as an argument to `fetch('path')`
+  - If we want to specify a different type of HTTP request we pass in an object after the path: `fetch('path', { method: 'POST', headers: {}})`
+    - we specify the type with the `method` property, we can also add headers, and anything else we might want.
+- By itself `fetch('items.json')` is just going to make a GET request 
+  - This runs asynchronously, it runs in the background and what it does is it returns a promise
+  - the way we catch the promise is with `.then`. 
+  - the promise gives us back a response as an auto-inserted argument passed into whatever function we have to handle our `.then`, 
+    -`fetch('items.json').then(res => console.log(res))`
+    - If we check this out in the browser we see that we are getting a readable stream in the body
+    - We have headers and status codes, 200 = okay, 300 = redirect, 400 = user error, 500 = server error. 
+  - Notice that the data we are requesting for, is not here, with the fetch API we have to take the response and format it to what we want, which is JSON in our case: `res.json()`  
+    - But, when we run `res.json()` we get another promise back, so we have to run `.then` again to handle the data...
+  - You can start seeing how we might use this data 
+  ```js:title=script.js
+  function calculate() {
+    fetch('items.json')
+      .then(res => res.json())
+      .then(data => (document.body.innerHTML = data[0].text));
+  }
+
+  calculate();
+  ```
+  - This would just replace our body's innerHTML with our the text of the first element in the data array.
+
+## JavaScript
+We need to fire off some events and select some DOM elements.
+1. select DOM elements: currencyEl_one, amountEl_one,  currencyEl_two, amountEl_two, rate, swap
+2. create calculate function
+3. add 4 event listeners, for our amountEl_one and two, we listen for the input event,  
+
+Im using a different exchange rate API since I didn't want to sign up for an account. I'm using this...
+
+- Site: https://exchangeratesapi.io/
+- API: https://api.exchangeratesapi.io/ 
+- Source:  https://github.com/exchangeratesapi/exchangeratesapi
+
+4. create variables for the currencyOne and currencyTwo values, 
+  - fetch API, with template literal in place of base currency, replaced with currencyOne
+  - this is going to give us a promise back, so .then, we get a proimse back and we need to res.json that response.
+  - then we get that data back., we want the rates.
+  - in the data we get back we want to save a variable of the rates, and we want to grab whatever the currency of currency two, we do so by passing in the currencyTwo as the index to the rates object.
+5. We then set the rateEl, to a string literal describing the exchange rate
+6. we then set the amountEl_two.value to be equal to the amountEl_one.value * rate, and then fix to 2 decimal places with `.toFixed(2)`
+7. Add event listener for our swap
+
+## Emmet Shortcuts:
+### flexbox
+- `df`: --> `display: flex`
+- `ai`: --> `align-items`
+  - `aic`: --> `align-items: center`
+- `fld`: --> `flex-direction`
+- `jc`: --> `justify content`
+  - `jcc`: justify-content: center;
+  - `jcsb`: justify-content: space-between;
+
+### font size 
+- `fz`: font-size
+  - `fz14`: --> `font-size: 14px`
+### padding 
+- `p`: padding
+  - `p15px30`: --> `padding: 15px 30px`;
+
+## Key Insights
+> [^**If we are using async/await and we want to parse the request into JSON in the same line, what must we remember to do?**]In turning this into an async operation instead of using promises. it is possible to just .json() on the awaited response, HOWEVER, (and can VSCODE correct this for you), since remember, res.json() would still return a promise you need to wrap everyything and await it as well...
+
+```js {6-11}
+async function calculate() {
+    const currency_one: string = currencyEl_one.value;
+    const currency_two: string = currencyEl_two.value;
+    
+    console.log(typeof currency_one, currency_two);
+    fetch(`https://api.exchangeratesapi.io/latest?base=
+    ${currency_one}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+    })
+}
+```
+
+This would need to be something like this... Paying attention to the wrapped await. 
+
+```js {6-7}
+async function calculate() {
+    const currency_one: string = currencyEl_one.value;
+    const currency_two: string = currencyEl_two.value;
+    
+    console.log(typeof currency_one, currency_two);
+    const data = await (await fetch(`https://api.exchangeratesapi.io/latest?base=
+    ${currency_one}`)).json();
+}
+```
+You could of course break this up to two separate assignments. like...
+```js
+const rawResponse = await fetch(`https://api.exchangeratesapi.io/latest?base=
+    ${currency_one}`); 
+const parsedResponse = await rawResponse.json();
+```
+You'd still have to await `rawResponse` to be fufuilled.
+ 
+- Note: Don't manually break lines, especially in your HTTP/API request query, lol. I was getting an error on the API side because I was requesting an endpoint with white-space.
+- On Firefox browsers I was getting a red/error box-shadow on the second input, to fix this, I added a pseudo-selector to `input`... 
+```scss {7-9}
+input {
+  border: none;
+  background: transparent;
+  font-size: 30px;
+  text-align: right;
+
+  &:invalid {
+      box-shadow: none;
+  }
+}
+```
+
+## Summary Questions 

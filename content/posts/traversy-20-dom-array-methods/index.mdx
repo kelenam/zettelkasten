@@ -1,0 +1,84 @@
+---
+title: DOM Array Methods | Traversy 20
+date: 2020-04-17
+slug: traversy-20-dom-array-methodss
+tags:
+  - JS
+  - DOM 
+  - Array methods
+  - HTML
+  - CSS 
+  - Projects
+---
+
+## HTML
+1. Setup h1, title of Array methods
+2. Next div with class of container, that everything will go in
+3. Next will be a sidebar that will contain users/people., we use an aside tag for this
+    - In this sidebar will be all our buttons:
+    - button with id of add-user and text Add User
+    - btn with id of double to Double Money
+    - btn id show-millionaires that will Show Only Millionaires 
+    - btn id of sort, Sort by Richest 
+    - btn id of calculate-wealth that Calculates entire Wealth 
+4. Beneath our sidebar we will have a main tag with an id of main
+5. Inside main we will have an h2 with strong tag around `Person` then outside of that `Wealth`
+
+That's pretty much it for our HTML, moving on to styling...
+
+## Styles 
+
+1. `*` Box-sizing to border box 
+2. `body`:
+    - bgc : f4f4f4
+    - ff: arial
+    - display flex
+    - flex dir: column
+    - align items center
+    - min height 100vh 
+    - margin 0
+3. `.container `
+    - display as flex: this is going to align the main area and the sidebar 
+    - padding on entire container of 20px
+    - margin 0 (tb), auto (lr)
+    - max width to 100%
+    - ⭐ regular width to 800px so it doesn't go past 800px when we stretch it out.
+
+4. For the `aside` bar we will just use the `aside` tag to style it  
+    - padding 10px 20px
+    - width 250px 
+    - add border to separate, : border-right: solid 1px solid #111
+5. `button`s in the sidebar
+    - bgc: fff 
+    - brder: solid 1px 111 
+    - border radius 5px 
+    - cursor: pointer
+    - ⭐ display: block (so that each button is on its own line )
+    - width 100% of size of the aside 
+    - padding 10px
+    - margin-bottom: 20px 
+    - font-weight: bold 
+    - font-size 14px 
+6. `main` area using main tag 
+    - flex to 1 
+    - padding 10px 20px 
+7. `h2` 
+    - border-bottom: 1px solid #111 
+    - padding bottom 10px; 
+    - display: flex, what this is going to do is put the strong tag on the same line and allow us to space between, like using table headings without using tables.
+    - justify-content: space between 
+    - font weight 300, which will apply to the non-strong tag ("Wealth")
+    - set the margin a bit for alignment< margin 0 0 20px; 
+8. `h3`, is going to be another header we add, with a lot of the same styles as the h2, so we can just copy it, but instead...
+    - we'll give it a bgc of #fff 
+    - and change margin to 20px 0 0 instead. 
+    - and padding to 10px 
+9. `.person` class, we will make 
+    - display: flex 
+    - jc spacebtween 
+    - font-size 20px 
+    - margin-bottom: 10px
+
+
+
+## Summary Questions 
