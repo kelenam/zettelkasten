@@ -68,7 +68,7 @@ That's pretty much it for our HTML, moving on to styling...
     - display: flex, what this is going to do is put the strong tag on the same line and allow us to space between, like using table headings without using tables.
     - justify-content: space between 
     - font weight 300, which will apply to the non-strong tag ("Wealth")
-    - set the margin a bit for alignment< margin 0 0 20px; 
+    - set the margin a bit for alignment: margin 0 0 20px; 
 8. `h3`, is going to be another header we add, with a lot of the same styles as the h2, so we can just copy it, but instead...
     - we'll give it a bgc of #fff 
     - and change margin to 20px 0 0 instead. 
@@ -79,6 +79,25 @@ That's pretty much it for our HTML, moving on to styling...
     - font-size 20px 
     - margin-bottom: 10px
 
+## JavaScript 
+
+## `getRandomUser` and `addData`
+1. Select all DOM elements
+2. Generate a random user: using the random user API: https://randomuser.me/ 
+3. initialize a varble called `data` with `let` that will basically just be where we put all of the people, its going to be an array of people.
+4. function to fetch random user. The endpoint we hit to get a random user is just: https://randomuser.me/api
+5. We take the the first result of that data and describe a new user object from it using 
+6. we use a function called addData to push that new user object into the external data array.
+
+## `updateDom`
+1. call the updateDom function in the end of addData that we will write
+2. create updateDom function that will take a parameter called provided data with a default value of the data array.
+3. Clear the main div, with `main.innerHTML` = the default h2s we have, Person, Wealth
+4. We're going to use the `forEach` method on `providedData`. The arrow function with take a param we'll call item, 
+    -⭐ we'll create a brand new element for each of our new people, for that we use `document.createElement('div')` 
+    - take that element add the person class to that div
+    - add innerHTML to that div and set it to backticks, strong tag with the name, then outside of that strong tag, put the item.money.
+    - We still have to append the element to the main area, by using `appendChild` 
 
 
 ## Summary Questions 
