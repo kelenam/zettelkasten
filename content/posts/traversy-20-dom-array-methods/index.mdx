@@ -89,7 +89,7 @@ That's pretty much it for our HTML, moving on to styling...
 5. We take the the first result of that data and describe a new user object from it using 
 6. we use a function called addData to push that new user object into the external data array.
 
-## `updateDom`
+## `updateDom` using `forEach` 
 1. call the updateDom function in the end of addData that we will write
 2. create updateDom function that will take a parameter called provided data with a default value of the data array.
 3. Clear the main div, with `main.innerHTML` = the default h2s we have, Person, Wealth
@@ -98,6 +98,14 @@ That's pretty much it for our HTML, moving on to styling...
     - take that element add the person class to that div
     - add innerHTML to that div and set it to backticks, strong tag with the name, then outside of that strong tag, put the item.money.
     - We still have to append the element to the main area, by using `appendChild` 
+5. Separate function to format money, formatMoney, can use a stack overflow 
+`(12345.67).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');  // 12,345.67` and return this in format money.
+6. Add event listener for addUserBtn, just going to call getRandomUser on click. 
 
+### `doubleMoney` using `map`  
+1. new function called `doubleMoney` that we will put right below, `getRandomUser`
+2. We are going to take that global `data` array and map through it, recast into it the mapped double money version of data. 
+    - So we return an object, but first we want to copy everything that is in that user (which at the moment it just name and money, so to do so we use the spread operator what we have in this user object ...user,), so saying `return {...user}` is just going to return what is already there. 
+    - Don't forget to call `updateDOM()` at the end of doubleMoney. 
 
 ## Summary Questions 
