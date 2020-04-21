@@ -1,0 +1,62 @@
+---
+title: Menu Slider & Modal | Traversy 20
+date: 2020-04-20
+slug: traversy-20-menu-slider-modal
+tags:
+  - JS
+  - HTML
+  - CSS 
+  - Projects
+---
+
+## HTML 
+1. Title My Landing Page, link our style and script 
+2. Link font awesome cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/fontawesome.min.css
+3. In our body, we are going to have our nav tag 
+  - within nav we want a div with a class of logo
+    - img tag within logo with random user.me api, so https://randomuser.me/api/portraits/men/76.jpg
+  - under logo we will have ul  
+    - in ul an li with an a tag with empty hrefs: Home
+    - The same li/a for Portfolio, Blog, Contact
+    - Thats it for the nav
+4. Have a header tag under the nav  
+  - we need a button to toggle the menu so tag of button with id and class of `toggle`
+    - within button we will have an image from font awesome: `i.fa.fa-bars.fa-2x` (font awesome we can double size of icon with  fa-2x)
+5. Below button we will have, our h1 called My Landing Page
+6. ⭐ Below that a p tag with 10 words of lorem, we get that in Emmet by saying `lorem10`.
+7. still within header, but below `p` tag we will create a button with a class callled `cta-btn` and an id of `open`. We will use this id to basically hide/show the modal. The text in the button will be `Sign Up`. 
+8. Next will be the main body/class or container. So a div with a class of container. 
+9. An h2 with : What is this landing page about?
+10. p tag, with lorem30,
+11. another p tag with lorem20
+12. still within container div, put h2: Tell me more
+13. another lorem tag with lorem40
+14. below that another h2 with "Benefits"
+15. An ul with three li tags: Lifetime Access, 30 day money back, tailored customer support
+16. Then another p with lorem70.
+17. Last thing we need is the modal. Can be outside of our container since it will have a fixed position. div with class `modal-container` and id of `modal`. Basically the container is going to the bg of our modal with the faded out bg, and the box in the middle will be the actual modal 
+18. In the modal container a new div with class `modal`
+  - in this modal a button with class close-btn and id of close 
+    - in this button we will use a fontawesome icon: `i.fa.fa-times
+  - Below button will be a div with class `modal-header`
+    - will have an h3 that says: Sign Up
+  - Under header will be a div with class `modal-content`
+    - in here a p tag with: "Register with us to get  offers, support and more"
+    - form with class `modal-form`
+      - in form there will be a div, no class,
+        - in this div there will be a label for name
+        - an input with id of `name`, and placeholder: "Enter name"
+        - Copy this div, with label/input tags, and paste it 3 times, and change name to email, password and confirm password, with id of password2. 
+    - Under this last div we need our submit button: `input:submit`, value will be `Submit`, and class will be `submit-btn`
+
+## Navbar Styling 
+- Going to grab Lato from google fonts: `@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');`
+- Set variables: 
+  - modal-duration: 1s,
+  - primary color 30336b
+  - secondary color be2edd
+- `*` bx 
+- `body` font-family: to Lato
+
+
+## Key Insights 

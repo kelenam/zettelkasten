@@ -1,7 +1,7 @@
 ---
 title: DOM Array Methods | Traversy 20
 date: 2020-04-17
-slug: traversy-20-dom-array-methodss
+slug: traversy-20-dom-array-methods
 tags:
   - JS
   - DOM 
@@ -105,7 +105,81 @@ That's pretty much it for our HTML, moving on to styling...
 ### `doubleMoney` using `map`  
 1. new function called `doubleMoney` that we will put right below, `getRandomUser`
 2. We are going to take that global `data` array and map through it, recast into it the mapped double money version of data. 
-    - So we return an object, but first we want to copy everything that is in that user (which at the moment it just name and money, so to do so we use the spread operator what we have in this user object ...user,), so saying `return {...user}` is just going to return what is already there. 
-    - Don't forget to call `updateDOM()` at the end of doubleMoney. 
+    >- So we return an object, but first we want to copy everything that is in that user (which at the moment it just name and money, so to do so we use the spread operator what we have in this user object ...user,), so saying `return {...user}` is just going to return what is already there. 
+    - Don't forget to call `updateDOM()` at the end of doubleMoney.  
+    - do when we want to double money, we just say in that object, `{ ...user, money: user.money * 2}`.
 
-## Summary Questions 
+### `sort`
+The [`sort()`]() method sorts the elements of an array in place and returns the sorted array. The default sort order is ascending, built upon converting the elements into strings, then comparing their sequences of UTF-16 code units values.
+- It does so based on string conversions.
+```js
+const arr = [ 1, 2, 110, 3, 4 , 330];
+
+const sortedArr = arr.sort();
+
+console.log(sortedArr);
+// --> [ 1, 110, 2, 3, 330, 4]
+```
+
+- If you're trying to sort things numerically you need to use some type of **compare function**.
+So to sort the above in a manner we would want we would change it like so...
+```js
+const arr = [ 1, 2, 110, 3, 4 , 330];
+
+const sortedArr = arr.sort((a, b) => {
+    return a - b;
+});
+
+console.log(sortedArr);
+```
+- If we wanted it in ascending order, we would just say `a - b`.
+- If we wanted to have this in descending order, we can say `b - a`
+
+### `sortByRichest`
+1. Create a new function called `sortByRichest` and create an event listener for this function on the corresponding button.
+2. We use the `sort` fuction to sort in descending order, the money property on our existing `data` array.
+3. Then we have to called `updateDOM() `
+
+## `filter` 
+Going to use the filter Array method, which **creates a new array** with all elements that pass the test implemented by the provided function. 
+
+### `showMilliionares`
+1. Below our `sort` function, we can add a `showMilliionares` function, and destructively set the `data` array to the filterered by those whose wealth is greater than 1,000,000. 
+
+## `reduce`
+The `reduce()` method executes a **reducer** function (that you provide) on each element of the array, resulting in a single output value. 
+
+```js 
+const arr = [1,2,3,4,5];
+const total = arra.reduce((acc, num) => (acc + num), 0);
+```
+
+### `calculateWealth`
+1. Create a new function called `calculateWealth` and set up and event handler for the button.
+2. In this function, we want to create a varibale called `weatlh` that will be the accumulated value of all the users combined wealth using `reduce`
+3. create a new variable that will hold a new div we will be returning after creating it with `createElement('div')`
+4. set the `innerHTML` of that newly created `wealthEl`, We will use an h3 with a strong tag, and put in the total wealth.
+5. append this new element to main
+
+
+## Key Insights
+Using the `document.createElement('div')` to create new divs, or any element for that matter. If we are using Divs we are set the inner content or text of that newly created div by using `innerHTML`. Then appending the new element as a child of whatever element we want to append it to.
+
+When we are using the destructuring syntax in our `doubleMoney` function...
+```ts
+function doubleMoney(): void {
+    userList = userList.map((user: any): {name: string, money: string} => {
+        return { ...user, money: user.money * 2 }
+    });
+    updateDOM();
+}
+```
+The reason we use destructuring, is that it takes all the existing data from the `user` object we are passing in, all proerties so on and so forth in that object even though at the moment there is only `name` and `money` as properties. If we had more than the properties mentioned they would be inclucded in our destructuring, although since we are using TS, if we wanted to stay explicit about our type declarations we should specify them there. I suppose if we are using TS in this case, as we are above, it might be more explicit to simply just write the above like so...
+```ts
+function doubleMoney(): void {
+    userList = userList.map((user: any): {name: string, money: string} => {
+        return { name: user.name , money: user.money * 2 }
+    });
+    updateDOM();
+}
+```
