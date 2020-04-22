@@ -23,7 +23,7 @@ tags:
   - we need a button to toggle the menu so tag of button with id and class of `toggle`
     - within button we will have an image from font awesome: `i.fa.fa-bars.fa-2x` (font awesome we can double size of icon with  fa-2x)
 5. Below button we will have, our h1 called My Landing Page
-6. ⭐ Below that a p tag with 10 words of lorem, we get that in Emmet by saying `lorem10`.
+6. ⭐[^ **What is the Emmet shortcut for specifying 10 words of lorem ipsum text?**] Below that a p tag with 10 words of lorem, we get that in Emmet by saying `lorem10`.
 7. still within header, but below `p` tag we will create a button with a class callled `cta-btn` and an id of `open`. We will use this id to basically hide/show the modal. The text in the button will be `Sign Up`. 
 8. Next will be the main body/class or container. So a div with a class of container. 
 9. An h2 with : What is this landing page about?
@@ -48,15 +48,242 @@ tags:
         - an input with id of `name`, and placeholder: "Enter name"
         - Copy this div, with label/input tags, and paste it 3 times, and change name to email, password and confirm password, with id of password2. 
     - Under this last div we need our submit button: `input:submit`, value will be `Submit`, and class will be `submit-btn`
+    - Update: Add form-input as a class to all the input fields.
 
 ## Navbar Styling 
 - Going to grab Lato from google fonts: `@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');`
 - Set variables: 
-  - modal-duration: 1s,
-  - primary color 30336b
-  - secondary color be2edd
+  - $modal-duration: 1s,
+  - $primary color 30336b
+  - $secondary color be2edd
 - `*` bx 
 - `body` font-family: to Lato
+  - m0
+- nav 
+  - bgc: primary color 
+  - border-right: 2px solid rgba(200,200,200, 0.1)
+  - color: #fff;
+  - position: fixed;
+  - top: 0;
+  - left: 0;
+  - width 200px
+  - height: 100vh;
+  - z-index: 100; 
+  - transform: translateX(-100%);
+- `nav .logo` 
+  - p30px0
+  - tac
+- `nav .logo img` 
+  - h75
+  - w7
+  - border radius : 50%
+- nav ul 
+  - p0 
+  - lst none 
+  - m0 
+- nav ul li 
+  bb 2px solid rgba(200,200,200,0.1)
+  p20
+- nav ul li:first-of-type 
+  bt: 2px solid rgba(200,200,200,0.1)
+- nav ul li a 
+  - color #fff 
+  - tdn
+- nav ul li a:hover 
+  - tdn: underline
 
+### Navbar Styling Notes
+- The way we get the navbar to appear is by using the transform property, and translate on the x-axis
+- To add a border to just to say the first element in a list, we can use a pseudo-selector, `first-of-type`, to add a style just to the first element in a list like we do above for the nav ul li.
+
+
+## Header Modal Styling 
+- header 
+   - bgc: $primary
+   - c#f 
+   - fz 130%
+   - ps (default is relative)
+  - p40px15px
+  - tac;
+- header h1 
+  - m0
+- header p 
+  - m 30px 0
+- button, input[type='submit']
+  - bgc: secondary-color 
+  - b0
+  - border-radius: 5px;
+  - c#f  
+  - cup (--> cursor pointer)
+  - p8px12px 
+- button:focus 
+  - outline: none
+- .toggle 
+  - bgc: rgba(0,0,0,0.3)
+  - poa (position: absolute;)
+  - top: 20px 
+  - left: 20px 
+- cta-btn 
+  - p12px30px 
+  - fz:  20px 
+- .container 
+  - p15 
+  - m0-a
+  - max-width 100%
+  - w800 
+- .modal-container 
+  - bgc: rgba(0,0,0,0.6)
+  - diplay:none; 
+  - pof (position fixed)
+  - t0
+  - l0 
+  - r0 
+  - b0 
+- .modal 
+  - bgc#f 
+  - border-radius: 5px 
+  - bxsh
+  - poa 
+  - oh / of (overflow hidden)
+  - t50% 
+  - l50% 
+  - transform: translate(-50%, -50%)
+  - w400
+- .modal-header 
+  - bgc: $primary-color 
+  - c#f 
+  - p15 
+- .modal-header h3 
+  - m0;
+  - bb 1px solid #333 
+- .modal-content 
+  - p20
+- .modal-form div 
+  - m15-0
+- .modal-form label 
+  - db
+  - mb5
+- .modal-form .form-input 
+  - p8
+  - w100% 
+- .close-btn 
+  - bg transparent
+  - fz25
+  - poa
+  - t0 
+  - r0 
+
+### Header Modal Styling Notes
+- The reason we set the position of th header itself to `relative` is because we are going to position the toggle buttton inside of it to absolute, and it needs a relative container in order to do that.
+> [^ **⭐ Let's say we are trying to style all buttons and inputs with the type of select, how would our style selector look like?**]- ⭐ We are going to be adding bases styles for all of the buttons, as well as the input with a type of submit, we can use the syntax to grab that submit input like so: `input[type='submit']`. 
+- > [^ **How do you specify more than one property value abbreviation in Emmet?**]Use `-` to separate css property abbreviations with Emmet. For instance, if you wanted `margin: 0 auto;` the shortest way to say this is `m0-a`, where 0 is your top and bottom and a is auto for left and right.
+- >[^ **If you want to style a container so that on a screen that is less than 800px it will take up the full width of the page, but only stay constrained to 800px on screens bigger than 800px, how would you approach this?**] You would set the max width to be 100% and the regular width to be 800px or whatever ccontainer size you want.
+- >[^ **How would one create a darkened overlay that takes up the whole screen for the backdrop of a modal?**]The modal container is going to cover the whole page, its basically going to be an overlay. That's why we we its position to fixed, and set it the top,left,right,bottom values all to 0. 
+- [^ **How do we get our absolutely positioned modal more centered to the page? Why do we need to do this?**]We can use `transform: translate(-50%, -50%)`, which takes in an x and y values, set to 50% to get our absolutely positioned modal more towards its own middle rather than being positioned by its origin (top, left point).
+
+## Menu & Modal Toggle 
+In our script, we want to bring in our elements. 
+1. make variables for toggle, close button, open, and modal. 
+2. add click event listener to toggle, we will toggle a class of `show-nav` (yet to be implemented) to the body
+3. go back into our css to add our stylign for `show-nav` we add the styling: translateX(200px) 
+  - add a transition property on the body for our transform to make it smoother: `transition: transform 0.3s ease;`
+4. Now we will address our modal, by adding a click event to our openState, the cb will add the `show-modal` class to to our `modal` 
+5. We add another event listener for the closeState where we remove the `show-modal` class.
+6. Back in our CSS we need to add the show-modal styling, in css we would do `.modal-container.show-modal`, in Sass that would look like nested show modal in modal container with the &, so `.modal-container { &.show-modal { } }`
+  - we change the display of this selector to display:block
+  - We want to add an animation on this modal so...
+7. In the modal styling:
+  - `animation-name:  modalopen;`
+  - animation duration set to $modal-duration
+8. The bottomn of our styling we use @keyframes...
+  ```css
+  @keyframes modalopen {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+  ```
+  - this makes it so the opacity changes from 0 to 1 over 1s. 
+9. The last thing want it so be able to close the modal simply by clicking outside of the modal. For this, in our JS we will take the window object and add an event listener on that, we will need the event parameter in our cb...
+```js 
+window.addEventListener('click', e => 
+  e.target === modal ? modal.classlList.remove('show-modal') : false
+)
+```
+  - this works because we are saying if our target is the modal, which we specify in the JS. 
+
+### Menu & Modal Toggle Notes 
+- Note: I ran into some TS issues with [close](https://developer.mozilla.org/en-US/docs/Web/API/Window/close)/[open](https://developer.mozilla.org/en-US/docs/Web/API/Window/open) being already declared on this block level so, I just renamed them to openState and closeState.
+- Remember, the nav width should match what we are transforming by, since we are translating it out on the x axis by its width amount, so if you change the width of the nav, make sure to match it in our translateX property
+- note when you are adding the .show-nav styling within body using Sass, you need to use the `&` prefix so `&.show-nav`, we use `&` when we want to write a selector that matches the outer selector and an element selector. Check out the Key Insights section below. 
+- [^ **How do you go about setting an animation name? for keyframe animations?**]By using the `animation-name` property and passing in an animation name without quotes: e.g. `animation-name: modalopen;`
 
 ## Key Insights 
+
+### CSS selectors: `.class1 .class2` v.s `.class1.class2`
+> [^ **What is the difference between `.class1 .class2` and `.class1.class2`?**]The difference between the two is that the space between selectors suggests the first selector is the parent tag of the ensuing selctors, `.class1 .class2` , `.class2` would be a descendant of `.class1` whereas `.class1.class2` is saying class lists that match having both classes `class1` and `class2`. So we could say `body` tags that have a class of `show-modal` like `body.show-modal` whereas `body .show-modal` is styling the `.show-modal` class where it is a descendent of `body`. 
+
+[The CSS class selector matches elements based on the contents of their class attribute](https://developer.mozilla.org/en-US/docs/Web/CSS/Class_selectors)
+```css
+/* All elements with class="spacious" */
+.spacious {
+  margin: 2em;
+}
+
+/* All <li> elements with class="spacious" */
+li.spacious {
+  margin: 2em;
+}
+
+/* All <li> elements with a class list
+that includes both "spacious" and "elegant" 
+For example, class="elegant retro spacious" */
+li.spacious.elegant {
+  margin: 2em;
+}
+```
+
+[A CSS selector can contain more than one simple selector. Between the simple selectors, we can include a combinator.](https://www.w3schools.com/Css/css_combinators.asp)
+
+There are four different combinators in CSS:
+- **descendant selector** (space)
+- **child selector** (>)
+- **adjacent sibling selector** (+)
+- **general sibling selector** (~)
+
+The [**descendant selector**]() matches all elements that are descendants of a specified element. The following example selects all `<p>` elements inside `<div>` elements: 
+```css
+div p {
+  background-color: yellow;
+}
+```
+The [**child selector**]() selects all elements that are the children of a specified element.
+The following example selects all `<p>` elements that are children of a `<div>` element:
+```css 
+div > p {
+  background-color: yellow;
+} 
+``` 
+
+The [**adjacent sibling**]() selector selects all elements that are the adjacent siblings of a specified element.
+Sibling elements must have the same parent element, and "adjacent" means "immediately following".
+The following example selects all `<p>` elements that are placed immediately after `<div>` elements:
+```css 
+div + p {
+  background-color: yellow;
+} 
+```
+
+The [**general sibling**]() selector selects all elements that are siblings of a specified element.
+The following example selects all `<p>` elements that are siblings of `<div>` elements: 
+```css 
+div ~ p {
+  background-color: yellow;
+} 
+```
+
+## Summary Questions

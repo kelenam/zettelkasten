@@ -1,0 +1,325 @@
+---
+title: Web Components | Traversy 
+date: 2020-04-21
+slug: traversy-web-components
+tags:
+  - JS
+  - web components 
+  - HTML
+  - CSS 
+  - Projects
+  - Traversy
+---
+
+## Premise 
+- frontend web dev is pretty congested. The common theme: delivering high quality user interfaces with encapsulated components. 
+- When you're using things like react, angular, vue, you're breaking things up into reusable components. 
+    - we can do something similar without using a framework, and that is by using **web components**. 
+
+## What are Web Components?
+>[^ **What are web components?**]-[**Web components**](): are a set of web platform API's that allow us to create custom, reusuable and encapsulated html tags to use in web pages and web apps.
+- Web components do not require any special 3rd party libraries or frameworks but can certainly be used with them.
+
+## 3 Main Building Blocks 
+The 3 main building blocks of web components are...
+
+1. **Custom Elements**
+2. **Shadow DOM**
+3. **HTML Templates**
+
+## Custom Elements 
+- create custom HTML tags...
+  - The way that we bind, custom html tags to their jsx-like name is by using `window.customElements.define`
+  - and then passing in the whatver we want to call the tag, (separating by - hyphens is convention)
+  - followed by the second argument which is the class name.
+  ```js 
+  class AppDrawer extends HTMLElement { ... }
+  window.customElements.define('app-drawer', AppDrawer)
+  ```
+- Create custom class 
+- Lifecycle methods available 
+```jsx
+<app-drawer></app-drawer>
+```
+
+### Custom Elements: LifeCycle Methods 
+- `constructor()`: called when an instance of the element is created or upgraded 
+  - state initialization for example.
+- `connectedCallback()`: Called every time when the element is inserted into the DOM 
+- `disconnectedCallback()`: Called everyy time the element is removed from the DOM 
+- `attributeChangedCallback(attributeName, oldValue, newValue)`: Called when an attribute is added, removed, updated, or replaced 
+  - because when we have custom classes we can listen for attribute changes much like we would have props in React
+
+## Shadow DOM 
+- Used for self-contained Components
+- Encapsulate styles and markup
+  - scoped styles 
+- Create with `element.attachShadow({mode: open})`
+- Creates a **"shadowRoot"** that we can reference and interact with 
+
+## HTML Templates 
+- Define the encapsulated markup of our web component
+- Template tag stores markup on page
+- Include both HTML and CSS in templates 
+- Use slots to add custom text 
+
+## Example
+We want to get to place where we can use a custom element like <user-card></user-card> in our HTML. 
+```html 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Components Example</title>
+    <link rel="stylesheet" href="dist/css/style.css">
+</head>
+<body>
+    <h3> Hello World </h3>
+
+    <user-card></user-card>
+
+    <script type="text/javascript" src="dist/js/script.js"></script>
+</body>
+</html>
+```
+Over in our JS, we should named this `userCard.js`, above we are using TS to compile to `script.js` in our dist folder, so handle however you'd like. 
+
+```js:title=userCard.js
+class UserCard extends HTMLElement {
+  constructor() {
+    super();
+    this.innerHTML = 'John Doe'
+  }
+}
+
+window.customElements.define('user-card', UserCard);
+```
+1. The first thing we want to do here is create a class that extends the `HTMLElement`
+  - In here we have a constructor which runs immediately
+  - ⭐ however, we need to call the constructor of the extended class (`HTMLElement`), we do this with the `super()` method, then we can use the `this` keyword to pertain to the custom element we are creating...
+  - Nothing will happen if we run this because we have yet to define the custom element
+2. We define the custom element on the `window` object by saying.... `window.customElements.define()`, this will take in two things:
+  1. The tag 
+  2. the class we want to connec the tag name to.
+3. If we save this, we should see our John Doe printed to the screen.
+
+
+### Handling Attributes
+Say we want to pass in a dynamic attribute, something like a `name` attribute to our `<user-card name="">`
+So over in our `UserCard.js` we can use the `getAttribute` method and pass in the name of the attribute we want to grab. 
+```js:title=userCard.js
+class UserCard extends HTMLElement {
+  constructor() {
+    super();
+    this.innerHTML = `${this.getAttribute('name')`; 
+  }
+}
+
+window.customElements.define('user-card', UserCard);
+```
+
+This should now work as expected. 
+
+So right now if we tried to style just our custom element and did something like...
+```js:title=userCard.js
+class UserCard extends HTMLElement {
+  constructor() {
+    super();
+    this.innerHTML = `<style>h3 { color: coral }</style><h3>${this.getAttribute('name')<h3>`; 
+  }
+}
+
+window.customElements.define('user-card', UserCard);
+```
+You'll notice that all our global h3s, will be styled with the color coral. We don't want that. We want to encapsulate everything into a web component so to do that we need to create a shadow dom...
+
+### Shadow DOM 
+The way we create a shadow DOM is by, in the constructor, we say `this.attachShadow({mode: 'open'})`. We are passing in some options, via an object with the property mode set to open, this will help with debugging.
+- If we just pass this line alone, you'll notice our component will disappear, because if using the shadow dom we have to do some additional things to make use of the shadow DOM.
+
+```js:title=userCard.js
+class UserCard extends HTMLElement {
+  constructor() {
+    super();
+
+    this.attachShadow({mode: 'open'})
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.innerHTML = ``; 
+  }
+}
+
+window.customElements.define('user-card', UserCard);
+```
+- `this.shadowRoot.appendChild(template.content.cloneNode(true));` 
+  - We have yet to create this `template` object which we will do outside/above our class.
+
+```js:title=userCard.js
+const template = document.createElement('template');
+template.innerHTML = `
+    <style>
+        h3 {
+            color: coral;
+        }
+    </style>
+    <div class="user-card">
+        <h3></h3>
+    </div>
+`;
+
+class UserCard extends HTMLElement {
+    constructor() {
+        super();
+
+        this.attachShadow({mode: 'open'});
+
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        console.log(this.shadowRoot);
+        
+        this.shadowRoot.querySelector('h3').innerText = this.getAttribute('name');
+    }   
+ }
+
+ window.customElements.define('user-card', UserCard); 
+```
+- So in the approach above, we can't simple say `this.getAttribute`, because in this context, `this` isn't going to be what we want. So we will actually handle this outside of the template itself. 
+- From now on `this.shadowRoot` this is what we want to use to select stuff from our custom web component. So we can say `this.shadowRoot.querySelector('h3').innerText = this.getAttribute('name')` and now we set the h3 inner text with our attribute.
+
+### Passing in an avatar 
+So let's create a new attribute image or avatar for us to pass in.
+```html 
+<user-card name="John Doe" avatar="https://randomuser.me/api/portraits/men/1.jpg">
+  <div slot="email">johndoe@gmail.com</div>
+  <div slot="phone">555-555-5555</div>
+</user-card>
+<user-card name="Jane Doe" avatar="https://randomuser.me/api/portraits/women/1.jpg">
+  <div slot="email">janedoe@gmail.com</div>
+  <div slot="phone">333-333-3333</div>
+</user-card>
+```
+
+### Using Slots 
+Here is the styling, kind of just pasted in to fasttrack things.
+```js
+const template = document.createElement('template');
+template.innerHTML = `
+    <style>
+    .user-card {
+        font-family: 'Arial', sans-serif;
+        background: #f4f4f4;
+        width: 500px;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-gap: 10px;
+        margin-bottom: 15px;
+        border-bottom: darkorchid 5px solid;
+    }
+    .user-card img {
+        width: 100%;
+    }
+    .user-card button {
+        cursor: pointer;
+        background: darkorchid;
+        color: #fff;
+        border: 0;
+        border-radius: 5px;
+        padding: 5px 10px;
+    }
+    </style>
+    <div class="user-card">
+        <img />
+        <div>
+            <h3></h3>
+            <div class="info">
+                <p>EMAIL</p>
+                <p>PHONE</p>
+            </div>
+            <button id="toggle-info">Hide Info</button>
+        </div>
+    </div>
+`;
+```
+## Using Slots 
+- So if you notice, in our div class of info, we have two p tags, that just have placeholder p tags, with EMAIL and PHONE, well if instead of `<p>EMAIL</p>` we said `<p><slot /></p>` and over in our html, we just said...
+```html 
+<user-card name="John Doe" avatar="https://randomuser.me/api/portraits/men/1.jpg">
+  hello
+</user-card>
+``` 
+- So this would work if you just wanted to put one thing, we could just use `<slot />` and then pass in whatever data we want in between our web component tags.
+- We have two things, so instead of putting 'hello', we are going to pass in divs with slot attributes.
+```html
+<user-card name="Jane Doe" avatar="https://randomuser.me/api/portraits/women/1.jpg">
+    <div slot="email">janedoe@gmail.com</div>
+    <div slot="phone">333-333-3333</div>
+</user-card>
+```
+And now over in our template we can say...
+```
+  <div class="info">
+      <p><slot name="email" /></p>
+      <p><slot name="phone" /></p>
+  </div>
+```
+
+## Adding Events 
+You can have whatever functionality you want to add, if you want to add animations you can, if you want to add literally anything you can.
+- Our button as an id of `toggle`, so we are going to need to have an event listener on this button.
+- Where we put this event listener is in the lifecyle method called `connectedCallback`
+- So under the constructor, we can call it...
+```js 
+class UserCard extends HTMLElement {
+    constructor() {
+        super();
+
+        this.showInfo = true;
+
+        this.attachShadow({mode: 'open'});
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.shadowRoot.querySelector('h3').innerText = this.getAttribute('name');
+        this.shadowRoot.querySelector('img').src = this.getAttribute('avatar');
+    }   
+    toggleInfo() {
+      this.showInfo = !this.showInfo;
+
+      const info = this.shadowRoot.querySelector('.info');
+      const toggleBtn = this.shadowRoot.querySelector('#toggle-info');
+
+      if (this.showInfo) {
+        info.style.display = 'block';
+        toggleBtn.innerText = 'Hide Info';
+      } else {
+        info.style.display = 'none';
+        toggleBtn.innerText = 'Show Info'
+      }
+    }
+    connectedCallback() {
+      this.shadowRoot.querySelector('#toggle-info').addEventListener('click', () => this.toggleInfo());
+    }
+    disconnectedCallback() {
+      this.shadowRoot.querySelector('#toggle-info').removeEventListener();
+    }
+}
+```
+- We use querySelector to grab the toggle info id in the template and simply add an event listener to it, and now, we can create the `toggleInfo()` method right in our class. 
+- As far as removing the event listener, we can manage that in `disconnectedCallback`
+
+## Links 
+
+## Key Insights
+Note: There will be "silent" error using Typescript, `TypeError: HTMLElement constructor: 'new' is required`. 
+This seems like a fix if we want to use TS + Web Components. 
+ https://stackoverflow.com/questions/54508917/how-can-i-get-web-components-to-compile-with-typescript-for-ie11-edge-chrome-fir
+Here's the solution:
+`npm install @webcomponents/webcomponentsjs --save-dev`
+```
+import "@webcomponents/webcomponentsjs/webcomponents-bundle";
+import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
+```
+
+I don't feel like installing a package for this, so I'm just going to write it in JS which will resolve this issue.
+
+You can use `removeEventListener()` to do what you would expect, remove an event listener on an element.removeEventListener. 
+
+## Summary Questions
+
