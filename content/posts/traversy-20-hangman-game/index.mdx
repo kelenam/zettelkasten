@@ -1,0 +1,64 @@
+---
+title: Menu Slider & Modal | Traversy 20
+date: 2020-04-21
+slug: traversy-20-menu-slider-modal
+tags:
+  - JS
+  - HTML
+  - CSS 
+  - Projects
+---
+
+## Notes
+- **SVG** stands for Scaleable Vector Graphics, and it is an XML based markup language for describing 2D vector graphics. 
+- You can think of SVG to graphics as what HTML is to text.
+- there is an `svg` tag 
+- we will be using svg for our hangman 
+
+## HTML 
+1. h1: hangman
+2. p: Find the hidden word - Enter a letter
+3. div.game-container: wrapped for our game container
+    - svg.figure-container (this svg element is kind of like a canvas)
+        - set height attribute of the svg element, with heigh="250"
+        - width="200"
+    - ⭐ in our svg element (we specify a line element: x1 is where the line starts on the x access, y1 is where the line starts on the y axis, x2 is where the line ends, and y2 is where on the y axis the line ends)
+        - <line x1="60" y1="20" x2="140" y2="20" class="figure-part" /> (top poll)
+        - <line x1="140" y1="20" x2="140" y2="50" /> (hang poll)
+        - <line x1="60" y1="20" x2="60" y2="230" /> (mast)
+        - <line x1="20" y1="230" x2="100" y2="230" /> (base line)
+        -  comment the separation
+        - <circle cx="140" cy="70" r="20" class="figure-part" /> (head)
+        - comment body 
+        - <line x1="140" y1="90" x2="140" y2="150" class="figure-part" /> (body line)
+        - comment arms
+        - <line x1="140" y1="120" x2="120" y2="100" class="figure-part" /> (left arm)
+        - <line x1="140" y1="120" x2="160" y2="100" class="figure-part" /> (right arm)
+        - comment legs
+        - <line x1="140" y1="150" x2="120" y2="180" class="figure-part" /> (left leg)
+        - <line x1="140" y1="150" x2="160" y2="180" class="figure-part" /> (left leg)
+        - We are adding the `figure-part` class to control showing of the hanged man
+    4. div.wrong-letters-container
+        5. div#wrong-letters (most of these will be empty until content is dynamically supplied with JS)
+    5. div#word.word (every letter is going to be wrapped in a span with each letter)
+6. div.popup-container#popup-container (Outside of our game container is going to be our final message item)
+    - The reason we use both classes and ids with the same name is because we use classes for styling and ids for grabbing in JS or things that have dynamic elements.
+    - div.popup 
+    - button#play-button : Play Again
+7. div.notification-container#notification-container,  (Notification for letter) 
+    - p: You have already entered this letter 
+
+
+
+## CSS 
+- body 
+    - bgc: #34495e
+    - c#fff
+- .figure-container 
+    - fill: transparent (the only thing that will have a fill is the head, everything else will have a stroke value)
+    - stroke: #fff 
+    - stroke-width: 4px;
+    - stroke-linecap: round; (controls the end of the line shape)
+- .figure-part 
+    -dn
+## Summary Questions

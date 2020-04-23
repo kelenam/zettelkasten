@@ -1,5 +1,5 @@
 ---
-title: Web Components | Traversy 
+title: Web Components Crash Course 
 date: 2020-04-21
 slug: traversy-web-components
 tags:
@@ -21,11 +21,11 @@ tags:
 - Web components do not require any special 3rd party libraries or frameworks but can certainly be used with them.
 
 ## 3 Main Building Blocks 
-The 3 main building blocks of web components are...
+[^ **What are the three main building blocks of web components?**]The 3 main building blocks of web components are...
 
-1. **Custom Elements**
-2. **Shadow DOM**
-3. **HTML Templates**
+>1. **Custom Elements**  
+2. **Shadow DOM**  
+3. **HTML Templates**  
 
 ## Custom Elements 
 - create custom HTML tags...
@@ -51,14 +51,14 @@ The 3 main building blocks of web components are...
   - because when we have custom classes we can listen for attribute changes much like we would have props in React
 
 ## Shadow DOM 
-- Used for self-contained Components
+>[^**What are some of the roles/features of the shadow DOM?**]- Used for self-contained Components
 - Encapsulate styles and markup
   - scoped styles 
 - Create with `element.attachShadow({mode: open})`
 - Creates a **"shadowRoot"** that we can reference and interact with 
 
 ## HTML Templates 
-- Define the encapsulated markup of our web component
+>[^**What are some of the roles/features of the HTML Template?**]- Define the encapsulated markup of our web component
 - Template tag stores markup on page
 - Include both HTML and CSS in templates 
 - Use slots to add custom text 
@@ -97,13 +97,12 @@ window.customElements.define('user-card', UserCard);
 ```
 1. The first thing we want to do here is create a class that extends the `HTMLElement`
   - In here we have a constructor which runs immediately
-  - ⭐ however, we need to call the constructor of the extended class (`HTMLElement`), we do this with the `super()` method, then we can use the `this` keyword to pertain to the custom element we are creating...
+  >- ⭐ [^ **What is the first thing we must do when extending our HTMLElement class within our constructor?**]However, we need to call the constructor of the extended class (`HTMLElement`), we do this with the `super()` method, then we can use the `this` keyword to pertain to the custom element we are creating...
   - Nothing will happen if we run this because we have yet to define the custom element
-2. We define the custom element on the `window` object by saying.... `window.customElements.define()`, this will take in two things:
-  1. The tag 
-  2. the class we want to connec the tag name to.
+>2. [^ **Where do we define the custom element? How do we do so and what two arguments are required?**]We define the custom element on the `window` object by saying.... `window.customElements.define()`, this will take in two things
+  >- The tag 
+  >- the class we want to connect the tag name to.
 3. If we save this, we should see our John Doe printed to the screen.
-
 
 ### Handling Attributes
 Say we want to pass in a dynamic attribute, something like a `name` attribute to our `<user-card name="">`
@@ -118,6 +117,9 @@ class UserCard extends HTMLElement {
 
 window.customElements.define('user-card', UserCard);
 ```
+>- [^ **How do we reference attributes within our custom components/tags?**]Within our constructor of our custom class, we can reference an attribute using the `.getAttribute()` method and then passing in the attribute/prop name as a string. 
+- We have reference to the custom component with the `this` keyword. 
+- We can set things like the innerHTML of a component like so... `this.innerHTML = ${this.getAttribute('name')};`, where our string literal statement has backticks (mdx makes this difficult to show)
 
 This should now work as expected. 
 
@@ -126,7 +128,8 @@ So right now if we tried to style just our custom element and did something like
 class UserCard extends HTMLElement {
   constructor() {
     super();
-    this.innerHTML = `<style>h3 { color: coral }</style><h3>${this.getAttribute('name')<h3>`; 
+    this.innerHTML = `<style>h3 { color: coral }</style>
+    <h3>${this.getAttribute('name')<h3>`; 
   }
 }
 
@@ -134,8 +137,13 @@ window.customElements.define('user-card', UserCard);
 ```
 You'll notice that all our global h3s, will be styled with the color coral. We don't want that. We want to encapsulate everything into a web component so to do that we need to create a shadow dom...
 
-### Shadow DOM 
-The way we create a shadow DOM is by, in the constructor, we say `this.attachShadow({mode: 'open'})`. We are passing in some options, via an object with the property mode set to open, this will help with debugging.
+## Shadow DOM 
+>- [^ **How do we create a shadowDOM?**]The way we create a shadow DOM is by, in the constructor, we say `this.attachShadow({mode: 'open'})`. We are passing in some options, via an object with the property mode set to open, this will help with debugging.
+- The object we pass into `attachShadow` is a dictionary that contains the following fields: `mode` and `delegatesFocus`, 
+  - `mode`: A string specifying the encapsulation mode for the shadow DOM tree. This can be one of:
+    - `open`: Elements of the shadow root are accessible from JavaScript outside the root, for example using Element.shadowRoot:
+    - `closed`:  Denies access to the node(s) of a closed shadow root from JavaScript outside it:
+    - [More Info](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow)
 - If we just pass this line alone, you'll notice our component will disappear, because if using the shadow dom we have to do some additional things to make use of the shadow DOM.
 
 ```js:title=userCard.js
@@ -151,8 +159,12 @@ class UserCard extends HTMLElement {
 
 window.customElements.define('user-card', UserCard);
 ```
+>- [^ **How do we access the shadowDOM?**]We have access to the newly created shadowDOM via the `shadowRoot` object.
 - `this.shadowRoot.appendChild(template.content.cloneNode(true));` 
   - We have yet to create this `template` object which we will do outside/above our class.
+
+-  The `HTMLTemplateElement` has a `content` property, which is a read-only DocumentFragment containing the DOM subtree which the template represents. [Reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template)
+- The `Node.cloneNode()` method returns a duplicate of the node on which this method was called. Passing in `true`, deep copies the whole tree/subtree of the node. [Reference](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode)
 
 ```js:title=userCard.js
 const template = document.createElement('template');
@@ -182,7 +194,7 @@ class UserCard extends HTMLElement {
 
  window.customElements.define('user-card', UserCard); 
 ```
-- So in the approach above, we can't simple say `this.getAttribute`, because in this context, `this` isn't going to be what we want. So we will actually handle this outside of the template itself. 
+- So in the approach above, we can't simple say `this.getAttribute` in the template, because in this context, `this` isn't going to be what we want. So we will actually handle this outside of the template itself. 
 - From now on `this.shadowRoot` this is what we want to use to select stuff from our custom web component. So we can say `this.shadowRoot.querySelector('h3').innerText = this.getAttribute('name')` and now we set the h3 inner text with our attribute.
 
 ### Passing in an avatar 
@@ -261,6 +273,11 @@ And now over in our template we can say...
       <p><slot name="phone" /></p>
   </div>
 ```
+- The HTML `<slot>` element—part of the Web Components technology suite—is a placeholder inside a web component that you can fill with your own markup, which lets you create separate DOM trees and present them together. [Reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Slot)
+### Understanding slots
+- **slots**, as mentioned above are just placeholders. In your template you will use the `<slot name="slot-attribite-name" />` tag as a placeholder for content inside of tags that have the `slot` property where the value of that `slot` property must match the `name` property we specify in our template. 
+  - Slots can define HTML, not just content. e.g. `<div slot="h1-and-p"><h1>Header 1</h1><p>Paragraph</p></div>` and in our template we could say `<div><slot name="h1-and-p" /></div>` where the slot is a place holder for the h1 and p tags in our HTMl. 
+  - It's important to note that how we define things in our template should match our HTML with the template being the last say in execution. For example, in the example above, if we wrapped everything in an h1 tag instead of a div, and pass in our slot between them, it will be equivalent to saying `<h1><h1>Header 1</h1><p>Paragraph</p></h1>` which wouldn't be what we'd want. So make sure you have consistency across expected values/elements.
 
 ## Adding Events 
 You can have whatever functionality you want to add, if you want to add animations you can, if you want to add literally anything you can.
@@ -294,7 +311,9 @@ class UserCard extends HTMLElement {
       }
     }
     connectedCallback() {
-      this.shadowRoot.querySelector('#toggle-info').addEventListener('click', () => this.toggleInfo());
+      this.shadowRoot.querySelector('#toggle-info').addEventListener('click', () =>
+        this.toggleInfo()
+      );
     }
     disconnectedCallback() {
       this.shadowRoot.querySelector('#toggle-info').removeEventListener();
@@ -303,8 +322,6 @@ class UserCard extends HTMLElement {
 ```
 - We use querySelector to grab the toggle info id in the template and simply add an event listener to it, and now, we can create the `toggleInfo()` method right in our class. 
 - As far as removing the event listener, we can manage that in `disconnectedCallback`
-
-## Links 
 
 ## Key Insights
 Note: There will be "silent" error using Typescript, `TypeError: HTMLElement constructor: 'new' is required`. 
@@ -321,5 +338,35 @@ I don't feel like installing a package for this, so I'm just going to write it i
 
 You can use `removeEventListener()` to do what you would expect, remove an event listener on an element.removeEventListener. 
 
-## Summary Questions
+## Summary
+- When we are creating a new web component class, the first thing we need to do is call `super()` within our constructor to extend the features of the HTMLElement parent class.
+- We use `window.customElements.define('tag-name', className);` to make the connection between our class and our custom web component/tag. 
+- We need to create a shadowDOM if we want tigher encapsulation of our markup and styles, we do so by saying `Element.attachShadow()`, where Element, within our component is going to be reference with they `this` keyword. 
+  - `attachShadow` takes in a dictionary/object, there are two avaiable properties in this dictionary, but for the most part, we just need to specify `mode` and set its value to `open` to allow this DOM to be accessed by JS. 
+- `this.shadowRoot.appendChild(template.content.cloneNode(true))` We can now access the shadowDOM `this.shadowRoot`. The first we would want to do is append to the shadowDOM an HTML template of our component. We do this using `appendChild` and pass in the template content where `template` is the HTMLL template we would still need to create. We use `.cloneNode(true)` to say we want to clone the node tree of the provided HTML template content. 
+- We can now access the tags in our template using query selectors on our shadowRoot like we would an HTML document/DOM. e.g.`this.shadowRoot.querySelector('h3').innerText = this.getAttribute('name');`. We are setting the innerText of the h3 in the shadowDOM that we cloned from our template. We can now modify things in that shadowDOM for instance the `.innerText` on the selected h3 set to the prop we are passing into the custom component.
+- Slots are just placeholders for markup we can dynamically pass into our template. 
+  - `<slot />` tags are used in our template as the placeholder for data/markup we provided in our markup.
+  - The way we provide the data/markup to the slot placeholder is by specifying the `slot` property of a wrapping HTML tag.
+- We add functionality/events to our web components using lifecyle methods like...
+  - `constructor()`: called when an instance of the element is created or upgraded 
+  - state initialization for example.
+  - `connectedCallback()`: Called every time when the element is inserted into the DOM 
+  - `disconnectedCallback()`: Called everyy time the element is removed from the DOM 
+  - `attributeChangedCallback(attributeName, oldValue, newValue)`: Called when an attribute is added, removed, updated, or replaced 
+    - because when we have custom classes we can listen for attribute changes much like we would have props in React
+- For most events like adding event listeners we can use the `connectedCallback()` method like so... 
+```js
+  //...
+  connectedCallback() {
+      this.shadowRoot.querySelector('#toggle-info').addEventListener('click', () =>
+        this.toggleInfo() //we can definew toggleInfo as a method in this class.
+      );
+  }
+```
+- It's very much like adding normal event handlers but we are targeting the shadowDOM or specific elements in our shadow DOM to attach the event listeners to.
 
+## Links 
+- [Traversy | Web Components Crash Course](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+
+## Summary Questions
