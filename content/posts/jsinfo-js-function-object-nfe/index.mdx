@@ -1,0 +1,33 @@
+---
+title: Function object, NFE | JavaScript.Info  
+date: 2020-04-16
+slug: jsinfo-js-function-object-nfe
+tags:
+  - JS
+  - JS.Info
+  - functions
+--- 
+
+As we already know, a function in JavaScript is a value.
+
+Every value in JavaScript has a type. What type is a function?
+
+In JavaScript, functions are objects.
+
+A good way to imagine functions is as callable “action objects”. We can not only call them, but also treat them as objects: add/remove properties, pass by reference etc.
+
+
+
+
+## Thoughts
+Not quite related but I was working through the "Advanced Working with Functions" section in JS.Info, and was working on one of the closure tasts and came to observe something that I thought I knew but apparently didn't. 
+
+
+"Post-increment `i++` increments the value of `i` and evaluates to the original non-incremented value."[Source](https://stackoverflow.com/questions/484462/difference-between-pre-increment-and-post-increment-in-a-loop)
+
+
+```js 
+function inc(n) { return n++ } 
+
+function inc(n) { return n += 1 } 
+``` 

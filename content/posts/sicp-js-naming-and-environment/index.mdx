@@ -1,0 +1,37 @@
+---
+title: Naming and the Environment | The Elements of Programming
+date: 2020-04-24
+slug: sicp-js-naming-and-environment
+tags:
+  - JS
+  - CS
+  - SICP
+  - CS
+  - theory
+---
+
+
+## Naming and the Environment
+A critical aspect of a programming language is *the means it provides for using names to refer to computational objects*, and our first such means are **constants**. We say that the name identifies a constant whose value is the object.
+
+In JavaScript, we name constants using [**constant declarations**](). Typing
+`const size = 2;`  
+causes the interpreter to associate the value` 2` with the name `size`.  
+- The purpose of the constant declaration is to create this association, and not to compute a particular value as for expression statements
+- The JavaScript specification demands that the special value undefined shall be the result of evaluating such constant declarations
+- Once the association has been made, we can refer to the value `2` by the name we gave it, `size`.
+- must declare `size` before we use it, obviously.
+
+Constant declaration is our language's simplest means of abstraction. Complex programs are constructed by building, step by step, computational objects of increasing complexity.
+
+It should be clear that the possibility of associating values with names and later retrieving them means that the interpreter must maintain *some sort of memory* that keeps track of the name-object pairs. This memory is called the [**environment**]() (more precisely the [**global environment**](), since we will see later that a computation may involve a number of different environments).
+
+## Links 
+- [🏠 MAIN](sicp-js-main)
+- [PRIMARY SECTION ⬆ | Building Abstractions with Functions](/sicp-js-building-abstractions-with-functions)
+    - [PARENT SECTION ↖ | Elements of Programming](/sicp-js-elements-of-programming)
+        - [PREV ⬅ | Expressions](/sicp-js-expressions)
+        - [NEXT ➡ | Naming and the Environment ](/)
+
+## Summary Questions
+

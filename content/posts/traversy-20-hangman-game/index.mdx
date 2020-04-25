@@ -1,12 +1,13 @@
 ---
-title: Menu Slider & Modal | Traversy 20
+title: Hangman Game | Traversy 20
 date: 2020-04-21
-slug: traversy-20-menu-slider-modal
+slug: traversy-20-hangman-game
 tags:
   - JS
   - HTML
   - CSS 
   - Projects
+  - Traversy 
 ---
 
 ## Notes
@@ -14,6 +15,16 @@ tags:
 - You can think of SVG to graphics as what HTML is to text.
 - there is an `svg` tag 
 - we will be using svg for our hangman 
+
+## Requirements 
+- We want the title of the game 
+- Below that we want to describe instructions on how to play 
+- We want to generate a graphic using SVG
+- we want to use styling to hide incremental part of the "man" in the hangman game separate from the gallows
+- We want an indicator to track letters we've gotten wrong 
+- we want letter indicators for letters we got right 
+- we want a modal telling us win/lose status with a button to try again 
+- we want a notification to indicate if we've already entered a letter.
 
 ## HTML 
 1. h1: hangman
@@ -46,14 +57,29 @@ tags:
     - div.popup 
     - button#play-button : Play Again
 7. div.notification-container#notification-container,  (Notification for letter) 
-    - p: You have already entered this letter 
-
-
+    - p: "You have already entered this letter"
 
 ## CSS 
+- *
+    - bx
 - body 
     - bgc: #34495e
     - c#fff
+    - ff: Arial, Helvetica
+    - df
+    - fld: column
+    - aic
+    - h80vh
+    - m0
+    - o 
+- h1 
+    - m20-0-0
+- .game-container
+    - p20-30px
+    - pos: rel 
+    - m: auto 
+    - h350
+    - w450
 - .figure-container 
     - fill: transparent (the only thing that will have a fill is the head, everything else will have a stroke value)
     - stroke: #fff 
@@ -61,4 +87,151 @@ tags:
     - stroke-linecap: round; (controls the end of the line shape)
 - .figure-part 
     -dn
-## Summary Questions
+- .wrong-letters-container 
+    - poa 
+    - t20
+    - r20 
+    - df
+    - fld: column
+    - tar
+- .wrong-letters-container p 
+    - m-0-0-5
+- .wrong-letters-container span 
+    - fz24 
+- .word 
+    - df 
+    - poa 
+    - b10 
+    - l50% 
+    - transform: translateX(-50%);
+- .letter 
+    - border-bottom: 3px solid #2980b9
+    - dif 
+    - fz30
+    - aic 
+    - jcc
+    - m0-3px
+    - h50 
+    - w20 
+
+## Popuup Notification Styling 
+- .popup-container 
+    - bgc: rgba(0,0,0,0.3)
+    - pof
+    - t0 
+    - b0 
+    - l0 
+    - r0 
+    - df 
+    - /* dn */
+    - aic 
+    - jcc
+- .popup 
+    - bgc: #2989b9
+    - brs5
+    - bsh 0 15px 10px 3px rgba(0, 0, 0, 0.1)
+    - p20
+    - tac 
+- .popup button 
+    - cup
+    - bgc#f  
+    - c: #2989b
+    - border: 0 
+    - mt20 
+    - p12-20 
+    - fz16
+- .popup button:active 
+    - transform: scale(0.98)
+- .popup button:focus 
+    -ou0
+- .notification-container 
+    - bgc: rgba(0,0,0,0.3)
+    - brs: 10px 10px 0 0
+    - p15-20
+    - poa 
+    - b-50px
+    - transition: transform 0.3s ease-in-out;
+- .notification-container.show 
+    -tf: translateY(-50px);
+
+### Popup / Notification
+- since our notification container is outside of the game container we can give it a position of absolute, 
+- We can still see the notification container if we don't set the p tag margin within the notifcation container to 0. 
+- since we want to smoothly move the notifcation up when we retype a letter, we give it a transition property.
+
+## JavaScript 
+1. Grab elements by id related to the variables we list below 
+    - wordEl
+    - wrongLettersEl
+    - playAgainBtn
+    - popup 
+    - notification 
+    - finalMessage
+2. querySelector all for the `.figure-parts` class.
+3. You want to set up empty arrays for both correctLetters and wrongLettersEl
+4. set a variable the selected word, the seleted word can come randomly from an array or fetched json.
+5. Create a function to display the word, this function will...
+    - take the wordEl and set the innerHTML set to a template string
+    - grab our seletedWord, but we need to turn it into an array so we can map through it and return either a letter or empty string.
+        - to turn a string into an array we can use the `.split` method
+        - then since the word is now and array, we can chain, map to iterate over each letter
+        - and within that map function, we can return another template string with some HTML 
+        - we want to return a span with the class of `letter` and within that span we want...
+            - `${correctLetters.includes(letter)}`, to essentially check if the correctLetters array contains the letter we are currently looping on
+                - if it is we are going to use a ternary to show the letter if its matched otherwise show an empty string
+            - finally we need to turn it back into a string, and for that we use `.join('')`
+    - this displayWord function is going to run initially but it's also going to run after every guess, so we need to see whether or not the user has won or not 
+        - right now, our `wordEl.innerText` will newline after each letter input, we need to remove that newline.
+        - we do so by creating a new variable called innerWord and we set it to wordEl.innerText but replace and use a regular expression (/\n/g, "").... `wordEl.innerText.replace(/\n/g, "");`
+    - now we can check if the `innerWord` is eqal to the selected word, and if it is, we can set the innerText of the `finalMessage` element to be 'Congratulations! You won!';
+        - we can then set the popup display style to flex with `popup.style.display = 'flex';`
+
+### Key events 
+So right below our displayWord functoin we can add a keydown letter press event listner
+
+1.window.addEventListner('keydown'). We only want to listen for letters, on the `event` there are keycodes for each corresponding key. Letters represent the keycodes from 65-90.
+    - if (e.leyCode >= 65 && e.keyCode <= 90)
+        - we create a variable called letter and assign it to e.key
+        - then we need to check if the selectedWord includes the letter just pressed
+            - within this we need another if to check if the letter was one that has already been pressed/confirmed, if it hasn't then we push the letter onto the correctedLetters array 
+            , and we called displayWord()
+            - else if it has been confirmed we want to showNotification()
+        - then else if the letter is not correct, we want to push it to the wrong letters array 
+            - we wan to make sure that this hasn't already been pushed to the wrong letters array as well,
+            if it hasn't then we push it to the wrongLetters array 
+            - then we call a function (we have yet to create called `updateWrongLettersEl()`)
+            - else we showNotification();
+2. Create the updateWRongLettersEl() function. 
+3. Create showNotification
+    - really simply, just adding the the show class to the classList of `notification`
+    - then we add a a setimeout to remove the notification after 2000ms. 
+
+## Wrong Letters & Play Again button
+There are three things we want to do in our `updateWrongLettersEl` function...
+
+1. Shows the letters we've pressed that are wrong. 
+2. Show the figure 
+3. Want to see if the whole figure is built/we lost and show lose popup. 
+
+We start by taking the wrongLettersEl.innerHTMl and setting it ...
+    - check to see if there is anything in the wrong letters array by checking its length, we can use a ternary, to say that if it is greater than 0 show `<p>Wrong</p>` otherwise show an empty string.
+    - in a seprate `${}`, we can map over wrongLetters with map and for each letter return the letter wrapped with span tags.
+- Now we address the figure parts, and check for each part and index. We create a variable that stores wrongLetters.length and we want to check if our index is less than errors, we want the part style to display as block. 
+    - else, part style display should be none. 
+- Then we want to 
+
+## Key Insights
+```js 
+let x = [1,2,3];
+console.log(Math.floor(Math.random() * x.length));
+// --> random number from 0-2 
+
+console.log(Math.ceil(Math.random() * x.length));
+// --> random number from 1-3
+```
+In the code above, remember `floor` is rounding down the randomly produced product of a floating point number between 0-0.9999bar ((inclusive of 0, but not 1) and the length of the given array, 3.
+
+- For my word list I just copied the array foudn in index.json from https://github.com/words/an-array-of-english-words
+
+- I was running into an issue with my stick figure not appropriately drawing on the third figure-part, it turns out I had an extra figure body line... Took me way too long to troubleshoot that. I event length checked the figure-part length and was like yup, length of 7, sounds right... So silly.
+ 

@@ -9,10 +9,6 @@ tags:
   - CS
   - theory
 ---
-## Review Questions
-1. In programming, we deal with two kinds of elements, what are they?
-1. What are statements? What are expresions? What are combinations?
-1. The interpreter always acts in the same basic cycle, which is?
 
 A powerful programming language is more than just a means for instructing a computer to perform tasks. The language also serves as a framework within which we organize our ideas about processes. Thus, when we describe a language, we should pay particular attention to the means that the language provides for combining simple ideas to form more complex ideas. Every powerful language has three mechanisms for accomplishing this:
 
@@ -20,86 +16,28 @@ A powerful programming language is more than just a means for instructing a comp
  > 1. [**means of combination**](), by which compound elements are built from simpler ones, and
  > 1. [**means of abstraction**](), by which compound elements can be named and manipulated as units.
 
- >* **In programming, we deal with two kinds of elements: functions and data.**
+ >* [^ **In programming, we essentially deal with two kinds of elements, what are they?**]**In programming, we deal with two kinds of elements: functions and data.**
  
  Informally, [**data**]() is stuff that we want to manipulate, and functions are descriptions of the rules for manipulating the data. 
  
  >[^ **Any powerful programming language should be able to describe...**]Thus, any powerful programming language should be able to describe primitive data and primitive functions and should have methods for combining and abstracting functions and data.
-
-## Expressions
-- easiest way to get started with JS is the console in the browser itself.
-> [^ **JavaScript programs can be considered __________**]- JavaScript programs are called [**statements**]().
-
-- One kind of statement is an [**expression statement**](), which consists of an [**expression**](), followed by a semicolon. A simple kind of expression is a number. (More precisely, the epxression consists of  the numerals that represent the number in base 10)
-
-- Expressions representing numbers may be combined with operators (such as + or *) to form a compound expression that respresents the application of a corresponding primitive function to those numbers.
-`137 + 429`  
-`100 - 9`  
-`10 / 5`  
-- You can think of the `+`, `-`, `/` as an addition function.
-
-Expressions such as these which contain other expressions as components, are called [**combinations**]().  
-Combinations that are formed by an *operator* symbol in the middle, and *operand* expressions to the left and right of it, are called [**operator combinations**](). 
-
->* **The value of an operator combination is obtained by applying the function specified by the operator to the *arguments* that are the values of the operands.**
-
-The convention of placing the operator between the operands is known as [**infix notation**](). It follows the mathematical notation that you already know.
-
-As in mathematics, operator combinations can be nested, that is, they can take arguments that themselves are operator combinations:
-`(3 * 5) + (10 - 6);`
-
-- Parentheses are used to group operator combinations to avoid ambiguities.
-- JS follows convention: mult/div stronger than add/sub.
-
-We say that `*` and `/` have [**higher precedence**]() than `+` and `-`. Sequences of additions and subtractions are read from left to right, as are sequences of multiplications and divisions.  
-`3 / 5 * 2 - 4 + 3;`
-stands for
-`(((3 / 5) * 2) - 4) + 3;`
-We say that the operators `+`, `-`, `*` and `/` are left-associative.
-
-The interpreter always operates in the same basic cycle: It reads a statement from the browser, evaluates the statement, and prints the result. This mode of operation is often expressed by saying that the interpreter runs in a [**read-eval-print loop**](). Observe in particular that it is not necessary to explicitly instruct the interpreter to print the value of the statement.
-
-## Naming and the Environment
-A critical aspect of a programming language is *the means it provides for using names to refer to computational objects*, and our first such means are **constants**. We say that the name identifies a constant whose value is the object.
-
-In JavaScript, we name constants using [**constant declarations**](). Typing
-`const size = 2;`  
-causes the interpreter to associate the value` 2` with the name `size`.  
-- The purpose of the constant declaration is to create this association, and not to compute a particular value as for expression statements
-- The JavaScript specification demands that the special value undefined shall be the result of evaluating such constant declarations
-- Once the association has been made, we can refer to the value `2` by the name we gave it, `size`.
-- must declare `size` before we use it, obviously.
-
-Constant declaration is our language's simplest means of abstraction. Complex programs are constructed by building, step by step, computational objects of increasing complexity.
-
-It should be clear that the possibility of associating values with names and later retrieving them means that the interpreter must maintain *some sort of memory* that keeps track of the name-object pairs. This memory is called the [**environment**]() (more precisely the [**global environment**](), since we will see later that a computation may involve a number of different environments).
-
-## Evaluating Operator Combinations
-## Functions
-
+ 
 ## Key Insights
 Thinking of common operations as just functions themselves, is kind of like an, 'oh yeah', that makes sense moment.
 
 ## TIL 
 Today I learned, the JS spec demands that the `undefined` shall be the result of evaluating such constant declarations. Like I've always known that but never really internalized as to why it might be happening. 
 
-
-## Functions
-## The Substitution Model for Function Application
-## Conditional Expressions and Predicates
-## Example: Square Roots by Newtons Method 
-## Functions as Black-Box Abstractions
-
-
-
-## Review Answers
-1. functions and data.
-
-
+ 
 ## Links
 - [Hard Parts, functions and data](/hardparts-js-v2-javascript-principles)
 -----
 **Nav**: 
-- [MAIN]
-- [PREV]
-- [NEXT]
+- [🏠 MAIN](sicp-js-main)
+- [PRIMARY SECTION ⬆ | Building Abstractions with Functions](/sicp-js-building-abstractions-with-functions)
+    - [PARENT SECTION ↖ | Elements of Programming](/sicp-js-elements-of-programming)
+        - [PREV ⬅ | Elements of Programming](/sicp-js-elements-of-programming)
+        - [NEXT ➡ | Expressions ](/sicp-js-expressions)
+
+## Summary Questions
+

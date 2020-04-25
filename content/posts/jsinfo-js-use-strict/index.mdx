@@ -1,0 +1,47 @@
+---
+title: The modern mode, "use strict" | JavaScript.Info  
+date: 2020-02-26
+slug: jsinfo-js-use-strict
+tags:
+  - JS
+  - JS.Info
+--- 
+ 
+> "use strict" at the top of the file was the directive introduced in ES5 (2009) as a way to keep old code working while simultaneously alleviating some of the the imperfect decisions initially cast into the language. 
+
+### Ensure that “use strict” is at the top
+Please make sure that "use strict" is at the top of your scripts, otherwise strict mode may not be enabled.
+
+Strict mode isn’t enabled here:
+```js 
+alert("some code");
+// "use strict" below is ignored--it must be at the top
+
+"use strict";
+
+// strict mode is not activated
+```
+- Only comments may appear above "use strict".
+- No way to cancel `"use strict"`
+
+## In Browsers
+- Most modern browsers have "use strict" on by default 
+- If not available in your browswer you can always wrap your code in an IIFE with 'use strict'; as the first line in the function.
+
+## Always “use strict”
+We have yet to cover the differences between strict mode and the “default” mode.
+
+In the next chapters, as we learn language features, we’ll note the differences between the strict and default modes. Luckily, there aren’t many and they actually make our lives better.
+
+For now, it’s enough to know about it in general:
+
+>1. The "use strict" directive switches the engine to the “modern” mode, changing the behavior of some built-in features. We’ll see the details later in the tutorial.
+2. Strict mode is enabled by placing "use strict" at the top of a script or function. Several language features, like “classes” and “modules”, enable strict mode automatically.
+3. Strict mode is supported by all modern browsers.
+4. We recommended always starting scripts with "use strict". All examples in this tutorial assume strict mode unless (very rarely) specified otherwise.
+
+ 
+## Links
+- [🏠 MAIN](/jsinfo-main)
+- [PREV ⬅ | Code Structure ](/jsinfo-js-code-structure)
+- [NEXT ➡ | Variables ](/jsinfo-js-variables)
