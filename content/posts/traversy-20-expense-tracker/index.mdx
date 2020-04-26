@@ -13,7 +13,63 @@ tags:
 
 ## HTML 
 
+## Style 
+- bd for border 
+- `trf` transform,
+- `trf:t` for transform: translate 
+- transition doesn't seem to have an emmet shortcut
 
+## JavaScript 
+- Create variables by getting id of 
+  - balance
+  - money plus 
+  - money minus 
+  - list 
+  - form
+  - text
+  - amount 
 
+We set a const for localStorageTranctions fetched from loca storage, a let for transactions
+
+I just the following code...
+```js 
+
+const localStorageTransactions = JSON.parse(localStorage.getItem('transactions'));
+
+// let transactions: any = localStorage.getItem('transactions') !== null 
+// ? localStorageTransactions : [];
+let transactions: any = localStorageTransactions !== null ? 
+                              localStorageTransactions : [];
+```
+
+- Going to have a function for addTransaction, remember this is fired on a submit, so we need to prevent default.
+  - pushes transaction to array 
+  - addTransactionDOM(transaction)
+  - updateValues()
+  - updateLocalStorage();
+  - clears text fields
+- function to generateId
+- addTransactionDOM 
+  - deals with plus and minus signs 
+     - styling 
+  - creates new html element and its html 
+  - appends new element to list 
+- updateValues 
+  - defines total, income, expense using HOF 
+  - sets the correspond html values
+- removeTransaction
+  - filters list 
+  - updateLocalStorage()
+  - init()
+- updateLocalStorage
+  - sets local storage with transactions array 
+- init 
+  - clears innerHTML of list 
+  - iterates over transactoins then calls addTransactionDOM for each transacdtion 
+  - updateValues();
+- event listener for submit on form.
+
+## Notes 
+It might just be easier to reference this: https://docs.emmet.io/cheat-sheet/
 
 ## Links 
