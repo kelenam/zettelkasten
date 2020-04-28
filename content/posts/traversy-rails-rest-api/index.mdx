@@ -1,0 +1,37 @@
+---
+title: Ruby on Rails 5 REST API | Traversy
+date: 2020-02-03
+slug: traversy-rails-rest-api
+tags:
+    - Rails
+    - REST
+    - API
+    - Traversy
+---
+## Installation 
+Downloading the Rails installer http://railsinstaller.org/en
+
+This will setup, by default (in Windows): `C:\Sites`, a directory where rails projects can be stored is created for you, there is a `todo` directory automatically created for you
+
+## Getting Started
+- We want to create a new application, we do so by saying `rails new projectName`
+    - You specify a flag `--api` to give yourself extra tools inside of your app if you're building an API 
+    - e.g. `rails new myarticles --api`
+
+## Using SQL 
+- When you install/create a rails application and you don't add an extra flags, by default its going to use sqlite. 
+- To install mysql use the command: `gem install mysql2`
+    - In our `Gemfile`, comment out `gem 'sqlite3'` and replace will `gem mysql2`
+- We're going to be using SQL, to do this, go into our `config` file then the `database.yml` file
+    - change the `adapater` to `mysql2`
+    - also add the username and password for our sql database:
+        - `username: yourUserName`
+        - `password: yourPassword`
+    - then under `development`
+        - change your `database` name to your database.
+- Rails uses database-migrations which allows you to create database/tables through command line.
+
+## Server
+Rails comes with a rails server, you run it by using the command `rails s` 
+
+## Links 

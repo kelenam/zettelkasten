@@ -9,11 +9,6 @@ tags:
   - Book
   - Keith J. Grant
 ---
-## Summary Questions
-1. The cascade considers three things to resolve potentially conflicting rulesets, what are they? 
-1. What are two common example of style sheet origins? 
-
-1. How do you override inline declarations in your stylesheets? What if the inline styles are marked `!important`?
 
 ## The Cascade
 The "C" in CSS.
@@ -22,13 +17,12 @@ The "C" in CSS.
 - First step towards this is understanding how the rules we write are applied.
 
 Rulesets can target the same element, how they get resolved depends on how the rules are defined.
-The ***cascade*** is the name for this set of rules.
+>- [^ **What is the cascasde?**]The ***cascade*** is the name for this set of rules.
 
-> The cascade considers three things to resolve potentially conflicting rulesets:
-> 
-> 1. ***stylesheet origin***: Where the styles come from. Your styles are applied in conjunction with the browser's default styles.
-> 2. ***selector specificity***: Which selectors take precedence over which.
-> 3. ***Source order***: Order in which styles are declared in the stylesheet.
+>- [^ **The cascade considers three things to resolve potentially conflicting rulesets, what are they?**]The cascade considers three things to resolve potentially conflicting rulesets:
+>   1. ***stylesheet origin***: Where the styles come from. Your styles are applied in conjunction with the browser's default styles.
+>   2. ***selector specificity***: Which selectors take precedence over which.
+>   3. ***Source order***: Order in which styles are declared in the stylesheet.
 
 ```
                                       No                     No                     No
@@ -52,13 +46,13 @@ Together, the *selector* and the *declaration block* are called a [***ruleset***
 - [***at-rules***]() are language constructs beginning with an "at" symbol, e.g. `@import`.
 
 ### Understanding stylesheet origin
-- There are different types of *origins* of stylesheets.
+>- [^ **What are two common example of style sheet origins?**]There are different types of *origins* of stylesheets.
 - *user agent styles* are the browsers default styles
 - styles you write are called *author* styles which have greater priority.
 - after *user agents styles* are considered, the browser applied your styles - the *author styles*, this allows declarations you specify to **override** those set by the user agent.
 
 #### Important declarations
-- An [***important declaration***]() can be specified by adding `!important` to the end of the declaration, before the semicolon:
+- An [**important declaration**]() can be specified by adding `!important` to the end of the declaration, before the semicolon:
 ```css
 color: red !important;
 ```
@@ -77,7 +71,7 @@ color: red !important;
 #### Inline styles
 [**Inline styles**](): if you use an HTML `style` attribute, to apply styles. The declarations are applied only to that element, they are in effect "scoped" declarations, which override any declarations applied from your stylesheet or a `<style>` tag.
 
->* To override inline declarations in your stylesheets, you'll need to add an `!important` to the declaration, shifting it into a higher-priorty origin. If the inline styles are marked important, then nothing can override them.
+>* [^ **How do you override inline declarations in your stylesheets? What if the inline styles are marked `!important`?**]To override inline declarations in your stylesheets, you'll need to add an `!important` to the declaration, shifting it into a higher-priorty origin. If the inline styles are marked important, then nothing can override them.
 
 #### Selector specificity
 The second part of specificity is determined by the selectors. For instance, a selctor with two class names has a higher specificity than a selector with one.
@@ -90,22 +84,104 @@ In our ongoing example if we said something like...
 }
 
 .featured {
-
+  background-color: orange; /* Teal background color */
 }
 ```
+- An ID selector has a higher specificity than a class selector.
+- [^ **A _type selctor_ is also known as a?**]Similarly, a class selector has a higher specificy than a tag selector (also called a [**type selector**]())
+
+#### Rules of specificity
+>- If a selector has more IDS, it wins (that is, it's more specific)
+- If that results in a tie, the selector with the most classes wins 
+- If that results in a tie, the selector with the most tag names wins.
+
+#### Pseudo-class selector Specificity 
+- [^ **What specificity do pseudo-class selectors have? What about things like `*` and `>, +, -`?**]Pseudo-class selectors (for example, `:hover`) and attribute selectors (for example, `[type="input"]`) each have the same specificity as a class selector. The universal selector (`*`) and combinators (`>,+,-`) have no effect on specificity.
+- [^ **If you add a declaration to your CSS and it seems to have no effect, often it's because**]... a more specific rule is overriding it.
+
+#### Specificity Notation 
+A common way to indicate specificity is in a number form, often with commas between each number. FOr example, "1,2,2" indicates a specificity of one ID, two classes, and two tags.
+- 2,0,0 would be two IDS 
+- 0,0,2 would be two tags 
+- Now you can simply compare numbers,
+- Occassionally people use four-number notation, 1,0,0,0, Where the 1 would be inline-style specificity.
+
 ### Understanding source order
+The third and final step to resolving the cascase is [**source order**](). If the origin and the specificity are the the same, then the declaration that appears later in the stylesheet--or appears in a stylesheet included llater on the page--takes precedence.
+
+#### Link Styles and Source Order
+- Link styling should obey a certain order, that's  because source order affects the cascade. This listing shows styles for links on a page in the "correct order"
+```css 
+a:link {
+  color: blue;
+  text-decoration: none;
+}
+
+a:visited {
+  color: purple;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  color: red;
+}
+```
+- The cascade is the reason this order matters: given the same specificity, later styles override earlier styles. 
+>- [^ **What is the hepful mnemonic to remember ordering link styles?**]A helpful mnemonic to remember this order is **LoVe/HAte**--link, visited, hover, active. Note that if you change one of the selectors to have different specificity than the others, this will break down and you may get unexpected results.
+
+#### Cascaded Values 
+>- [^ **The browser follows what three steps in determing cascade values?**]The browswer follows these threwe steps--**origin**, **specificity**, and **source order** to resolve every property for every element on the page. A declaration that "wins" the cascade is called a **cascaded value**.
+- [**cascaded value**](): A value for a particular property applied to an element as a result of the cascade 
+- If a property is never specified for an element, it has no cascaded value for that property. 
 
 ### Two rules of thumb
+>- [^ **What are the two rules of thumb when working with the cascade?**]The two common rules of thumb for working with the cascade: 
+  1. **Don't use IDs in your selector**
+  2. **Don't use `!important`**
+
+These two rules can be good advice, but don't cling to them forever. There are exceptiosn where they can be okay, but never use them as a knee-jerk reaction to win a specificity battle.
 
 ## Inheritance
+There's one last way that an element ca receive styles--*inheritance*. The cascade is frequentllky conflated with the concept of inheritance. They are related, but different. 
+
+- If an element has no cascaded value for a given proeprty, it may inhert one from an ancestor element. e.g. common to apply a `font-family` to the body element.
+- Not all properties are inherited. By default, only certain ones are. 
+  - In general, these are properties you'll want to be inherited. 
+  - They are primaryily properties pertain to text, e.g. `color`, `font`, `font-family`, etc.
+  - A few others inherit as well, such as the list properties: `list-style`, `list-style-type`, etc.
+- Inherited properties are passed down the DOM tree from parent nodes to their descendants.
+
+### Use your DevTools!
+- DevTools provide visibility into exactly which rules are applying to which elements and why.
+  - strike-through styles are *overriden values*.
+  - cascaded values are the ones without a strik-through
+  - inherited values are listed as such 
+>- ⭐ The style inspector shows every selector targeting the inspected element, ordered by specificity. Below that are all inherited properties.
+  - You can type in the Filter box at the top to hide all but a certain set of declarations 
+  
 ## Special values
+There are two special values that you can apply to any property to help manipulate the cascade: `inherit` and `initial`.
+
 ### Using the `inherit` keyword
+Sometimes you'll want inheritance to take place when a cascade value is preventing it. To do this you can use the keyword `inherit`. **You can override another value with this, and it will cause the element to inherit that value from its parent.**.
+
+
 ### Using the `initial` keyword
 ## Shorthand properties
 ### Beware shorthands silently overriding other styles
 ### Understanding the order of shorthand values
  
-## Summary Answers
-1. 
+## Links 
+- [🏠 MAIN](/css-id-main)
+- [PREV ⬅ | Expressions](/microservices-node-fundamental-ideas)
+- [NEXT ➡ | A Mini-Microservices App ](/micoservices-node-mini-app)
 
-## Links
+## Key Insights
+
+- The difference between inheritance and the cascade
+  - It's common to apply your `font-family` to the body element and let inheritance take care of the rest. 
+
+## Summary Questions 
