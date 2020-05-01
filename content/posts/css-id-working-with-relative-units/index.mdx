@@ -1,0 +1,76 @@
+---
+title: Working with Relative Units | CSS In Depth 
+date: 2020-02-26
+slug: css-id-working-with-relative-units
+tags:
+  - CSS 
+  - CSS In Depth
+  - Book
+  - Keith J. Grant
+---
+
+- CSS provides a wide variety of unit options to choose from. Pixels are one such option.
+- Pixels are known as [**absolute units**](), that is 5px always means the same thing.
+- Other units such as ems are not absolute but rather [**relative units**](), where their value changes based on external factors. 
+- many devs uncertain about ems acting predictably, by the end of this we will have removed the mysterious of their expected values. 
+
+## The power of relative values 
+CSS brings a *late-binding* of styles to the web page: The content of and its styles aren't pulled together until after the authoring of both is complete. The web is a place that is no longer like a traditional publishing house or early computer application develoment where there were fixed sizes of things. In the web, things/windows and especially with mobile, can be adjusted/variable between users. 
+
+### The struggle for pixel-perfect design 
+For a long time, designers mitigated complexity of adjustable/variable screen sizes by focusing on "pixel-perfect" designs (think Web 2.0). They'd create a tightly defined container, often a centered column around 800px wide and design within those contraints. 
+
+### The end of pixel-perfect web 
+Laptops, and smartphones changed the game on locking in on ideal/singular page/view presentations, and thus began the emergence of [**responsive design**](), in CSS this rewfers to styles that "respond" differently based on the size of the browser window. 
+
+- Added abstraction means additional complexity. As you write your CSS, you need to be able to think simultaneously in specifics, as well as in generalities. 
+    - When you've multiple ways to do something, side with way that works more generally under multiple circumstances.
+- *Relative units* are one of the tools CSS provides to work at this level of abstraction.
+
+### Pixels, points, and picas 
+- pixels, `px` 
+- millimeters, `mm` 
+- 
+
+Pixel is a slightly misleading name, a CSS pixel != a monitor pixel, notably in the case of "retina" displays. 
+
+## Ems and rems 
+### Using ems to define font-size 
+
+### Using rems for font-size 
+
+## Stop thinking in pixels 
+
+### Setting a sane default font-size 
+
+### Resizing a single component 
+
+## Viewport-relative units 
+
+### Using `vw` for font size 
+
+### Using `calc()` for font size 
+
+## Unitless numbers and line-height 
+
+## Custom properties (aka CSS variables)
+
+### Changing custom properties dynamically 
+### Changing custom properties with JavaScript 
+### Experimenting with custom properties 
+
+
+## Summary 
+- Embrace the use of relative units, allowing the page's structure to determien the meaning of your styles.
+- Favor the use of rems for font size, but selectively use ems for simple scaling of components on the page.
+- You can make your entire page scale responsively without any media queries. 
+- Use unitless values when specifying line heights 
+- You can start getting familiar with one of CSS's newest features, custom properties. 
+
+## Links 
+- [🏠 MAIN](/css-id-main)
+- [PREV ⬅ | Cascade, specificity, and inheritance ](/css-id-cascade-specificity-inheritance)
+- [NEXT ➡ | Working with Relative Units ](/micoservices-node-mini-app)
+
+## Summary Questions 
+ 

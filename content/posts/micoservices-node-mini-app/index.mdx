@@ -98,12 +98,55 @@ It's again a good idea to have a very clear picture of what this service aims to
 
 - There is going to be a bit more complexity on this service required since we are going to be tying it to our posts.
 
+However, it's mostly going to be the same: 
+```js 
+const express = require('express');
+const bodyParser = require('body-parser');
+const { randomBytes } = require('crypto');
 
+const app = express();
+app.use(bodyParser.json());
 
-## Quick Comments Test 
+const commentsByPostId= {};
 
-## Note on the React App 
+app.get('/posts/:id/comments', (req, res) => {
+    res.send(commentsByPostId[req.params.id] || []);
+});
+
+app.post('/posts/:id/comments', (req, res) => {
+    const commentId = randomBytes(4).toString('hex');
+    const { content } = req.body;
+
+    // Protect against undefined in the case the post doesn't exist
+    const comments =  commentsByPostId[req.params.id] || [];
+
+    comments.push({ id: commentId, content });
+
+    // Set the comments to be updated with the newly pushed comment
+    commentsByPostId[req.params.id] = comments;
+
+    // Send back all comments 
+    res.status(201).send(comments);
+});
+
+app.listen(4001, () => {
+    console.log("Listening on 4001");
+})
+```
+- We want the first route handler to deal with a get request to posts/:id/comments, make sure you have the colon right before id. 
+- Just like our posts we are going to be storing all our comments in an in-memory data structure
+- The reason we call it, `commentsByPostId` is because we want to look up comments associated with a given post. So this is going to be a slightly more complex structure than just a plain object...
+- the `:id` in the path is referenceable by saying `req.params.id` 
+
+![](postsById.png)
+
+In the next section we will work on the React portion and we'll start to see a lot of deficiencies with our current architecture.
+ 
 ## React Project Setup 
+The first thing you are going to want to do is come up with a component design for our React application. 
+
+![](component-hierarchy.png)
+
 ## Building Post Submission
 ## Handling CORS Errors 
 ## Fetching and Rewndering Posts 
@@ -112,8 +155,6 @@ It's again a good idea to have a very clear picture of what this service aims to
 ## Completed React App 
 ## Request Minimization Strategies 
 ## An Async Solution 
-
-
 
 ## Links 
 - [🏠 MAIN](/microservices-node-fundamental-ideas)  

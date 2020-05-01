@@ -1,0 +1,77 @@
+---
+title: Values are Expressions | JavaScript Allongé
+date: 2020-01-01
+slug: js-allonge-values-expressions
+tags:
+  - JS
+  - Reg Braithwaite
+--- 
+
+This is exactly how the JavaScript environment works for the purpose of this book. We are going to dispense with web servers, browsers and other complexities and deal with this simple model: You give the computer an `expression`, and it returns a `value`, just as you express your wishes to a barista and receive a coffee in return.
+
+## Values are expressions 
+
+**All values are expressions**. Say you hand the barista a café Cubano. Yup, you hand over a cup with some coffee infused through partially caramelized sugar. You say, “I want one of these.” The barista is no fool, she gives it straight back to you, and you get exactly what you want. Thus, a café Cubano is an [**expression**]() (you can use it to place an order) and a [**value**]() (you get it back from the barista).
+
+```js 
+42 
+```
+> - [^ **Is the number, `42` an expression? A value? Neither? Or both? How do you tell?**]Is this an expression? A value? Neither? Or both?
+
+> The answer is, this is both an expression and a value. The way you can tell that it’s both is very easy: When you type it into JavaScript, you get the same thing back, just like our café Cubano:
+```js 
+42
+//=> 42
+```
+Let’s try this as well with something else the computer understands easily:
+```js 
+"JavaScript" + " " + "Allonge"
+  //=> "JavaScript Allonge"
+``` 
+Now we see that “strings” are values, and you can make an expression out of strings and an operator `+`. Since strings are values, they are also expressions by themselves. *But strings with operators are not values, they are expressions.* 
+
+## values and identity
+In JavaScript, we test whether two values are identical with the `===` operator, and whether they are not identical with the `!==` operator:
+```js
+2 === 2
+    //=> true
+    
+'hello' !== 'goodbye'
+    //=> true
+```
+- There are 4 possibilities when comparing with strict equals. 
+    1. Different types, '2' !== 2. 
+    2. Different contents 5 === 2. 
+    3. value types 
+    4. reference types 
+
+## value types
+If they are the same kind of cup, and they hold the same contents, we have no way to tell the difference between them. This is the case with the strings, numbers, and booleans we have seen so far.
+```js 
+2 + 2 === 4
+  //=> true
+  
+(2 + 2 === 4) === (2 !== 5)
+  //=> true
+```
+Note well what is happening with these examples: Even when we obtain a string, number, or boolean as the result of evaluating an expression, it is identical to another value of the same type with the same “content.” Strings, numbers, and booleans are examples of what JavaScript calls “**value**” or “**primitive**” types. We’ll use both terms interchangeably.
+
+## reference types
+>- [^ **So what kinds of values might be the same type and have the same contents, but not be considered identical to JavaScript?**]So what kinds of values might be the same type and have the same contents, but not be considered identical to JavaScript? Objects/Arrays. 
+```js 
+[2-1, 2, 2+1] === [1,2,3]
+[1,2,3] === [1, 2, 3]
+[1, 2, 3] === [1, 2, 3]
+``` 
+How about that! When you type `[1, 2, 3]` or any of its variations, you are typing an expression that generates its own unique array that is not identical to any other array, even if that other array also looks like `[1, 2, 3]`.
+
+They look the same, but if you examine them with `===,` you see that they are different. 
+
+>-  [^ **Every time you evaluate an expression to create an array...**]**Every time you evaluate an expression (including typing something in) to create an array, you’re creating a new, distinct value even if it appears to be the same as some other array value.** As we’ll see, this is true of many other kinds of values, including functions, the main subject of this book.
+
+## Links 
+- [🏠 MAIN](/js-allonge-main) 
+- [PREV ⬅ | Introduction ](/js-allonge-main)
+- [NEXT ➡ | A Rich Aroma: Basic Numbers ](/js-allonge-basic-numbers)
+
+## Summary Questions 

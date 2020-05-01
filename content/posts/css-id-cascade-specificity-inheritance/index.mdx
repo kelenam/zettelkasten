@@ -168,20 +168,101 @@ There are two special values that you can apply to any property to help manipula
 ### Using the `inherit` keyword
 Sometimes you'll want inheritance to take place when a cascade value is preventing it. To do this you can use the keyword `inherit`. **You can override another value with this, and it will cause the element to inherit that value from its parent.**.
 
+https://codepen.io/kelena_mori/pen/dyYzzaz
+
+Add this footer to our exmaple.
+```html 
+<footer class="footer">
+  &copy; 2016 Wombat Coffee Roasters &mdash;
+  <a href="/terms-of-use">Terms of use</a>
+</footer>
+```
+- typically, you'll have a font color set for all links on the page (and if you don't, the user agent styles sets one), and that color is applied to to the Terms of Use link as well.
+- To make the link in the footer gray, you'll need to override it...
+```css 
+a:link {
+  color: blue; /* Global link color the page */
+}
+.footer {
+  color: #666; /*footer color set to gray */
+  background-color: #ccc;
+  padding: 15px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+.footer a {
+  color: inherit; /* inherits font color from the footer */
+  text-decoration: underline;
+}
+```
+- Here the third ruleset overrides the blue link color by inheriting it color from its parent
+- The benefit here is that the footer link will change along with the rest of the footer should anything alter.
+- You can also use the `inherit` keyword to force inheritance of a property not normally inherited, such as border or padding.
 
 ### Using the `initial` keyword
+- Sometimes you'll find you have styled applied to an element that you want to undo. 
+- Every CSS property has an initial value or default 
+- If you assign the value `initial` to that property, then it effectively resets to its default value.
+  - Note: May not be compatibile with < IE11
+- The benefit of `initial` is that you don't have to think about it as much. If you want to remove a border from an element, set `border: initial`. If you want to restore an element to its default width: `width: initial`
+  - You may be in the habit of using the value `auto` to do this sort of reset, in fact you could do `width: auto` to get the same effect, but its only because the default value of `width` IS `auto`.
+  - `auto` however, is not the default value for all properties, which is why `initial` might be a safer bet.
+- Note: `display: initial` will result in `display: inline` no matter the element, that's because the default value for `display` itself is `inline` regardless of whatever type of element it is being applied to.
+
 ## Shorthand properties
+- [^ **What are shorthand properties? What is an example of one?**][**shorthand properties**]() are proeprties that let you set the values of several other properties at one time.
+  - e.g. `font` is a shorthand property that represents several font properties: `font-style`, `font-weight`, `font-size`, `line-height`, and `font-family`,
+- shorthand properties are useful for keeping your code succinct and clear, but a few quirks about them arent' readily apparent.
+
 ### Beware shorthands silently overriding other styles
+- Most shorthand properties let you omit certain values and only specify the bits you're concerned with.
+- However, doing this still sets the omitted values, e.g. `font` property for a page title without specifying a `font-weight` a font-weight of `normal` would still be set.
+
+#### `font` is the worst offender for overwrites 
+- `font` is the most egregious for causing problems , because it sets such a wide array of properties. For this reasons, I avoid using it except to set general styles on the `<body>` element.
+
 ### Understanding the order of shorthand values
- 
-## Links 
-- [🏠 MAIN](/css-id-main)
-- [PREV ⬅ | Expressions](/microservices-node-fundamental-ideas)
-- [NEXT ➡ | A Mini-Microservices App ](/micoservices-node-mini-app)
+- Shorthand properties try to be lenient, e,.g. `border: 1px solid black` == `border: black 1px solid` because the browser can understand which values you intend. 
+- Most shorthands however, need a specific order: Top, Right, Bottom, Left.
+- shorthand properties for padding and margin for example, for these properties, the values are in clockwise order, beginning at the top.
+> - ⭐ Remembering this order can keep you out of trouble. In fact, the word _TRouBLe_ is an mnemonic you can use to remember the order: Top, Right, Bottom, Left. 
+
+#### TRBL properties also support truncated notations 
+- If the declaration ends before one of the four sides is given a value, that side takes its value from the opposite side. 
+  - Specify three values: and the left and right side will both use the second one
+  - Specifiy two values and the top and bottom will use the first one.
+  -  If you specify one values, it will apply  to all four sides. 
+>- For many developers, the most problematic of these is when three values are given. Remember, this specifies the top, right, and bottom. Because no left valeu is given, it will take the same value as the right; the second value will be applied to both the left and the right sides.
+- Most often you'll use two values wher the first is Top/Bottom and the second value is Left/Right.
+  - More often then note you will have more padding on the sides than on the top and bottom of things, buttons for instance.
+
+### Horizontal, Vertical 
+- The _TRouBLe_ mneomonic only applies to properties that apply individually to all four sides of the box.
+- Other properties only support up to two values.
+  - e.g. `background-position`, `box-shadow`, `text-shadow` 
+    - Anything you could imagine on a Cartesian grid.
+  - They work inversely to trouble, that is, horizontal right/left values first, followed by vertical top/bottom values.
+  - That is because these properties represent a Cartesian grid where coordinates are given (x,y)
+  - `box-shadow:  10px 2px #5f9090;     /* Shadow offset 10px to the right and 2px down */`
+
+> If you're working with a property that specifies two measurements from a corner, think "Cartesian grid". If you're working with one that specifies measurements for each sdie all the way around an element, think "clock". 
+
+## Summary 
+- Keep selector specificity under control 
+- Don't confuse cascade with inheritance 
+- Certain properties are inherited, including those for text, lists, and table borders.
+- Don't confuse `initial` with `auto` values 
+- Stay out of _TRouBLe_ with shorthand
 
 ## Key Insights
 
 - The difference between inheritance and the cascade
   - It's common to apply your `font-family` to the body element and let inheritance take care of the rest. 
+
+## Links 
+- [🏠 MAIN](/css-id-main)
+- [PREV ⬅ | Introduction ](/css-id-main)
+- [NEXT ➡ | Working with Relative Units ](/css-id-working-with-relative-units)
 
 ## Summary Questions 

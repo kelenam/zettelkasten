@@ -1,0 +1,160 @@
+---
+title: 📑 Introduction | JavaScript Allongé
+date: 2020-01-01
+slug: js-allonge-main
+tags:
+  - JS
+  - Reg Braithwaite
+--- 
+
+##  Contents
+1. [A Pull of the Lever: Prefaces](/js-allonge-main)
+2. [Prelude: Values and Expressions over Coffee](/js-allonge-values-expressions)
+    1. values are expressions
+    1. values and identity
+3. A Rich Aroma: Basic Numbers
+    1. A Rich Aroma: Basic Numbers
+4. The first sip: Basic Functions
+    1. As Little As Possible About Functions, But No Less
+    1. Ah. I’d Like to Have an Argument, Please.
+    1. Closures and Scope
+    1. That Constant Coffee Craving
+    1. Naming Functions
+    1. Combinators and Function Decorators
+    1. Building Blocks
+    1. Magic Names
+    1. Summary
+5. Recipes with Basic Functions
+    1. Partial Application
+    1. Unary
+    1. Tap
+    1. Maybe
+    1. Once
+    1. Left-Variadic Functions
+    1. Compose and Pipeline
+6. Picking the Bean: Choice and Truthiness
+    1. Truthiness and Operators 
+7. Composing and Decomposing Data
+    1. Arrays and Destructuring Arguments
+    1. Self-Similarity
+    1. Tail Calls (and Default Arguments)
+    1. Garbage, Garbage Everywhere
+    1. Plain Old JavaScript Objects
+    1. Mutation
+    1. Reassignment
+    1. Copy on Write
+    1. Tortoises, Hares, and Teleporting Turtles
+    1. Functional Iterators
+    1. Making Data Out Of Functions
+8. Recipes with Data
+    1. mapWith
+    1. Flip
+    1. Object.assign
+    1. Why? (Y-Combinator)
+9. A Warm Cup: Basic Strings and Quasi-Literals
+    9. quasi-literals and evaluation time 
+10. Stir the Allongé: Objects and State
+    1. Encapsulating State with Closures
+    1. Composition and Extension
+    1. This and That
+    1. What Context Applies When We Call a Function?
+    1. Method Decorators
+    1. Summary
+11. Recipes with Objects, Mutations, and State
+    1. Memoize
+    1. getWith
+    1. pluckWith
+    1. Deep Mapping
+12. The Coffee Factory: “Object-Oriented Programming”
+    12. objects, classes, and oop 
+13. Served by the Pot: Collections
+    1. Iteration and Iterables
+    1. Generating Iterables
+    1. Lazy and Eager Collections
+    1. Interlude: The Carpenter Interviews for a Job
+    1. Interactive Generators
+    1. Basic Operations on Iterables
+14. A Coffeehouse: Symbols
+    14. Symbols and Privacy with symbols 
+15. Life on the Plantation: Metaobjects
+    1. Why Metaobjects?
+    1. Mixins, Forwarding, and Delegation
+    1. Later Binding
+    1. Delegation via Prototypes
+    1. Shared Prototypes
+16. Decaffeinated: Impostors
+    1. Decaffeinated: Impostors
+17. Finish the Cup: Constructors and Classes
+    1. Constructors and new
+    1. Why Classes in JavaScript?
+    1. Classes with class
+    1. Object Methods
+    1. Why Not Classes?
+    1. Summary
+18. Recipes with Constructors and Classes
+    1. Bound
+    1. Send
+    1. Invoke
+    1. Fluent
+19. Colourful Mugs: Symmetry, Colour, and Charm
+    1. Colourful Mugs: Symmetry, Colour, and Charm
+20. Con Panna: Composing Class Behaviour
+    1. Extending Classes with Mixins
+    1. Functional Mixins
+    1. Emulating Multiple Inheritance
+    1. Preventing Property Conflicts
+    1. Reducing Coupling
+21. More Decorators
+    1. Stateful Method Decorators
+    1. Class Decorators beyond ES6/ECMAScript 2015
+    1. Method Decorators beyond ES6/ECMAScript 2015
+    1. Lightweight Traits
+22. More Decorator Recipes
+    1. After Method Advice
+    1. Before Method Advice
+    1. Provided and Unless
+    1. Method Advice
+23. Closing Time at the Coffeeshop: Final Remarks
+ 
+
+## About JavaScript Allongé
+**JavaScript Allongé is a first and foremost, a book about programming with functions.**
+
+## Why this book?
+It was written to describe certain ideas in programming: Working with small, independent entities that compose together to make bigger programs. Thus, the focus on things like writing decorators.
+
+The common thread that runs through all these things(things like classes, mixins, symbols, iterators and generators) is that since they are all simple objects and simple functions, we can use the same set of “programming with functions” techniques to build programs by composing small, flexible, and decoupled entities.
+
+## What JavaScript Allongé is. And isn’t.
+- JavaScript Allongé is a book about programming with functions
+- But while JavaScript Allongé attempts to be provocative, it is not prescriptive.
+- Choices in software development are also often driven by requirements specific to the type of software being developed
+
+Choices in software development must also consider the question of consistency. If a particular codebase is written with lots of helper functions that place the subject first, like this:
+```js 
+const mapWith = (iterable, fn) =>
+  ({
+    [Symbol.iterator]: function* () {
+      for (let element of iterable) {
+        yield fn(element);
+      }
+    }
+  });
+```
+
+Then it can be jarring to add new helpers written that place the verb first, like this:
+```js 
+const filterWith = (fn, iterable) =>
+  ({
+    [Symbol.iterator]: function* () {
+      for (let element of iterable) {
+        if (!!fn(element)) yield element;
+      }
+    }
+  });
+```
+There are reasons why the second form is more flexible, especially when used in combination with partial application, but does that outweigh the benefit of having an entire codebase do everything consistently the first way or the second way?
+
+## Links 
+- [🏠 MAIN](/js-allonge-main) 
+- [NEXT ➡ | values are expressions ](/js-allonge-values-expressions)
