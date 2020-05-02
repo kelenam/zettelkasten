@@ -6,6 +6,7 @@ tags:
   - JS
   - Reg Braithwaite
 ---
+
 **In JavaScript, functions are values**, but they are also much more than simple numbers, strings, or even complex data structures like trees or maps. **Functions represent computations to be performed.**
 ```js 
 () => 0
@@ -16,7 +17,7 @@ This is a function that is applied to no values and returns `0`. Let’s verify 
 (() => 0)
   //=> [Function]
 ``` 
-What!? Why didn’t it type back` () => 0` for us? *This seems to break our rule that if an expression is also a value, JavaScript will give the same value back to us. What’s going on?* The simplest and easiest answer is that although the JavaScript interpreter does indeed return that value, displaying it on the screen is a slightly different matter. `[Function]` is a choice made by the people who wrote Node.js, the JavaScript environment that hosts the JavaScript REPL. If you try the same thing in a browser, you may see something else.
+>- [^ ⭐**What is our rule for checking if an expression is also a value?**]⭐What!? Why didn’t it type back` () => 0` for us? *This seems to break our rule that if an expression is also a value, JavaScript will give the same value back to us. What’s going on?* The simplest and easiest answer is that although the JavaScript interpreter does indeed return that value, displaying it on the screen is a slightly different matter. `[Function]` is a choice made by the people who wrote Node.js, the JavaScript environment that hosts the JavaScript REPL. If you try the same thing in a browser, you may see something else.
 
 ## functions and identities
 You recall that we have two types of values with respect to identity: **Value types** and **reference types**. Value types share the same identity if they have the same contents. Reference types do not.
@@ -36,7 +37,7 @@ Here’s how we apply a function to some values in JavaScript: Let’s say that 
 
 `fn_expr(args)`
 
-Right now, we only know about one such expression: `() => 0`, so let’s use it. We’ll put it in parentheses5 to keep the parser happy, like we did above: `(() => 0)`. Since we aren’t giving it any arguments, we’ll simply write () after the expression. So we write:
+Right now, we only know about one such expression: `() => 0`, so let’s use it. We’ll put it in parentheses  to keep the parser happy, like we did above: `(() => 0)`. Since we aren’t giving it any arguments, we’ll simply write `()` after the expression. So we write:
 
 ```js 
 (() => 0)()
@@ -44,7 +45,7 @@ Right now, we only know about one such expression: `() => 0`, so let’s use it.
 ```
 
 ## functions that return values and evaluate expressions
-We’ve seen `() => 0`. We know that `(() => 0)()` returns 0, and this is unsurprising. Likewise, the following all ought to be obvious:
+We’ve seen `() => 0`. We know that `(() => 0)()` returns `0`, and this is unsurprising. Likewise, the following all ought to be obvious:
 
 ```js 
 (() => 1)()
@@ -85,7 +86,7 @@ When dealing with expressions that have a lot of the same characters (like paren
 It evaluates to the same thing, `0`.
 
 ## commas
-> The [**comma operator**]() in JavaScript is interesting. It takes two arguments, evaluates them both, and itself evaluates to the value of the right-hand argument. In other words:
+>- [^ **What is the comma seperator and what does it do?**]The [**comma operator**]() in JavaScript is interesting. It takes two arguments, evaluates them both, and itself evaluates to the value of the right-hand argument. In other words:
 ```js 
 (1, 2)
   //=> 2
@@ -99,7 +100,7 @@ We can use commas with functions to create functions that evaluate multiple expr
   //=> 4
 ``` 
 
-> This is useful when trying to do things that might involve side-effects, but we’ll get to that later. In most cases, JavaScript does not care whether things are separated by spaces, tabs, or line breaks. So we can also write:
+>- [^ **When might the comma separator be useful?**]This is useful when trying to do things that might involve side-effects, but we’ll get to that later. In most cases, JavaScript does not care whether things are separated by spaces, tabs, or line breaks. So we can also write:
 
 ```js 
 () =>
@@ -130,6 +131,7 @@ What is this `undefined`?
 
 ## `undefined`
 > In JavaScript, the absence of a value is written [**`undefined`**](), and it means there is no value. It will crop up again. undefined is its own type of value, and it acts like a value type:
+
 ```js 
 undefined
   //=> undefined
@@ -145,14 +147,16 @@ undefined === undefined
 ``` 
 > No matter how you evaluate `undefined`, you get an identical value back. `undefined` is a value that means “I don’t have a value.” But it’s still a value.
 
-> You might think that `undefined` in JavaScript is equivalent to NULL in SQL. No. In SQL, two things that are NULL are not equal to nor share the same identity, because two unknowns can’t be equal. In JavaScript, every `undefined` is identical to every other `undefined`.
+> You might think that `undefined` in JavaScript is equivalent to `NULL` in SQL. No. In SQL, two things that are NULL are not equal to nor share the same identity, because two unknowns can’t be equal. In JavaScript, every `undefined` is identical to every other `undefined`.
 
-## void
+## `void`
 We’ve seen that JavaScript represents an undefined value by typing `undefined`, and we’ve generated `undefined` values in two ways:
 
-By evaluating a function that doesn’t return a value `(() => {})()`, and;
-By writing undefined ourselves.
-There’s a third way, with JavaScript’s void operator. Behold:
+>[^ **What are the three ways to evaluate a value as `undefined`?**]1. By evaluating a function that doesn’t return a value `(() => {})()`, and;
+2. By writing `undefined` ourselves.
+3. By using the `void` operator, `void 0`
+
+There’s a third way, with JavaScript’s `void` operator. Behold:
 ```js 
 void 0
   //=> undefined
@@ -161,33 +165,38 @@ void 1
 void (2 + 2)
   //=> undefined
 ```
-void is an operator that takes any value and evaluates to undefined, always. So, when we deliberately want an undefined value, should we use the first, second, or third form?7 The answer is, use void. By convention, use void 0.
+>- [^ **What is `void`? When would we use it and what is the convention when using it?**]`void` is an operator that takes any value and evaluates to `undefined`, always. So, when we deliberately want an `undefined` value, should we use the first, second, or third form? The answer is, use void. By convention, use `void 0.`
 
-The first form works but it’s cumbersome. The second form works most of the time, but it is possible to break it by reassigning undefined to a different value, something we’ll discuss in Reassignment and Mutation. The third form is guaranteed to always work, so that’s what we will use.8
+>- [^ **Why would we use the `void` operator over the other methods to produce an `undefined` value?**]The first form works but it’s cumbersome. The second form works most of the time, but it is possible to break it by reassigning undefined to a different value, something we’ll discuss in Reassignment and Mutation. **The third form is guaranteed to always work, so that’s what we will use.**
 
 ## back on the block
 Back to our function. We evaluated this:
-
+```js 
 (() => {})()
   //=> undefined
-We said that the function returns the result of evaluating a block, and we said that a block is a (possibly empty) list of JavaScript statements separated by semicolons.9
+``` 
+>- [^ **Again, what is a block?**]We said that the function returns the result of evaluating a [**block**](), and we said that a block is a (possibly empty) list of JavaScript statements separated by semicolons. 
 
-Something like: { statement1; statement2; statement3; ... ; statementn }
+Something like: { statement1; statement2; statement3; ... ; statementN }
 
-We haven’t discussed these statements. What’s a statement?
+We haven’t discussed these statements. What’s a **statement**?
 
-There are many kinds of JavaScript statements, but the first kind is one we’ve already met. An expression is a JavaScript statement. Although they aren’t very practical, these are valid JavaScript functions, and they return undefined when applied:
-
+>- [^ **What is a statement?**]There are many kinds of JavaScript statements, but the first kind is one we’ve already met. **An expression is a JavaScript statement**. Although they aren’t very practical, these are valid JavaScript functions, and they return `undefined` when applied:
+```js
 () => { 2 + 2 }
 () => { 1 + 1; 2 + 2 }
-As we saw with commas above, we can rearrange these functions onto multiple lines when we feel its more readable that way:
+```
 
+As we saw with commas above, we can rearrange these functions onto multiple lines when we feel its more readable that way:
+```js
 () => {
     1 + 1;
     2 + 2
   }
-But no matter how we arrange them, a block with one or more expressions still evaluates to undefined:
+```
 
+But no matter how we arrange them, a block with one or more expressions still evaluates to `undefined`:
+```js
 (() => { 2 + 2 })()
   //=> undefined
   
@@ -199,8 +208,11 @@ But no matter how we arrange them, a block with one or more expressions still ev
     2 + 2
   })()
   //=> undefined
+```
+
 As you can see, a block with one expression does not behave like an expression, and a block with more than one expression does not behave like an expression constructed with the comma operator:
 
+```js
 (() => 2 + 2)()
   //=> 4
 (() => { 2 + 2 })()
@@ -210,8 +222,10 @@ As you can see, a block with one expression does not behave like an expression, 
   //=> 4
 (() => { 1 + 1; 2 + 2 })()
   //=> undefined
-So how do we get a function that evaluates a block to return a value when applied? With the return keyword and any expression:
+```
 
+So how do we get a function that evaluates a block to return a value when applied? With the `return` keyword and any expression:
+```js 
 (() => { return 0 })()
   //=> 0
   
@@ -220,60 +234,60 @@ So how do we get a function that evaluates a block to return a value when applie
   
 (() => { return 'Hello ' + 'World' })()
   // 'Hello World'
-The return keyword creates a return statement that immediately terminates the function application and returns the result of evaluating its expression. For example:
-
+``` 
+>- [^ **What does the `return` keyword do?**]The `return` keyword creates a **return statement** that immediately terminates the function application and returns the result of evaluating its expression. For example:
+```js 
 (() => {
     1 + 1;
     return 2 + 2
   })()
   //=> 4
+```
 And also:
-
+```js 
 (() => {
     return 1 + 1;
     2 + 2
   })()
-  //=> 2
-The return statement is the first statement we’ve seen, and it behaves differently than an expression. For example, you can’t use one as the expression in a simple function, because it isn’t an expression:
-
+  //=> 2 
+``` 
+The `return` statement is the first statement we’ve seen, and it behaves differently than an expression. For example, you can’t use one as the expression in a simple function, because it isn’t an expression:
+```js 
 (() => return 0)()
   //=> ERROR
-Statements belong inside blocks and only inside blocks. Some languages simplify this by making everything an expression, but JavaScript maintains this distinction, so when learning JavaScript we also learn about statements like function declarations, for loops, if statements, and so forth. We’ll see a few more of these later.
+``` 
+>- [^ ⭐**Statements belong only inside... Why is JS different than other languages when it comes to treatment of statements? What are so examples of statements in JS?**]⭐**Statements belong inside blocks and only inside blocks**. Some languages simplify this by making everything an expression, but JavaScript maintains this distinction, so when learning JavaScript we also learn about statements like function declarations, for loops, if statements, and so forth. We’ll see a few more of these later.
 
 ## functions that evaluate to functions
-If an expression that evaluates to a function is, well, an expression, and if a return statement can have any expression on its right side… Can we put an expression that evaluates to a function on the right side of a function expression?
+>- [^ **Can we put an expression that evaluates to a function on the right side of a function expression?**]If an expression that evaluates to a function is, well, an expression, and if a return statement can have any expression on its right side… Can we put an expression that evaluates to a function on the right side of a function expression?
 
 Yes:
-
+```js 
 () => () => 0
-That’s a function! It’s a function that when applied, evaluates to a function that when applied, evaluates to 0. So we have a function, that returns a function, that returns zero. Likewise:
-
+``` 
+That’s a function! It’s a *function that when applied, evaluates to a function that when applied, evaluates to 0*. So we have a function, that returns a function, that returns zero. Likewise:
+```js 
 () => () => true
-That’s a function, that returns a function, that returns true:
-
+``` 
+That’s a function, that returns a function, that returns `true`:
+```js 
 (() => () => true)()()
   //=> true
+``` 
 We could, of course, do the same thing with a block if we wanted:
-
+```js 
 () => () => { return true; }
+``` 
 But we generally don’t.
+
+## Key Insights 
+- You can't use a statement when an expression is required, for instance, an arrow function not making use of a block expects an expression, not a statement, so you can't say `() => return 'something'`. This would create a syntaxError.
+- **Statements belong inside blocks and only inside blocks**. 
+  - e.g. function declarations, for loops, if statements, and so forth. 
 
 ## Links 
 - [🏠 MAIN](/js-allonge-main) 
 - [PREV ⬅ | A Rich Aroma: Basic Numbers ](/js-allonge-basic-numbers)
-- [NEXT ➡ | The first sip: Basic Functions ](/js-allonge-basic-functions)
+- [NEXT ➡ | Ah. I’d Like to Have an Argument, Please. ](/js-allonge-argument-please)
 
 ## Summary Questions 
-
-```js 
-/*
-    sayHello should return "hello",
-    it should return type string 
-*/
-
-/* 
-    addNumbers should return a number,
-    it should be greater than 5 if args
-    (5,5) are passed in 
-*/ 
-```

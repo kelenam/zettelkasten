@@ -81,7 +81,8 @@ Emmet does work in Codepen! Just need to tab instead of return.
 
 > [^ **What if you know the pixel-based font size you'd like, but what to specify the declaration in ems?**]Tip: If you know the pixel-based font size you'd like, but what to specify the declaration in ems, here's a simple formula: divide the desired pizel size by the parent (inherited) pizel size. For example, if you want a 10 px font and your element is inheriting a 12 px font, 10 / 12 = 0.83333 em. If you want a 16 px font and the parent font is 12px, 16/ 12 = 1.3333em. 
 
-It's helpful to know the default browswer size is `medium` which computes to `16px`
+It's helpful to know the default.
+ size is `medium` which computes to `16px`
 
 ### ems for font size together with ems for other properties
 - What makes ems tricky is when you use them for both font size and nay other properties on the same element. 
@@ -102,36 +103,287 @@ body {
 - In this example, `padding` has a specified valeus of `1.2em`. This multiplied by 19.2px (the current element's font size) produces a calculated value of 23.04px.
 - Even though `font-size` and `padding` have the same specified value, their calcuated values differ.
 
-#### THe shrinking font problem 
+#### The shrinking font problem 
 >- When you use ems for the font size of lists and then nest lists several levels deep you can see the effect of this "shrinking text problem". It occurs when you are applying an em-based font size to each level of a nested list. If each list had a font size of `0.8em`, each sub-list will be 80% of the parent and so on and so forth.
 
 Ems are nice for padding, margins, and element sizing, but when it comes to font sizes it can get complicated. Thankfully, there is a better options--rems. 
 
 ### Using rems for font-size 
->- [^ **What happens when a browser parses an HTML document?**]It creates a representation ain memory of all the ements on the page. This representation is called the [**Document Objectc Model, the DOM**](). It's a tree structure, where each element is represented by a code. 
+>- [^ **What happens when a browser parses an HTML document?**]It creates a representation ain memory of all the ements on the page. This representation is called the [**Document Object Model, the DOM**](). It's a tree structure, where each element is represented by a code. 
 - The `<html>` element is the to-level (or root) node. It is the ancestor of all elements within it 
 >- The root node has a special pseudo-class selector (`:root`) that you can use to target it.
    - This is equivalent to using the type selector `html` with the specificity of a class rathern than a tag.
+>- ⭐Rem is short for root em. 
+  - Instead of being relative to the current element, rems are relative to the root element.
+  - No matter where you apply it in the document, 1.2 rem has the same computed value: 1.2 times the font size of the root element.
+
+```css
+:root {
+  font-size: 1em; /*The :root pseudo-class 
+  selector is equivalent to HTML type selector */
+} 
+
+ul {
+  font-size: 0.9rem; /*Uses the browser's 
+  default size (16 px) */
+}
+```
+
+Note: specifying font sizes with relative units or percentages helps with accessibility for those with vision impairments.
+
+>- [^ ⭐**When in doubt, use rems for... use pixels for ... and use ems for ...**]⭐Rems simplify a lot of the complexities involved with ems. They offer a good middle ground between pixels and ems, but that doesn't mean they should be used in place of everything. Every tool has its place.
+- My default is to use rems for font sizes
+- Pixels for borders and
+- ems for most other measures, especially paddings, margins, and border radius (though I favor the use of percentages for container widths when necessary)
+
 ## Stop thinking in pixels 
+- There was an antipattern propogated to make root font size .625em, so that you can think in pixels with base-10. e.g. If you want something 14px, you can say 1.4em.
+- Get into the habit of thinking with relative units instead of pixels. 
 
 ### Setting a sane default font-size 
+Let's say you want a default font size to be 14px.
+
+Instead of setting it to 10px default and then overriding it, instead just set the desired value at the root. Thew diresd value divided by the inherited value--in this case, the browser's default is--14/16, which equals 0.875.
+
+Now your desired font size is applied to the whole page, and differs only when you specify it to be so.
+
+```html 
+<div class="panel">
+  <h2>Single-origin</h2>
+  <div class="panel-body">
+    We have built partnerships with small farms around 
+    the world to hand-select beans the peak of the season.
+    We then carefully roast in <a href="/">small batches</a>
+    to maximize their potential.
+  </div>
+</div>  
+```
+The `>` in the second selector is a [**direct descendant combinator**](). It targets an h2 that's a child element of a `.panel` element.
+```css
+:root {
+  font-size: 0.875em;
+}
+
+body {
+  font-family: Arial;
+}
+.panel {
+  border: 1px solid #999;
+  padding: 1em;
+  border-radius: 0.5em;
+}
+.panel > h2 {
+  margin-top: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+```
+
+### Making the panel responsive
+[**media query**](): An `@media` rule rule is used to specify styles that will be applied only to certain screen sizes or media types.
+
+```css 
+@media (min-width: 800px) {
+  :root {
+    font-size: 0.875em;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    font-size: 1em;
+  }
+}
+```
+By applying these font sizes at the root on your page, you've responsively defined the meaning of em and rem throughout the entire page.
+
+- If you're disciplined enough to style your entire page in relative units like this, the entire page will scale up and down based on the viewport size.
+- padding, border raidus, and all your relatively set units will scale responsively, and your design will be responsive so long as you are using relative units.
+- two media queries + relative units save you from having to write many media queries for all things (if youre using a pixel based approach)
 
 ### Resizing a single component 
+- You can extend your styling by creating a class, e.g. `larger` that will be a larger version of an existing element. With everything relatively sized, all we would have to do to create a larger version of the element is specifying the `.larger` class and setting its font-size to something larger using rems. 
+- You can use a specified class like `larger` and simply change the font-size of the `larger` class in order to make an element appear bigger
 
 ## Viewport-relative units 
+- [**view-port relative units**]() are another form of relative unit used for defining lenghts relative to browser's viewport.
+- [**viewport**]() the framed are in the browser window where the web page is visible.
+
+### brief overview 
+- `vh` - 1/1000th of the viewport height 
+- `vw` - 1/1000th of the viewport width 
+- `vmin` - 1/1000th of the smaller dimension, height or width (IE9 supports vm instead of vmin)
+- `vmax` - 1/1000th of the larger dimension, height or width (Not support in IE or Edge at time of writing)
+
+```css
+.square {
+  width: 90vmin;
+  height: 90vmin;
+  background-color: #369;
+}
+```
+- The viewport-relative lengths are great for thigns like making a large hero image fill the screen. Your image can be inside a long container, but setting the image height to 100vh make it exactly the height of the viewport.
 
 ### Using `vw` for font size 
+- One application for viewport-relative heights. In fact, I find this more practical than applyign vh and vw to element heights or widths.
+- the nice thing about using vh for fonts is that there is no sudden breakpoint changes; it transitions incrementally as the viewport size changes.
+- the downside is that the big screens make the font really big and the small screens really small, we can use `calc()` to address this issue.
 
 ### Using `calc()` for font size 
 
+>- [^ ⭐**What does calc() do and when is it particularly useful?**]⭐The `calc()` function lets you do basic arithmatic with two or more values. Useful for combining values that are measured in different units.
+  - The addition and substraction operators must be surrounded by whitespace, so just get in the habit of adding a space around every operator. e.g. `calc(1em + 10px)`
+ 
+```css 
+:root {
+  font-size: calc(0.5em + 1vw);
+}
+```
+Now if you open the page and slowly resize your browser. You'll see the font scale smoothly as you do...
+
+- The 0.5 em hewre operates as a sort of minimum font size, and the 1vh adds a responsive scalar.
+- This will give you a bse font size that scales from 11.75 px on an iPhone 6 up to 20px in a 1,200 px browser window.
+- Now, instead of having threwe or four hard-coded breakpoints, everything on your page will scale fluidly according to the viewport.
+
 ## Unitless numbers and line-height 
+>- [^ **What are _unitless values_?**] - Some properties allow for [**unitless values**]() (that is, a number with no specified unit)
+  - e.g. `line-height`, `z-index`, and `font-weight`.
+  - You can also use the unitless value `0` anywhere a length unit (such as px, em or rem) is required because, in these cases, the unit does not matter--0px equals 0%, equals 0em.
+    - warning: 0 cannot be used for angular values, such as degrees or time-based values like seconds.
+
+`line-height` is unusual in that it accepts both units and unitless values.
+
+- using px for `line-height` might give you unexpected results 
+- same with using `em` for a unit because...
+
+When an element has a defined [**length**](): The formal name for a CSS value that denotes a distance measurement. It's a number followed by a unit, such as 6 px. Length comes in two flavors: absolute and relative.
+
+When units such as ems are specified for a line height, their value is calculated, and that calculated value is passed down to any inheriting children. This can cause unexpected results.
+
+> ⭐When you use a unitless number, that declared value is inherited, meaning its computed value is recuclated for each inheriting child element. This will almost always be the result you want.
 
 ## Custom properties (aka CSS variables)
+- Custom properties for css proposed in 2015 and is now widely adopted/supported by most browsers.
+
+Note: If you happen to a CSS preprocessor with its own variables. Don't disregard CSS varibles. They are different in nature and far more versatile. Better to refer to them as "custom properties" than simply variables.
+
+To define a custom property, you declare it much like any other CSS property...
+```css
+:root {
+  --main-font: Helvetica, Arial, sans-serif;
+}
+```
+- The name must begin with two hyphens (`--`) to distinguish it from other CSS properties, followed by whatever name you'd like to use.
+- Variables must be declared inside a declaration block.
+
+A function called `var()` allow the use of variables. You'll use this function to reference the `--main-font` variable you just defined.
+```css
+:root {
+  --main-font: Helvetica, Arial, sans-serif;
+}
+
+p {
+  font-family: var(--main-font); /* sets
+  the font family for paragraphs */
+}
+```
+- custom properties let you define a value in one pladce, as a single "source of truth" and reuse it elsewhere. Useful for things like colors/branding.
+- The `var()` function accetps a second parameter, which specifies a fallback value.
+- Note: if `var()` evaluates to an invalid value the property will be set to its initial value.
 
 ### Changing custom properties dynamically 
-### Changing custom properties with JavaScript 
-### Experimenting with custom properties 
+What makes CSS variables interesting is that the declarations of custom properties cascade and inherit. You can define the same variable inside multiple selectors, adn teh varaible will have a differnt value for various parts of the page. 
 
+https://codepen.io/kelena_mori/pen/vYNWOQr
+
+```html
+<div class="panel">
+  <h2>Single-origin</h2>
+  <div class="panel-body">
+    We have built partnerships with small farms around the world to 
+    hand-select beans the peak of the season. We then carefully 
+    roast in <a href="/">small batches</a> to maximize their potential.
+  </div>
+</div>  
+
+<aside class="dark">
+  <div class="panel">
+    <h2>Single-origin</h2>
+    <div class="body">
+          We have built partnerships with small farms around the world 
+          to hand-select beans the peak of the season. We then carefully
+          roast in <a href="/">small batches</a> to maximize their potential.
+    </div>
+  </div>
+</aside>
+```
+
+```css
+:root {
+  --main-bg: #fff;
+  --main-color: #000;
+}
+
+body {
+  font-family: Arial;
+}
+
+.panel {
+  font-size: 1rem;
+  padding: 1em;
+  border: 1px solid #999;
+  border-radius: 0.5em;
+  background-color: var(--main-bg);
+  color: var(--main-color);
+}
+
+.panel > h2 {
+  margin-top: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.dark {
+  margin-top: 2em;
+  padding: 1em;
+  background-color: #999;
+  --main-bg: #333;
+  --main-color: #fff;
+}
+```
+>- [^ **What is the significance of setting a ruleset with the `:root` selector?**] - we've defiend the varibles inside a ruleset with the `:root` selector. This is significant because it means these values are set for everything in the root element (the entire page). When a descendant element of the root uses the varaibles, these are the values they'll resolve to.
+- When we style the `.dark` class and specify the varibles again by their name, they're resolve to the values defiend on the dark container, rather than on  the root. 
+- Notice you didn't have to restyle the panel, or apply any additional classes. 
+- The custom properties behave as a sort of scoped variable because the values are inherited by descendant elements.
+
+### Changing custom properties with JavaScript 
+
+```js
+const rootElement = document.documentElement;
+const styles = getComputedStyle(rootElement);/* Gets 
+                  the styles object for an element */
+const mainColor = styles.getPropertyValue('--main-bg'); /* Gets
+                  the --main-bg value from the styles object */
+console.log(String(mainColor).trim()); /* Ensures mainColor
+                  is a String and trims whitespace; logs #fff */
+```
+If we wanted to set the new bg color to a light blue with JS we could say...
+```js
+rootElement.style.setProperty('--main-bg', '#cdf');
+```
+- If you run this script any elements inheriting the `--main-bg` property will update to use this new value.
+- with this technique, you can use JS to re-theme your site, live in the browser, or you could do any number of on-the-fly changes.
+
+### Experimenting with custom properties 
+Be aware that any declaring using `var()` will be ignored by old browsers that don't understand. Provide a fallback behavior for those browsers when possible:
+```css
+p {
+  color: black;
+  color: var(--main-color);
+}
+```
 
 ## Summary 
 - Embrace the use of relative units, allowing the page's structure to determien the meaning of your styles.
@@ -140,10 +392,23 @@ Ems are nice for padding, margins, and element sizing, but when it comes to font
 - Use unitless values when specifying line heights 
 - You can start getting familiar with one of CSS's newest features, custom properties. 
 
+## Key Insights 
+I learned a ton in this section:
+  - Different between ems/rems, when to use either/both 
+  - Learned to stop thinking so much in pixels, and let "pixel-perfect" days of web 2.0 behind.
+  - When in doubt, use rems for font-size, pixels for borders, and ems for most other properties. 
+  - By using relative in most areas, you can control a lot of the dynamcism of the page with very little code changes 
+  - Combining ems and viewport-relative units like `vw` and the `calc()` function, you can create an auto-scaling web page without the use of media queries.
+    - in turn, if your other element stylings adapt to your `font-size` styling, you can have a really great responsive-base with very little code.
+  - How unitless properties are different, what the special case is with `line-height`
+  - CSS custom properties are powerful and shouldn't be ignored just because your might use Sass.
+    - with CSS custom properties you can do some dynamic updating by leveraging JavaScript to get/set property styles.
+
 ## Links 
 - [🏠 MAIN](/css-id-main)
 - [PREV ⬅ | Cascade, specificity, and inheritance ](/css-id-cascade-specificity-inheritance)
-- [NEXT ➡ | Working with Relative Units ](/micoservices-node-mini-app)
+- [NEXT ➡ | Mastering the Box Model](/css-id-cascade-mastering-box-model)
 
 ## Summary Questions 
- `
+
+ 
