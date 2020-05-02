@@ -7,6 +7,8 @@ tags:
   - Reg Braithwaite
 --- 
 
+In computer science, a literal is a notation for representing a fixed value in source code. *Almost all programming languages have notations for atomic values such as integers, floating-point numbers, and strings, and usually for booleans and characters*; some also have notations for elements of enumerated types and compound values such as arrays, records, and objects. An anonymous function is a literal for the function type. — Wikipedia
+
 JavaScript, like most languages, has a collection of literals. We saw that an expression consisting solely of numbers, like `42`, is a **literal**. It represents the number forty-two, which is 42 base 10. Not all numbers are base ten. 
 
 Internally, both `042`(octal literal) and `34` have the same representation, as **double-precision floating point numbers**. 
@@ -14,9 +16,41 @@ Internally, both `042`(octal literal) and `34` have the same representation, as 
 For example, the largest integer JavaScript can safely handle is 9007199254740991, or `2^53 - 1`. Like most programming languages, JavaScript does not allow us to use commas to separate groups of digits.
 
 
+## floating
+Most programmers never encounter the limit on the magnitude of an integer. But we mentioned that numbers are represented internally as floating point, meaning that they need not be just integers. We can, for example, write 1.5 or 33.33, and JavaScript represents these literals as floating point numbers.
+
+A computer’s internal representation for a floating point number is binary, while our literal number was in base ten. This makes no meaningful difference for integers, but it does for fractions, because some fractions base 10 do not have exact representations base 2.
+
+However:
+```js 
+0.1
+  //=> 0.1
+0.1 + 0.1
+  //=> 0.2
+0.1 + 0.1 + 0.1
+  //=> 0.30000000000000004
+```
+
+But as a rule, if you need to work with real numbers, you should have more than a nodding acquaintance with the [IEEE Standard for Floating-Point Arithmetic](https://en.wikipedia.org/wiki/IEEE_floating_point). **Professional programmers almost never use floating point numbers to represent monetary amounts**. For example, “$43.21” will nearly always be presented as two numbers: 43 for dollars and 21 for cents, not 43.21. In this book, we need not think about such details, but outside of this book, we must.
+
+## operations on numbers
+As we’ve seen, JavaScript has many common arithmetic operators. We can create expressions that look very much like mathematical expressions. 
+
+**In JavaScript, operators have an order of precedence designed to mimic the way humans typically parse written arithmetic**. So:
+```js 
+2 * 5 + 1
+  //=> 11
+1 + 5 * 2
+  //=> 11
+``` 
+JavaScript treats the expressions as if we had written `(2 * 5) + 1 `and `1 + (5 * 2)`, because the `*` operator has a **higher precedence** than the + operator. JavaScript has many more operators.  
+In addition to the common `+`, `-`, `*`, and `/`, JavaScript also supports modulus, `%`, and unary negation, `-`:
+ 
+> [^ **What are bitwise operators and what do they do?**]There are lots and lots more operators that can be used with numbers, including [**bitwise operators**]() like `|` and `&` that allow you to operate directly on a number’s binary representation, and a number of other operators that perform assignment or logical comparison that we will look at later.
+
 ## Links 
 - [🏠 MAIN](/js-allonge-main) 
 - [PREV ⬅ | Values are Expressions](/js-allonge-values-expressions)
-- [NEXT ➡ | A Rich Aroma: Basic Numbers ](/js-allonge-basic-numbers)
+- [NEXT ➡ | The first sip: Basic Functions ](/js-allonge-basic-functions)
 
 ## Summary Questions 

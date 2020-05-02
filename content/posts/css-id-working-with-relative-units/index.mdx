@@ -30,15 +30,88 @@ Laptops, and smartphones changed the game on locking in on ideal/singular page/v
 ### Pixels, points, and picas 
 - pixels, `px` 
 - millimeters, `mm` 
-- 
+- picas `pc` 
+- points `pt` 
 
 Pixel is a slightly misleading name, a CSS pixel != a monitor pixel, notably in the case of "retina" displays. 
 
 ## Ems and rems 
+>- [^ **What is the most common relative length unit? It's based in what?**]**Ems** are the most common relative length unit, are a measure used in typography, referring to a specified font size. In CSS, 1 em means the font size of the current element; its exact value varies depending on the element you're applying it to.
+
+```js 
+.padded {
+  font-size: 16px;  
+  padding: 1em;      /* Sets padsding on all sides equal to font-size */
+}
+```
+- This padding has a specified value of 1em. This is multiplied by the font size, producing a rendered padding of 16px. 
+>- [^ **In CSS, with respect to using relative units, what is a computed value?**]**Values declared using relative units are evaluted by the browser to an absolute value, called the** [**computed value**](). 
+
+Using ems can be convenient when setting properties like `padding`, `height`, `width`, or `border-radius` because these will scale evenly with the element if it inherits different font size, or if the user changes the font settings.
+
+You can define the styles of these boxes by specifying the padding andw border radius using ems. By giving each a pasdding and border radius of 1 em, you can specify a different font size for each element, and the other properties will scale along with the font. 
+
+```css 
+.box {
+  padding: 1em;
+  border-radius: 1em;
+  background-color: lightgray;
+}
+
+.box-small {
+  font-size: 12px;
+}
+
+.box-large {
+  font-size: 18px;
+}
+```
+>- ⭐ This is a powerful feature of ems. You can define the size of an element and then scale the entire thing up or down with a single declaration that changes the font size.
+
 ### Using ems to define font-size 
+- When it comes to the `font-size` property, ems behave a little differently.
+- ems are defined by the current element's font size 
+  - what if you have a `font-size: 1.2em; ` declared with ems?
+  - a font size can't equal 1.2 itself 
+  - instead `font-size` ems are derived from the `inherited` font size
+
+https://codepen.io/kelena_mori/pen/dyYVORJ
+
+Emmet does work in Codepen! Just need to tab instead of return.
+
+> [^ **What if you know the pixel-based font size you'd like, but what to specify the declaration in ems?**]Tip: If you know the pixel-based font size you'd like, but what to specify the declaration in ems, here's a simple formula: divide the desired pizel size by the parent (inherited) pizel size. For example, if you want a 10 px font and your element is inheriting a 12 px font, 10 / 12 = 0.83333 em. If you want a 16 px font and the parent font is 12px, 16/ 12 = 1.3333em. 
+
+It's helpful to know the default browswer size is `medium` which computes to `16px`
+
+### ems for font size together with ems for other properties
+- What makes ems tricky is when you use them for both font size and nay other properties on the same element. 
+- This forces the browser to calculate the font size first, and then it uses that values to calculate the other values. 
+- Both properties can have the same *declared value*, but they'l have different *computed values*.
+
+```css 
+body {
+  font-size: 16px;
+}
+
+.slogan {
+  font-size: 1.2em;   /* evaluates to 19.2px */
+  padding: 1.2em;     /* evaluates to 23.04px */
+  background-color: #ccc;
+}
+```
+- In this example, `padding` has a specified valeus of `1.2em`. This multiplied by 19.2px (the current element's font size) produces a calculated value of 23.04px.
+- Even though `font-size` and `padding` have the same specified value, their calcuated values differ.
+
+#### THe shrinking font problem 
+>- When you use ems for the font size of lists and then nest lists several levels deep you can see the effect of this "shrinking text problem". It occurs when you are applying an em-based font size to each level of a nested list. If each list had a font size of `0.8em`, each sub-list will be 80% of the parent and so on and so forth.
+
+Ems are nice for padding, margins, and element sizing, but when it comes to font sizes it can get complicated. Thankfully, there is a better options--rems. 
 
 ### Using rems for font-size 
-
+>- [^ **What happens when a browser parses an HTML document?**]It creates a representation ain memory of all the ements on the page. This representation is called the [**Document Objectc Model, the DOM**](). It's a tree structure, where each element is represented by a code. 
+- The `<html>` element is the to-level (or root) node. It is the ancestor of all elements within it 
+>- The root node has a special pseudo-class selector (`:root`) that you can use to target it.
+   - This is equivalent to using the type selector `html` with the specificity of a class rathern than a tag.
 ## Stop thinking in pixels 
 
 ### Setting a sane default font-size 
@@ -73,4 +146,4 @@ Pixel is a slightly misleading name, a CSS pixel != a monitor pixel, notably in 
 - [NEXT ➡ | Working with Relative Units ](/micoservices-node-mini-app)
 
 ## Summary Questions 
- 
+ `
