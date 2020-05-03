@@ -1,0 +1,119 @@
+---
+title: Speak Number Guessing Game | Traversy 20
+date: 2020-05-02
+slug: traversy-20-speak-number
+tags:
+  - JS
+  - HTML
+  - CSS 
+  - speech recognition
+  - Projects
+---
+
+## Setup 
+The speech recognition API is not widely supported (is in Chrome), in Firefox. you have to change a flag. 
+
+In the url bar of a ff windows, you can say `about:config`, and then accept risk and continue, this will let use change a flag in the browser, then search for speech, and set the `media.webspeech.recognition.force_enable` set to true as well as the `media.webspeech.recognition.enable`
+
+## HTML 
+- img src our mic image 
+- h1: Guess a number between 1 - 100 
+- h3: Speak the number into your microphone 
+- div#msg.msg (ultimately will be empty, generate contents dynamically with js)
+    - div: You said 
+        - span.box: 20 
+        - div: GO HIGHER
+
+## CSS 
+- * 
+    - bz 
+- body 
+    - bg: #2f3542 url('dist/img/bg.jpg') no-repeat left center/cover;
+    - mh100vh
+    - c#f 
+    - df
+    - fxdc
+    - aic
+    - jcc 
+    - tac
+    - m0
+    - ffA
+- h1, h3 
+    - mb0
+- p 
+    - lh1.5
+    - m0 
+- .play-again 
+    - p8-15
+    - bd0
+    - bgc#f4f4
+    - bdrs5px
+    - mt10
+- .msg 
+    - fz1.5em    
+    - mt40px
+.box 
+    - bd1px #dedede
+    - dib
+
+## JS 
+Check out MDN for the API: https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition
+
+We are going to be using the `SpeechRecognition.start()` and the `result` and `end` event. 
+
+### Speech recognition
+We need to initialize a speech recognition object 
+Some browsers you may need to implement the webkit API....
+```js 
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+```
+
+Pretty much just bringing in one variable: the msgEl.
+- set variable for msg element 
+- We need a const for a randomNumber set to the function call of getRandomNumber() which we will now write
+- function getRandomNumber()
+    - return Math.floor(Math.random() * 100) + 1;
+- create object for speech recognition api 
+- initialize a new instance of SpeechRecognition, by setting to a variable the result of `new window.SpeechRecognition`
+- then call recognition.start();
+- we then need to listen for the `result` event 
+    - recognition.addEventListener, listening for `result` then callback of onSpeak
+- create onSpeak function, part of event listener, so pass in e param
+    - e gives us back a ton of stuff, we want the results array 
+        - within it there is a nested array at 0 
+            - another one at index 0, -SpeechRecognitionAlternative 
+                - within is a property called transcript, or whatever we said. 
+    - const msg = e.results[0][0].transcript
+    - we want to call writeMessage(msg), then checkNumber(msg), we'll create both of these. 
+
+### `writeMessage` and `checkNumber`
+- writeMessage(msg)
+    - set the innerHTML of our msgEl with template literals 
+        - a div with : You said
+             - span with class box, with the contents of the msg 
+- checkMessage(msg)
+    - new variable that converts msg to number 
+    - check if valid number , we can use the Number and is NaN 
+        - Then we can append the inner html to a div giving an error message 
+        - then return 
+    - Then write if to check if number is in range 
+        - then append message to guess in range for guess 
+        - then return 
+    - check if num equal to random number 
+        - then write inner HTML of document.body to     
+            h2: congrats you guessed the number!, it was ${num}
+            - button.play-again#play-again,  to play again 
+    - else if , number is higher, then say go lower, about to msgEl 
+        - number is lower go higher. 
+- addEvent listener to the document body for playing again 
+- 
+
+### Only letting us guess once issue
+Don't want to reload, because that will change number, so we need to add a new event, listening to end event on recognition and cb should be arrow function that just calls recognition.start() again. 
+
+## Notes
+I was having issues with TS flagging `Number.isNaN()` as Number not having this method, so I used `isNaN` instead.
+
+We can add an event to the body of the page since our DOM is already painted and we are creating a Play Again button after the fact. We use e.target.id to check if the id of the button matches 'play-again' and restart the game by reloading the page. We make use of the `window.location.reload()` function.
+
+ 

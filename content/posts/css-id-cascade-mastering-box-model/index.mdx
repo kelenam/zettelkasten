@@ -1,0 +1,192 @@
+---
+title: Mastering the Box Model | CSS In Depth 
+date: 2020-02-26
+slug: css-id-cascade-mastering-box-model
+tags:
+  - CSS 
+  - CSS In Depth
+  - Book
+  - Keith J. Grant
+---
+
+- Practice advice for element sizing 
+- Vertical centering 
+- Columns of equal hewight 
+- Negative margins and margin collapsing 
+- Consistent spacing of components on the page 
+
+## Difficulties with element width 
+We will be creating a simple page with a header at the top and two columns beneath.
+
+```html
+<body>
+  <header>
+    <h1>Franklin Running Club</h1>
+  </header>
+  <div class="container">
+    <main class="main">
+      <h2>Come join us!</h2>
+      <p>
+        The Franklin Running club meets at 6:00p
+        every Thursday at the town square.
+        Runs are three to five miles, at your own pace.
+      </p>
+    </main>
+    <aside class="sidebar">
+      <div class="widget"></div>
+      <div class="widget"></div>
+    </aside>
+  </div>
+</body>
+```
+- Let's start with some of the obvious styles: font, background-color for main page and main containers.
+    - This will help you see the position and size of each as you go.
+- Sometimes background-colors of elements are transparent, it might be helpful when styling it to give it a bgc so you can see it.
+
+```css
+body {
+  background-color: #eee;            
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+header {
+  color: #fff;
+  background-color: #0072b0;
+  border-radius: 0.5em;
+}
+
+main {
+  display: block; /* fixes IE bug */
+}
+
+.main {
+  background-color: #fff;
+  border-radius: 0.5em;
+}
+
+
+.sidebar {
+  padding: 1.5em; /* Adds padding to the sidebar */
+  background-color: #fff;
+  border-radius: 0.5em;
+}
+```
+- Note: IE has a bug where `<main>` elements are rendered inline by default, we correct here with the above.
+
+Next we are going to put our two columns in place. To begin we will use a **float-based layout**. You'll float the `main` and the `sidebar` to the left and give them widths of 70% and 30% respectively...
+
+```css {2,3,9,10}
+.main {
+  float: left;
+  width: 70%;
+  background-color: #fff;
+  border-radius: 0.5em;
+}
+
+.sidebar {
+  float: left;
+  width: 30%;
+  padding: 1.5em;
+  background-color: #fff;
+  border-radius: 0.5em;
+}
+```
+- Instead of two columns sitting side by side, they line wrapped. 
+>- Even though you specified widths of 70% and 30%, the columns took up more than 100% of the available space.
+    - The reason for that is because of the default behavior of the box model.
+    - When you set the width or the height of an element, you're specifying the width or height of its content; any padding, border, and margins are then added to that width.
+    - this means that an element with a 300px width, a 10px padding, and a 1 px border has a rendered width of 322px
+        - this gets even more confusing when the units aren't the same.
+
+In our example, the sidebar has a width of 30% plus 1.5em left and right padding. The main column has only a width of 70%. This brings the total of the two columns to 100% plus 3 ems.
+
+### Avoiding Magic Numbers 
+The naive fix is to reduce the width of one of the columns (the sidebar for example). 
+
+>- [^ **What is a _magic number_ and why is it best to avoid it?**] On my screen, a width of 26% for the sidebar works, but this is unreliable. The 26% is known as a [**magic number**](). Instead of us using the desired value, we found one by making haphazard changes to our styles until we got the result we wanted. Magic numbers are to be avoided as they are are difficult to explain why the work, and more difficult for you and others to understand its behavior and what it will do.
+
+- An alternative to this magicd number is to let the browser do the math with `calc()`, the columns are 3em to wide (due to padding) so we could simly say `calc(30% - 3em)`, however, there is still a better way!
+
+### Adjusting the Box Model 
+Because of the problem you just encountered, the default box model isn't typically what you'll want to use (The default for `box-sizing` is `content-box`). Instead, you'll want your specified widths to include padding and borders. We can do this with `box-sizing: border-box`.
+
+With this model, padding doesn't make an element wider; it makes the content narrower. It also does this with height.
+
+### Using universal border-box sizing 
+It would be nice to fix the border-box sizing universally for all elements, and you can do so with the **universal selector** (`*`).
+```css
+*,
+::before,
+::after {
+    box-sizing: border-box; /* Applies border box
+    to all elements and pseudo-elements on the page */
+}
+```
+- After applying this to the page, `height` and `width`will always specify the actual height and width of an element. Padding won't change them.
+- Note: adding this snippet at the top of your styles has become common practice.
+
+If, however, you're using 3rd-party components with their own CSS and didn't write their styles with this fix in mind, you will need to adjust this otherwise you may see some broken styles. 
+
+To fix, you need to target every element inside the component at the root level of your styles...
+
+```css
+:root {
+    box-sizing: border-box; /* Applies border 
+    box sizing to the root element */
+}
+*,
+::before,
+::after {
+    box-sizing: inherit; /*Tells all other elements
+    and pseudo-elements to inherit their box sizing */
+}
+```
+ 
+### Adding a gutter between columns 
+- Visually its more appealing to have a small gap between columns or [**gutter**](). You can achieve this a few different ways. One way is by adding a padding to one column, but this isn't optimal.
+
+#### Percent-based gutter margin 
+- A better option could be by adding a margin to one of the columns and adjusting the widths of elements to account for this.
+  - e.g. `.sidebar { width: 29%; margin-left: 1%; }`
+  - This adds a gutter but its based on the outer container's width; the percentage is relative to the full width of the parent. 
+  - What if you want to specify the gutter in units other than percentages?
+
+#### Using `calc()` to substract the gutter from the width 
+- Instead of moving 1% from the width into the margin, you can move 1.5 em. 
+  - e.g. `.sidebar { width: calc(30% - 1.5em); margin-left: 1.5em; }`
+  - Not only are we now able to use ems, we are also making it more explicit in our code what we are doing.
+
+## Difficulties with element height
+- Working with element height is differnt than working with element width.
+- Typically its best to avoid setting explicit heights 
+- Normal document flow is designed with a constrainted width but an unlimited height.
+
+[**Normal document flow**]() refers to the default layout behavior of elements on the page. Inline elements flow along the text of the page, from left to right, line wrapping when they reach the edge of their container. Block-level  elements fall on the individual lines, with a line break above and below.
+
+### Controlling overflow behavior 
+### Applying alternatives to pewrcentage-based heights
+### Using `min-height` and `max-height`
+### Vertically centering content
+
+## Negative margins 
+## Collapsed margins 
+
+### Collapsing between text  
+### Collapsing multiple margins 
+### Collapsing outside a container 
+
+## Spacing elements within a container 
+
+### Considering changing content 
+### Creating a more general solution: the lobotimized owl selector
+
+## Summary 
+
+## Links 
+- [🏠 MAIN](/css-id-main)
+- [PREV ⬅ |  Working with Relative Units ](/css-id-working-with-relative-units)
+- [NEXT ➡ | Mastering the Box Model](/css-id-cascade-mastering-box-model)
+
+## Summary Questions 
+
+ 
