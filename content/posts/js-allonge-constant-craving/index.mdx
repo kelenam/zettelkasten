@@ -4,6 +4,8 @@ date: 2020-01-01
 slug: js-allonge-constant-craving
 tags:
   - JS
+  - const 
+  - functions 
   - Reg Braithwaite
 ---
  
@@ -24,14 +26,15 @@ In order to bind `3.14159265` to the name `PI`, we’ll need a function with a p
 )(3.14159265)
 ``` 
 What do we put inside our new function that binds 3.14159265 to the name PI when evaluated? Our circumference function, of course:
-
+```js
 ((PI) =>
   (diameter) => diameter * PI
 )(3.14159265)
-This expression, when evaluated, returns a function that calculates circumferences. That sounds bad, but when we think about it, (diameter) => diameter * 3.14159265 is also an expression, that when evaluated, returns a function that calculates circumferences. All of our “functions” are expressions. This one has a few more moving parts, that’s all. But we can use it just like (diameter) => diameter * 3.14159265.
+```
+This expression, when evaluated, returns a function that calculates circumferences. That sounds bad, but when we think about it, `(diameter) => diameter * 3.14159265` is also an expression, that when evaluated, returns a function that calculates circumferences. All of our “functions” are expressions. This one has a few more moving parts, that’s all. But we can use it just like `(diameter) => diameter * 3.14159265`.
 
 Let’s test it:
-
+```js 
 ((diameter) => diameter * 3.14159265)(2)
   //=> 6.2831853
   
@@ -39,16 +42,20 @@ Let’s test it:
   (diameter) => diameter * PI
 )(3.14159265)(2)
   //=> 6.2831853
-That works! We can bind anything we want in an expression by wrapping it in a function that is immediately invoked with the value we want to bind.14
+``` 
+>- [^ **How do we immediately bind a value to a function expression?**]That works! We can bind anything we want in an expression by wrapping it in a function that is immediately invoked with the value we want to bind.
 
-inside-out
-There’s another way we can make a function that binds 3.14159265 to the name PI and then uses that in its expression. We can turn things inside-out by putting the binding inside our diameter calculating function, like this:
-
+## inside-out
+There’s another way we can make a function that binds `3.14159265` to the name PI and then uses that in its expression. We can turn things inside-out by putting the binding inside our diameter calculating function, like this:
+```js 
 (diameter) =>
   ((PI) =>
     diameter * PI)(3.14159265)
-It produces the same result as our previous expressions for a diameter-calculating function:
+```
 
+>- [^ **In the following 3 ways of calculating circumference which is the best approach and why?**]It produces the same result as our previous expressions for a diameter-calculating function:
+
+```js 
 ((diameter) => diameter * 3.14159265)(2)
   //=> 6.2831853
   
@@ -61,71 +68,83 @@ It produces the same result as our previous expressions for a diameter-calculati
   ((PI) =>
     diameter * PI)(3.14159265))(2)
   //=> 6.2831853
-Which one is better? Well, the first one seems simplest, but a half-century of experience has taught us that names matter. A “magic literal” like 3.14159265 is anathema to sustainable software development.
+``` 
+Which one is better? Well, the first one seems simplest, but a half-century of experience has taught us that names matter. A **“magic literal”** like `3.14159265` is anathema to sustainable software development.
 
 The third one is easiest for most people to read. It separates concerns nicely: The “outer” function describes its parameters:
-
+```js 
 (diameter) =>
   // ...
-Everything else is encapsulated in its body. That’s how it should be, naming PI is its concern, not ours. The other formulation:
-
+``` 
+Everything else is encapsulated in its body. That’s how it should be, naming `PI` is its concern, not ours. The other formulation:
+```js 
 ((PI) =>
   // ...
 )(3.14159265)
-“Exposes” naming PI first, and we have to look inside to find out why we care. So, should we always write this?
-
+```
+“Exposes” naming `PI` first, and we have to look inside to find out why we care. So, should we always write this?
+```js 
 (diameter) =>
   ((PI) =>
     diameter * PI)(3.14159265)
-Well, the wrinkle with this is that typically, invoking functions is considerably more expensive than evaluating expressions. Every time we invoke the outer function, we’ll invoke the inner function. We could get around this by writing
-
+```
+>- [^ **what is the "wrinkle"/downside with the third approach of the internal IIFE?**]Well, the wrinkle with this is that typically, **invoking functions is considerably more expensive than evaluating expressions. Every time we invoke the outer function, we’ll invoke the inner function.** We could get around this by writing
+```js 
 ((PI) =>
   (diameter) => diameter * PI
 )(3.14159265)
+``` 
 But then we’ve obfuscated our code, and we don’t want to do that unless we absolutely have to.
 
 What would be very nice is if the language gave us a way to bind names inside of blocks without incurring the cost of a function invocation. And JavaScript does.
 
-const
-Another way to write our “circumference” function would be to pass PI along with the diameter argument, something like this:
+## const
+Another way to write our “circumference” function would be to pass `PI` along with the diameter argument, something like this:
 
-(diameter, PI) => diameter * PI
+`(diameter, PI) => diameter * PI`  
 And we could use it like this:
 
+```js 
 ((diameter, PI) => diameter * PI)(2, 3.14159265)
   //=> 6.2831853
-This differs from our example above in that there is only one environment, rather than two. We have one binding in the environment representing our regular argument, and another our “constant.” That’s more efficient, and it’s almost what we wanted all along: A way to bind 3.14159265 to a readable name.
+```
 
-JavaScript gives us a way to do that, the const keyword. We’ll learn a lot more about const in future chapters, but here’s the most important thing we can do with const:
+This differs from our example above in that there is only one environment, rather than two. We have one binding in the environment representing our regular argument, and another our “constant.” That’s more efficient, and it’s almost what we wanted all along: A way to bind `3.14159265` to a readable name.
 
+JavaScript gives us a way to do that, the `const` keyword. We’ll learn a lot more about `const` in future chapters, but here’s the most important thing we can do with `const`:
+```js 
 (diameter) => {
   const PI = 3.14159265;
 
   return diameter * PI
 }
-The const keyword introduces one or more bindings in the block that encloses it. It doesn’t incur the cost of a function invocation. That’s great. Even better, it puts the symbol (like PI) close to the value (3.14159265). That’s much better than what we were writing.
+```
+>- [^ **Why might, using a const statement for binding PI be better than our nested IIFE?**]The `const` keyword introduces one or more bindings in the block that encloses it. It doesn’t incur the cost of a function invocation. That’s great. Even better, it puts the symbol (like `PI`) close to the value (`3.14159265`). That’s much better than what we were writing.
 
-We use the const keyword in a const statement. const statements occur inside blocks, we can’t use them when we write a fat arrow that has an expression as its body.
+>- [^ **Where can we NOT use const statements?**]We use the `const` keyword in a[**const statement**](). *const statements occur inside blocks, we can’t use them when we write a fat arrow that has an expression as its body.*
 
 It works just as we want. Instead of:
-
+```js 
 ((diameter) =>
   ((PI) =>
     diameter * PI)(3.14159265))(2)
+```
 Or:
-
+```js 
 ((diameter, PI) => diameter * PI)(2, 3.14159265)
   //=> 6.2831853
+``` 
 We write:
-
+```js 
 ((diameter) => {
   const PI = 3.14159265;
 
   return diameter * PI
 })(2)
   //=> 6.2831853
-We can bind any expression. Functions are expressions, so we can bind helper functions:
-
+``` 
+**We can bind any expression. Functions are expressions, so we can bind helper functions**:
+```js 
 (d) => {
   const calc = (diameter) => {
     const PI = 3.14159265;
@@ -135,21 +154,39 @@ We can bind any expression. Functions are expressions, so we can bind helper fun
 
   return "The circumference is " + calc(d)
 }
-Notice calc(d)? This underscores what we’ve said: if we have an expression that evaluates to a function, we apply it with (). A name that’s bound to a function is a valid expression evaluating to a function.15
+``` 
+Notice `calc(d)`? This underscores what we’ve said: if we have an expression that evaluates to a function, we apply it with `()`. A name that’s bound to a function is a valid expression evaluating to a function.
 
 Amazing how such an important idea–naming functions–can be explained en passant in just a few words. That emphasizes one of the things JavaScript gets really, really right: Functions as “first class entities.” Functions are values that can be bound to names like any other value, passed as arguments, returned from other functions, and so forth.
 
 We can bind more than one name-value pair by separating them with commas. For readability, most people put one binding per line:
-
+```js 
 (d) => {
-  const PI   = 3.14159265,
+  const PI = 3.14159265,
       calc = (diameter) => diameter * PI;
 
   return "The circumference is " + calc(d)
 }
-nested blocks
-Up to now, we’ve only ever seen blocks we use as the body of functions. But there are other kinds of blocks. One of the places you can find blocks is in an if statement. In JavaScript, an if statement looks like this:
+```
 
+Note: I guess, what I'm having issue with this is the surrounding anonymous function. I mean it gives the scoped context for limiting where const of `PI` is defined, but it has no named attachement and as it stand, doesn't do anything since its never invoked. It also confuses me that we went from an example where we have the wrapped outer function being the relevant parameter name we want, diameter, where our PI constant is an environment detail: `(diameter) => ((PI) => diameter * PI)(3.14159265)`, this way we have a returned function that we can store and call with a diameter to get the desired value. 
+
+When we have the example above, we are wrapping, the outer function with a `d` parameter name, would it make sense if these switched? 
+```js 
+(diameter) => {
+  const PI = 3.14159265,
+      calc = (d) => d * PI;
+
+  return "The circumference is " + calc(diameter)
+}
+```
+- Here I guess we obfuscated what the actual calculation function is doing, and we lose clarity on that line, we still have to look inwards into the function, so I guess it does make more sense to `d` be the wrapping parameter value.
+
+Is the point that we can bind any expression, and functions are expression so we can bind them to names and invoke that stored function by adding parens to the bound name? 
+
+## nested blocks
+Up to now, we’ve only ever seen blocks we use as the body of functions. But there are other kinds of blocks. One of the places you can find blocks is in an `if` statement. In JavaScript, an `if` statement looks like this:
+```js 
 (n) => {
   const even = (x) => {
     if (x === 0)
@@ -159,8 +196,9 @@ Up to now, we’ve only ever seen blocks we use as the body of functions. But th
   }
   return even(n)
 }
+``` 
 And it works for fairly small numbers:
-
+```js 
 ((n) => {
   const even = (x) => {
     if (x === 0)
@@ -171,8 +209,9 @@ And it works for fairly small numbers:
   return even(n)
 })(13)
   //=> false
-The if statement is a statement, not an expression (an unfortunate design choice), and its clauses are statements or blocks. So we could also write something like:
-
+``` 
+The `if` statement is a statement, not an expression (an unfortunate design choice), and its clauses are statements or blocks. So we could also write something like:
+```js 
 (n) => {
   const even = (x) => {
     if (x === 0)
@@ -185,8 +224,9 @@ The if statement is a statement, not an expression (an unfortunate design choice
   }
   return even(n)
 }
+``` 
 And this also works:
-
+```js 
 ((n) => {
   const even = (x) => {
     if (x === 0)
@@ -200,15 +240,16 @@ And this also works:
   return even(n)
 })(42)
   //=> true
-We’ve used a block as the else clause, and since it’s a block, we’ve placed a const statement inside it.
+``` 
+We’ve used a block as the `else` clause, and since it’s a block, we’ve placed a `const` statement inside it.
 
-const and lexical scope
-This seems very straightforward, but alas, there are some semantics of binding names that we need to understand if we’re to place const anywhere we like. The first thing to ask ourselves is, what happens if we use const to bind two different values to the “same” name?
+## const and lexical scope
+This seems very straightforward, but alas, there are some semantics of binding names that we need to understand if we’re to place const anywhere we like. The first thing to ask ourselves is, what happens if we use `const` to bind two different values to the “same” name?
 
 Let’s back up and reconsider how closures work. What happens if we use parameters to bind two different values to the same name?
 
 Here’s the second formulation of our diameter function, bound to a name using an IIFE:
-
+```js 
 ((diameter_fn) =>
   // ...
 )(
@@ -216,8 +257,9 @@ Here’s the second formulation of our diameter function, bound to a name using 
     (diameter) => diameter * PI
   )(3.14159265)
 )
-It’s more than a bit convoluted, but it binds ((PI) => (diameter) => diameter * PI)(3.14159265) to diameter_fn and evaluates the expression that we’ve elided. We can use any expression in there, and that expression can invoke diameter_fn. For example:
-
+```
+It’s more than a bit convoluted, but it binds `((PI) => (diameter) => diameter * PI)(3.14159265)` to diameter_fn and evaluates the expression that we’ve elided. We can use any expression in there, and that expression can invoke ``diameter_fn``. For example:
+```js 
 ((diameter_fn) =>
   diameter_fn(2)
 )(
@@ -226,12 +268,13 @@ It’s more than a bit convoluted, but it binds ((PI) => (diameter) => diameter 
   )(3.14159265)
 )
   //=> 6.2831853
-We know this from the chapter on closures, but even though PI is not bound when we invoke diameter_fn by evaluating diameter_fn(2), PI is bound when we evaluated (diameter) => diameter * PI, and thus the expression diameter * PI is able to access values for PI and diameter when we evaluate diameter_fn.
+``` 
+We know this from the chapter on closures, but even though PI is not bound when we invoke diameter_fn by evaluating `diameter_fn(2)`, `PI` is bound when we evaluated `(diameter) => diameter * PI`, and thus the expression `diameter * PI` is able to access values for `PI` and `diameter` when we evaluate `diameter_fn`.
 
-This is called lexical scoping, because we can discover where a name is bound by looking at the source code for the program. We can see that PI is bound in an environment surrounding (diameter) => diameter * PI, we don’t need to know where diameter_fn is invoked.
+>- [^ **What is lexical scoping?**]This is called [**lexical scoping**](https://en.wikipedia.org/wiki/Scope_(computer_science)#Lexical_scope_vs._dynamic_scope), because we can discover where a name is bound by looking at the source code for the program. We can see that PI is bound in an environment surrounding `(diameter) => diameter * PI`, we don’t need to know where `diameter_fn` is invoked.
 
 We can test this by deliberately creating a “conflict:”
-
+```js 
 ((diameter_fn) =>
   ((PI) =>
     diameter_fn(2)
@@ -242,10 +285,11 @@ We can test this by deliberately creating a “conflict:”
   )(3.14159265)
 )
   //=> 6.2831853
-Although we have bound 3 to PI in the environment surrounding diameter_fn(2), the value that counts is 3.14159265, the value we bound to PI in the environment surrounding (diameter) ⇒ diameter * PI.
+``` 
+Although we have bound `3` to `PI` in the environment surrounding `diameter_fn(2)`, the value that counts is `3.14159265,` the value we bound to `PI` in the environment surrounding `(diameter) ⇒ diameter * PI`.
 
 That much we can carefully work out from the way closures work. Does const work the same way? Let’s find out:
-
+```js 
 ((diameter_fn) => {
   const PI = 3;
   
@@ -258,54 +302,61 @@ That much we can carefully work out from the way closures work. Does const work 
   })()
 )
   //=> 6.2831853
-Yes. Binding values to names with const works just like binding values to names with parameter invocations, it uses lexical scope.
+``` 
+>- [^ **Binding values to names with `const` works just like binding values to names with parameter invokcations, it uses...**]Yes. Binding values to names with const works just like binding values to names with parameter invocations, it uses lexical scope.
 
-are consts also from a shadowy planet?
-We just saw that values bound with const use lexical scope, just like values bound with parameters. They are looked up in the environment where they are declared. And we know that functions create environments. Parameters are declared when we create functions, so it makes sense that parameters are bound to environments created when we invoke functions.
+## are consts also from a shadowy planet?
+We just saw that values bound with const use lexical scope, just like values bound with parameters. **They are looked up in the environment where they are declared. And we know that functions create environments.** Parameters are declared when we create functions, so it makes sense that parameters are bound to environments created when we invoke functions.
 
-But const statements can appear inside blocks, and we saw that blocks can appear inside of other blocks, including function bodies. So where are const variables bound? In the function environment? Or in an environment corresponding to the block?
+But `const` statements can appear inside blocks, and we saw that blocks can appear inside of other blocks, including function bodies. So where are `const` variables bound? In the function environment? Or in an environment corresponding to the block?
 
 We can test this by creating another conflict. But instead of binding two different variables to the same name in two different places, we’ll bind two different values to the same name, but one environment will be completely enclosed by the other.
 
 Let’s start, as above, by doing this with parameters. We’ll start with:
-
+```js 
 ((PI) =>
   (diameter) => diameter * PI
 )(3.14159265)
-And gratuitously wrap it in another IIFE so that we can bind PI to something else:
-
+``` 
+And gratuitously wrap it in another IIFE so that we can bind `PI` to something else:
+```js 
 ((PI) =>
   ((PI) =>
     (diameter) => diameter * PI
   )(3.14159265)
 )(3)
+``` 
 This still evaluates to a function that calculates diameters:
-
+```js 
 ((PI) =>
   ((PI) =>
     (diameter) => diameter * PI
   )(3.14159265)
 )(3)(2)
   //=> 6.2831853
-And we can see that our diameter * PI expression uses the binding for PI in the closest parent environment. but one question: Did binding 3.14159265 to PI somehow change the binding in the “outer” environment? Let’s rewrite things slightly differently:
-
+```
+And we can see that our `diameter * PI` expression uses the binding for `PI` in the closest parent environment. but one question: Did binding `3.14159265` to `PI` somehow change the binding in the “outer” environment? Let’s rewrite things slightly differently:
+```js 
 ((PI) => {
   ((PI) => {})(3);
   
   return (diameter) => diameter * PI;
 })(3.14159265)
-Now we bind 3 to PI in an otherwise empty IIFE inside of our IIFE that binds 3.14159265 to PI. Does that binding “overwrite” the outer one? Will our function return 6 or 6.2831853? This is a book, you’ve already scanned ahead, so you know that the answer is no, the inner binding does not overwrite the outer binding:
-
+``` 
+Now we bind `3` to `PI` in an otherwise empty IIFE inside of our IIFE that binds `3.14159265` to `PI`. Does that binding “overwrite” the outer one? Will our function return `6` or `6.2831853`? This is a book, you’ve already scanned ahead, so you know that the answer is no, the inner binding does not overwrite the outer binding:
+```js 
 ((PI) => {
   ((PI) => {})(3);
   
   return (diameter) => diameter * PI;
 })(3.14159265)(2)
   //=> 6.2831853
+``` 
+>- [^ **When we bind a variable using a parameter inside another binding, the inner binding... the outer binding. Meaning it has effect where?**]
 We say that when we bind a variable using a parameter inside another binding, the inner binding shadows the outer binding. It has effect inside its own scope, but does not affect the binding in the enclosing scope.
 
-So what about const. Does it work the same way?
-
+So what about `const`. Does it work the same way?
+```js 
 ((diameter) => {
   const PI = 3.14159265;
   
@@ -316,17 +367,19 @@ So what about const. Does it work the same way?
   return diameter * PI;
 })(2)
   //=> 6.2831853
-Yes, names bound with const shadow enclosing bindings just like parameters. But wait! There’s more!!!
+```
+Yes, names bound with `const` shadow enclosing bindings just like parameters. But wait! There’s more!!!
 
-Parameters are only bound when we invoke a function. That’s why we made all these IIFEs. But const statements can appear inside blocks. What happens when we use a const inside of a block?
+>- [^ **Parameters are only bound when we? What about const?**]Parameters are only bound when we invoke a function. That’s why we made all these IIFEs. But `const` statements can appear inside blocks. What happens when we use a const inside of a block?
 
-We’ll need a gratuitous block. We’ve seen if statements, what could be more gratuitous than:
-
+We’ll need a gratuitous block. We’ve seen `if` statements, what could be more gratuitous than:
+```js 
 if (true) {
   // an immediately invoked block statement (IIBS)
 }
+``` 
 Let’s try it:
-
+```js 
 ((diameter) => {
   const PI = 3;
   
@@ -347,10 +400,12 @@ Let’s try it:
   return diameter * PI;
 })(2)
   //=> 6.2831853
-Ah! const statements don’t just shadow values bound within the environments created by functions, they shadow values bound within environments created by blocks!
+``` 
+>- [^ **const statements don't just shadow values bound within the environments created by functions but also... Why is this important?**]
+Ah! `const` statements don’t just shadow values bound within the environments created by functions, they shadow values bound within environments created by blocks!
 
-This is enormously important. Consider the alternative: What if const could be declared inside of a block, but it always bound the name in the function’s scope. In that case, we’d see things like this:
-
+This is enormously important. Consider the alternative: What if `const` could be declared inside of a block, but it always bound the name in the function’s scope. In that case, we’d see things like this:
+```js 
 ((diameter) => {
   const PI = 3.14159265;
   
@@ -360,8 +415,9 @@ This is enormously important. Consider the alternative: What if const could be d
   return diameter * PI;
 })(2)
   //=> would return 6 if const had function scope
-If const always bound its value to the name defined in the function’s environment, placing a const statement inside of a block would merely rebind the existing name, overwriting its old contents. That would be super-confusing. And this code would “work:”
-
+``` 
+If `const` always bound its value to the name defined in the function’s environment, placing a const statement inside of a block would merely rebind the existing name, overwriting its old contents. That would be super-confusing. And this code would “work:”
+```js:title=invalid-const-scope-example
 ((diameter) => {
   if (true) {
     const PI = 3.14159265;
@@ -369,11 +425,12 @@ If const always bound its value to the name defined in the function’s environm
   return diameter * PI;
 })(2)
   //=> would return 6.2831853 if const had function scope
-Again, confusing. Typically, we want to bind our names as close to where we need them as possible. This design rule is called the Principle of Least Privilege, and it has both quality and security implications. Being able to bind a name inside of a block means that if the name is only needed in the block, we are not “leaking” its binding to other parts of the code that do not need to interact with it.
+``` 
+>- [^ **What is the the Principle of Least Privilege? Why is it important?**]Again, confusing. Typically, we want to bind our names as close to where we need them as possible. This design rule is called the [**Principle of Least Privilege**](https://en.wikipedia.org/wiki/Principle_of_least_privilege), and it has both quality and security implications. Being able to bind a name inside of a block means that if the name is only needed in the block, we are not “leaking” its binding to other parts of the code that do not need to interact with it.
 
-rebinding
-By default, JavaScript permits us to rebind new values to names bound with a parameter. For example, we can write:
-
+## rebinding
+By default, JavaScript permits us to *rebind* new values to names bound with a parameter. For example, we can write:
+```js 
 const evenStevens = (n) => {
   if (n === 0) {
     return true;
@@ -389,8 +446,9 @@ const evenStevens = (n) => {
 
 evenStevens(42)
   //=> true
-The line n = n - 2; rebinds a new value to the name n. We will discuss this at much greater length in Reassignment, but long before we do, let’s try a similar thing with a name bound using const. We’ve already bound evenStevens using const, let’s try rebinding it:
-
+```
+The line `n = n - 2`; *rebinds* a new value to the name `n`. We will discuss this at much greater length in the Reassignment section, but long before we do, let’s try a similar thing with a name bound using `const`. We’ve already bound `evenStevens` using `const`, let’s try rebinding it:
+```js
 evenStevens = (n) => {
   if (n === 0) {
     return true;
@@ -403,12 +461,17 @@ evenStevens = (n) => {
   }
 }
   //=> ERROR, evenStevens is read-only
-JavaScript does not permit us to rebind a name that has been bound with const. We can shadow it by using const to declare a new binding with a new function or block scope, but we cannot rebind a name that was bound with const in an existing scope.
+```
+>- [^ **JS doesn't allow us to do what with const? However, we can still... with regards to function/block scope.**]JavaScript does not permit us to rebind a name that has been bound with `const`. We can shadow it by using `const` to declare a new binding with a new function or block scope, but we cannot rebind a name that was bound with `const` in an existing scope.
 
-This is valuable, as it greatly simplifies the analysis of programs to see at a glance that when something is bound with const, we need never worry that its value may change.
+This is valuable, as it greatly simplifies the analysis of programs to see at a glance that when something is bound with `const`, we need never worry that its value may change.
+
+## Key Insights 
+- **magic literals**, like `3.14159265` and CSS **magic numbers** like using 26% for a column width to fix padding issue instead of doing something like border-box and and calc() width to acccount for narrowed margin.
+
 ## Links 
 - [🏠 MAIN](/js-allonge-main) 
 - [PREV ⬅ | Closures and Scope ](/js-allonge-closures-and-scope)
-- [NEXT ➡ | That Constant Coffee Craving ](/js-allonge-constant-craving)
+- [NEXT ➡ | Naming Functions ](/js-allonge-naming-functions)
 
-## Summary Questions ffsdafsdfasdf
+## Summary Questions  

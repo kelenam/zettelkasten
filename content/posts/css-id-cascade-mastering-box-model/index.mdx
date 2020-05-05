@@ -157,26 +157,70 @@ To fix, you need to target every element inside the component at the root level 
   - Not only are we now able to use ems, we are also making it more explicit in our code what we are doing.
 
 ## Difficulties with element height
-- Working with element height is differnt than working with element width.
+>- [^ **How is the normal document flow designed, with regard to width and height? What is it best to avoid doing with regards to element height?**]Working with element height is differnt than working with element width.
 - Typically its best to avoid setting explicit heights 
 - Normal document flow is designed with a constrainted width but an unlimited height.
+  - because of this, height of a container organically determined by its contents, not by the container itself.
 
 [**Normal document flow**]() refers to the default layout behavior of elements on the page. Inline elements flow along the text of the page, from left to right, line wrapping when they reach the edge of their container. Block-level  elements fall on the individual lines, with a line break above and below.
 
 ### Controlling overflow behavior 
-### Applying alternatives to pewrcentage-based heights
+>- [^ **What do you run the risk of by explicitly setting an element's height?**]You run the risk of *overflowing* the container. This happens when the content doesn't fit the specified constraint and renders outside of the parent element.
+
+
+>- [^ **How can you control the behavior of overflowing content?**]You can control the exact behavior of the overflowing content with the `overflow` property.
+  - `visibile` (default value): All content is visible, even when it overflows the container's edge.
+  - `hidden`: content that overflwos the containers padding edge is clipped and won't be visible 
+  - `scroll`: sidebars addded
+  - `auto`: Scrollbars added only if overflow. (preferred over `scroll`)
+
+### Horizontal overflow 
+  - `overflow-x` and `overflow-y` are axis specific properties that take the same vales as overflow.
+  - can get mixed results 
+
+Be judicious with the use of scrollbars. Nested scrolling isn't a great UX. 
+
+### Applying alternatives to percentage-based heights
+>- [^ **Why is specifying height based on percentages problematic?**]Percentage refers to the size of an element's containing block; the height of that container, however, is typically determined by the height of its children. This produces a circular definition that the browswer can't resolve, so it'll ignore the declaration.
+- For percentage-based heights to work, the parent must have an explicitly defined height. 
+
+One reason that people try to use percentage-based heights is to make a container fill the screen. A better approach is to use the viewport-relative `vh` units.
+
+A height of 100vh is exactly the height of the viewport. The most common use, though, is to create columns of equal height.
+
+#### Columns of equal height 
+The columns of equal height problem is one weakness that has plagued CSS from the beginning.
+  - CSS at one time supplanted the use of HTML tables for layout out content.
+    - at the time tables were the only way to produce two columns of equal height 
+    - you could technically have set the column to a set height (but deal with overflow)
+    - or you could have let each element evaluate to a different height based on content, both not very good options.
+    - Things introduced later, like `display: table` and flexible box, aka flexbox helped solve this issue.
+
+>- [^ **What is the best way to deal with columns of differing heights, to visualize reconcile their height?**]The best solution is to let columns size themselves naturally, and then extend the shorter column so that its height is equal to the height of the taller one.
+
+#### CSS Table Layouts 
+https://codepen.io/kelena_mori/pen/abvVjZL
+
+To make two columns of equal height, you can opt for using a CSS-based table layout. Instead of using floats, you can make a container `display: table` and each column a `dislay: table-cell`
+
+- You may notice there's no `table-row` element. With CSS tables the inclusion of a row element isn't as strict a requirement as it is with HTML tables.
+- By default, an element with a `table` display value won't expand to a 100% width like a `block` element.
+  - You have to declare width explicitly
+  - that's because margins can't be applied to `table-cell` elements
+  - ⭐To define space between cells of a table, you can use the `border-spacing` proeprty of the table element.
+
+
 ### Using `min-height` and `max-height`
 ### Vertically centering content
 
 ## Negative margins 
-## Collapsed margins 
 
+## Collapsed margins 
 ### Collapsing between text  
 ### Collapsing multiple margins 
 ### Collapsing outside a container 
 
 ## Spacing elements within a container 
-
 ### Considering changing content 
 ### Creating a more general solution: the lobotimized owl selector
 
