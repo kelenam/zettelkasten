@@ -18,10 +18,10 @@ Having looked at basic pure functions and closures, we’re going to see some pr
 The recipes are written for practicality, and their implementation may introduce JavaScript features that haven’t been discussed in the text to this point, such as methods and/or prototypes. The overall use of each recipe will fit within the spirit of the language discussed so far, even if the implementations may not.
 Partial Application
 
-In Building Blocks, we discussed partial application, but we didn’t write a generalized recipe for it. This is such a common tool that many libraries provide some form of partial application. You’ll find examples in Lemonad from Michael Fogus, Functional JavaScript from Oliver Steele and the terse but handy node-ap from James Halliday.
+In [Building Blocks](/js-allonge-building-blocks), we discussed partial application, but we didn’t write a generalized recipe for it. This is such a common tool that many libraries provide some form of partial application. You’ll find examples in Lemonad from Michael Fogus, "Functional JavaScript" from Oliver Steele and the terse but handy "node-ap" from James Halliday.
 
-These two recipes are for quickly and simply applying a single argument, either the leftmost or rightmost.25 If you want to bind more than one argument, or you want to leave a “hole” in the argument list, you will need to either use a generalized partial recipe, or you will need to repeatedly apply arguments. They are context-agnostic.
-
+These two recipes are for quickly and simply applying a single argument, either the leftmost or rightmost. If you want to bind more than one argument, or you want to leave a “hole” in the argument list, you will need to either use a generalized partial recipe, or you will need to repeatedly apply arguments. They are context-agnostic.
+```js 
 const callFirst = (fn, larg) =>
   function (...rest) {
     return fn.call(this, larg, ...rest);
@@ -44,11 +44,11 @@ const sayHelloToCeline = callLast(greet, 'Celine');
 
 sayHelloToCeline('Eartha')
   //=> 'Hello, Celine, my name is Eartha'
-
+``` 
 As noted above, our partial recipe allows us to create functions that are partial applications of functions that are context aware. We’d need a different recipe if we wish to create partial applications of object methods.
 
 We take it a step further, and can use gathering and spreading to allow for partial application with more than one argument:
-
+```js 
 const callLeft = (fn, ...args) =>
     (...remainingArgs) =>
       fn(...args, ...remainingArgs);
@@ -56,11 +56,11 @@ const callLeft = (fn, ...args) =>
 const callRight = (fn, ...args) =>
     (...remainingArgs) =>
       fn(...remainingArgs, ...args);
-
+``` 
 
 ## Links 
 - [🏠 MAIN](/js-allonge-main) 
 - [PREV ⬅ | Magic Names ](/js-allonge-magic-names )
-- [NEXT ➡ |](/)
+- [NEXT ➡ Unary |](/js-allonge-unary)
 
 ## Summary Questions  
