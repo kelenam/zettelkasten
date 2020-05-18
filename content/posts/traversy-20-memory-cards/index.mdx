@@ -59,9 +59,58 @@ tags:
     - transform: translate(120%, -50%);
     - z-index: 2
 - .btn 
+    - cup
     - bgc#f 
-    - 
-
+    - bd: 1px solid #aaa 
+    - bdrs3px
+    - fz14px
+    - mt20px
+    - p10-15
+- .btn-small 
+    - fz12
+    - p5-10
+- .btn-ghost 
+    - b0
+    - bgc transparent
+- .clear 
+    - poa
+    - b30
+    - l30
+- .cards 
+    - perspective: 1000px
+    - po: relative
+    - h300
+    - w500
+    - mw100%
+- .card
+    - poa
+    - opacity: 0
+    - fz1.5em
+    - t0
+    - l0
+    - h100%
+    - w100%
+- .card.active 
+    - cup
+    - opacity: 1
+    - zindex: 10
+- .inner-card 
+    - boxshadow: 0 1px 10px rgba(0,0,0, 0.3)
+    - border radius: 4px 
+    - h100%
+    - w100%
+    - po relative 
+- .inner-card-front, .inner-card-back 
+    - poa 
+    - t0
+    - l0 
+    - df 
+    - jcc 
+    - aic 
+    - h100% 
+    - w100% 
+    - background: #fff 
+    -
 
 ## Key Insights
 So I was actually having an issue running `npx create-react-app` and having an error related to node_modules and npm, the reason for this was that I had node_modules in my user root directory. 
