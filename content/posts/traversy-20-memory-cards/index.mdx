@@ -49,8 +49,9 @@ tags:
     - aic 
     - jcc 
     - h100vh 
-    - o 
-    - ff-'Lato'
+    - m0 
+    - overflow: hidden
+    - ff 'Lato'
 - h1 
   - pos: relative 
 - h1 bustton 
@@ -81,7 +82,7 @@ tags:
     - po: relative
     - h300
     - w500
-    - mw100%
+    - max w100%
 - .card
     - poa
     - opacity: 0
@@ -90,10 +91,15 @@ tags:
     - l0
     - h100%
     - w100%
+    - transform: translateX(50%) rotateY(-10deg)
 - .card.active 
     - cup
     - opacity: 1
     - zindex: 10
+    - transform: translateX(0) rotateY(0deg)
+    - transition: transform 0.4s ease, opacity 0.4s ease;
+- .card.left 
+    - transform: translateX(-50%) rotateY(-10deg)
 - .inner-card 
     - boxshadow: 0 1px 10px rgba(0,0,0, 0.3)
     - border radius: 4px 
@@ -110,10 +116,17 @@ tags:
     - h100% 
     - w100% 
     - background: #fff 
-    -
+- .card.show-answer .inner-card {
+    transform: rotateX(180deg);
+}
+
 
 ## Key Insights
 So I was actually having an issue running `npx create-react-app` and having an error related to node_modules and npm, the reason for this was that I had node_modules in my user root directory. 
+
+On our card class we are adding the transforms to control the card rotation and the slide effect. 
+
+Handling rotation is down with a class `show-answer`, that will trigger our card to trigger its animation on the x axis and "flip". By adding the 180deg transform on our show-answer class, we're still going to have our 
 
 ## Summary Questions
 
