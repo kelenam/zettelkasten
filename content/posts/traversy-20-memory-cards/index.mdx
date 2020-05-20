@@ -106,6 +106,8 @@ tags:
     - h100%
     - w100%
     - po relative 
+    - transform-style: preserve-3d;
+    - transition: transform 0.4s ease
 - .inner-card-front, .inner-card-back 
     - poa 
     - t0
@@ -116,9 +118,22 @@ tags:
     - h100% 
     - w100% 
     - background: #fff 
-- .card.show-answer .inner-card {
+    - backface-visibility: hidden 
+- .card.show-answer .inner-card 
     transform: rotateX(180deg);
-}
+- .inner-card-front 
+    - transform: rotateX(0deg)
+    - z-index: 2
+- .inner-card-back 
+    - transform: rotateX(180deg)
+- .inner-card-front::after, .inner-card-back::after 
+    - content: 'Flip';
+    - poa
+    - t10 
+    - r10
+    - font-weight bold 
+    - fz16px
+    - color #ddd 
 
 
 ## Key Insights
@@ -126,7 +141,14 @@ So I was actually having an issue running `npx create-react-app` and having an e
 
 On our card class we are adding the transforms to control the card rotation and the slide effect. 
 
-Handling rotation is down with a class `show-answer`, that will trigger our card to trigger its animation on the x axis and "flip". By adding the 180deg transform on our show-answer class, we're still going to have our 
+Handling rotation is down with a class `show-answer`, that will trigger our card to trigger its animation on the x axis and "flip".
+
+backface-visibility: hidden is a property we use to hide what is on the backface side of something.
+
+The transform-style CSS property sets whether children of an element are positioned in the 3D space or are flattened in the plane of the element
+https://developer.mozilla.org/en-US/docs/Web/CSS/transform-style
+
+Font awesome has "unit-codes" that can be used within our css to insert an icon. We will be using f021. The way that you use it is by saying `content: '\f021 Flip'` Then setting the `font-family: 'Font Awesome 5 Free', 'Lato'`,
 
 ## Summary Questions
 

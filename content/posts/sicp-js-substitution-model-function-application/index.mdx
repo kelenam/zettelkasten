@@ -1,0 +1,113 @@
+---
+title: The Substitution Model for Function Application | The Elements of Programming
+date: 2020-05-20
+slug: sicp-js-substitution-model-function-application
+tags:
+  - JS
+  - CS
+  - SICP
+  - CS
+  - theory
+---
+
+To evaluate an application combination, the interpreter follows a similar process as for operator combinations, which we described in section: [Evaluating Operator Combinations](/sicp-js-evaluating-operator-combinations). That is, the **interpreter evaluates the elements of the combination and applies the function (which is the value of the function expression) to the arguments (which are the values of the argument expressions of the application combination)**.
+
+In more detail, the interpreter proceeds as follows when evaluating application combinations:
+
+To evaluate an application combination of the form
+```
+$\textit{function-expression}$ ( $\textit{argument-expressions}$ )
+```
+
+do the following:
+    
+1. Evaluate the function expression of the application combination, resulting in the function to be applied.
+2. Evaluate the argument expressions of the combination.
+3. Apply the function to the arguments:
+    - If the function is primitive, we simply apply the corresponding mathematical function to the arguments.
+    - If the function is compound, we evaluate the return expression of the function with each parameter replaced by the corresponding argument.
+
+To illustrate this process, let's evaluate the application combination
+```js 
+f(5);
+```
+
+Evaluating the name `f` results in the function declared in section [Functions](/sicp-js-functions). Evaluating the argument expression 5 yields the argument value 5. Now, we retrieve the return expression of `f`:
+```js 
+sum_of_squares(a + 1, a * 2)
+``` 
+in which we replace the parameter a by the argument `5`:
+```js  
+sum_of_squares(5 + 1, 5 * 2)
+``` 
+Thus the problem reduces to the evaluation of an application combination with two arguments and a function expression `sum_of_squares`. Evaluating this combination involves three subproblems. We must evaluate the function expression to get the function to be applied, and we must evaluate the argument expressions to get the arguments. Now `5 + 1` produces `6` and `5 * 2` produces `10`, so we must apply the `sum_of_squares` function to 6 and 10. These values are substituted for the parameters `x` and `y` in the return expression of `sum_of_squares`, reducing the expression to...
+```js
+square(6) + square(10)
+```
+If we use the declaration of square once, this reduces to
+```js
+(6 * 6) + square(10)
+```
+which reduces by multiplication to
+```js
+36 + square(10)
+```
+A second application of square yields
+```js
+36 + (10 * 10)
+```
+which reduces by multiplication to
+```js 
+36 + 100
+```
+and finally by addition to
+```js
+136
+```
+
+The process we have just described is called the [**substitution model**]() for function application. It can be taken as a model that determines the meaning of function application, insofar as the functions in this chapter are concerned. However, there are two points that should be stressed:
+
+The purpose of the substitution is to help us think about function application, not to provide a description of how the interpreter really works. Typical interpreters do not evaluate function applications by manipulating the text of a function to substitute values for the parameters. In practice, the substitution is accomplished by using a local environment for the parameters. We will discuss this more fully in chapters 3 and 4 when we examine the implementation of an interpreter in detail.
+
+Over the course of this book, we will present a sequence of increasingly elaborate models of how interpreters work, culminating with a complete implementation of an interpreter and compiler in chapter 5. The substitution model is only the first of these models—a way to get started thinking formally about the evaluation process. In general, when modeling phenomena in science and engineering, we begin with simplified, incomplete models. As we examine things in greater detail, these simple models become inadequate and must be replaced by more refined models. The substitution model is no exception. In particular, when we address in chapter 3 the use of functions with mutable data, we will see that the substitution model breaks down and must be replaced by a more complicated model of function application. 
+
+Applicative order versus normal order
+According to the description of evaluation given above, the interpreter first evaluates the function and argument expressions and then applies the resulting function to the resulting arguments. This is not the only way to perform evaluation. An alternative evaluation model would not evaluate the operands until their values were needed. Instead it would first substitute argument expressions for parameters until it obtained an expression involving only operators, and would then perform the evaluation. If we used this method, the evaluation of
+
+f(5)
+would proceed according to the sequence of expansions
+```js
+sum_of_squares(5 + 1, 5 * 2)
+square(5 + 1)  +  square(5 * 2)
+(5 + 1) * (5 + 1) + square(5 * 2)
+(5 + 1) * (5 + 1) + (5 * 2) * (5 * 2)
+``` 
+followed by the reductions
+```js 
+6 * (5 + 1) + (5 * 2) * (5 * 2)
+6 * 6 + (5 * 2) * (5 * 2)
+36 + (5 * 2) * (5 * 2)
+36 + 10 * (5 * 2)
+36 + 10 * 10
+36 + 100
+136
+``` 
+This gives the same answer as our previous evaluation model, but the process is different. In particular, the evaluations of 5 + 1 and 5 * 2 are each performed twice here, corresponding to the reduction of the expression
+```js 
+x * x
+``` 
+with `x` replaced respectively by `5 + 1` and `5 * 2`.
+
+This alternative fully expand and then reduce evaluation method is known as [**normal-order evaluation**]() , in contrast to the evaluate the arguments and then apply method that the interpreter actually uses, which is called applicative-order evaluation. It can be shown that, for function applications that can be modeled using substitution (including all the functions in the first two chapters of this book) and that yield legitimate values, normal-order and applicative-order evaluation produce the same value. (See exercise 1.5 for an instance of an illegitimate value where normal-order and applicative-order evaluation do not give the same result.)
+
+JavaScript uses applicative-order evaluation, partly because of the additional efficiency obtained from avoiding multiple evaluations of expressions such as those illustrated with above and, more significantly, because normal-order evaluation becomes much more complicated to deal with when we leave the realm of procedures that can be modeled by substitution. On the other hand, normal-order evaluation can be an extremely valuable tool, and we will investigate some of its implications in chapters 3 and 4.[2]
+
+## Links 
+- [🏠 MAIN](sicp-js-main)
+- [PRIMARY SECTION ⬆ | Building Abstractions with Functions](/sicp-js-building-abstractions-with-functions)
+    - [PARENT SECTION ↖ | Elements of Programming](/sicp-js-elements-of-programming)
+        - [PREV ⬅ | Functions ](/sicp-js-functions)
+        - [NEXT ➡ |  ](/)
+
+## Summary Questions
+

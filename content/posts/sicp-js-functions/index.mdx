@@ -1,0 +1,84 @@
+---
+title: Functions | The Elements of Programming
+date: 2020-05-19
+slug: sicp-js-functions
+tags:
+  - JS
+  - CS
+  - SICP
+  - CS
+  - theory
+---
+
+>- [^ **What are three elements that must appear in any powerful programming language?**]We have identified in JavaScript some of the elements that must appear in any powerful programming language:
+
+ 1. Numbers and arithmetic operations are primitive data and functions.
+ 2. Nesting of combinations provides a means of combining operations.
+ 3. Constant declarations that associate names with values provide a limited means of abstraction.
+
+>- [^ **What are function declarations?**]Now we will learn about [**function declarations**]() , a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.
+
+We begin by examining how to express the idea of squaring. We might say, To square something, take it times itself. This is expressed in our language as
+```js 
+function square(x) {
+    return x * x;
+}
+```
+
+We can understand this in the following way:
+```js 
+function square(    x   ) { return x    *     x; }
+//  ^       ^       ^         ^    ^    ^     ^
+// To    square something,  take   it times itself.
+``` 
+We have here a [**compound function**]() , which has been given the name `square`. The function represents the operation of multiplying something by itself. The thing to be multiplied is given a local name, `x`, which plays the same role that a pronoun plays in natural language. Evaluating the declaration creates this compound function and associates it with the name square.
+
+Our simplest form of a function declaration is
+```js 
+function $\textit{name}$( $\textit{parameters}$ ) { return $\textit{expression}$; }
+``` 
+The `$\textit{name}$` is a symbol to be associated with the function in the environment. The $\textit{parameters}$ are the names used within the body of the function to refer to the corresponding arguments of the function. The $\textit{expression}$ after the keyword return is the **return expression** that will yield the value of the function application when the parameters are replaced by the arguments to which the function is applied. The `$\textit{parameters}$` are grouped within parentheses and separated by commas, just as they would be in an actual call to the function being declared.
+
+Having declared the `square` function, we can now use it in a **function application expression**, which we turn into a statement using a semicolon:
+```js 
+square(21);
+``` 
+The name `square` is the function expression of the application, and `21` is the **argument expression**.
+```js 
+square(2 + 5);
+```
+Here, the argument expression is itself a compound expression, the operator expression 2 + 5.
+```js 
+square(square(3));
+```
+Of course application expressions can also serve as argument expressions.
+We can also use `square` as a building block in declaring other functions. For example, `$x^2 +y^2$` can be expressed as
+```js 
+square(x) + square(y);
+```
+We can easily declare a function `sum_of_squares` that, given any two numbers as arguments, produces the sum of their squares:
+```js 
+function sum_of_squares(x,y) {
+    return square(x) + square(y);
+}
+```
+Now we can use `sum_of_squares` as a building block in constructing further functions:
+```js
+function f(a) {
+    return sum_of_squares(a + 1, a * 2);
+}
+```
+The application of functions such as `sum_of_squares(3,4)` is—after operator combination—the second kind of combination of expressions into larger expressions that we encounter. In addition to compound functions, JavaScript provides a number of [**primitive functions**]()  that are built into the interpreter. An example is the function `math_log` that computes the natural logarithm of its argument. Evaluating the application expression `math_log(1)` results in the number 0. Primitive functions are used in exactly the same way as compound functions. Indeed, one could not tell by looking at the definition of `sum_of_squares` given above whether square was built into the interpreter, like math_log, or defined as a compound function.
+
+## Key Insights 
+Take note of what is meant by **primitive functions** as they are referenced in the next section. Essentially they are just baked-in JS functions, things from the Math library for example. 
+
+## Links 
+- [🏠 MAIN](sicp-js-main)
+- [PRIMARY SECTION ⬆ | Building Abstractions with Functions](/sicp-js-building-abstractions-with-functions)
+    - [PARENT SECTION ↖ | Elements of Programming](/sicp-js-elements-of-programming)
+        - [PREV ⬅ | Evaluating Operator Combinations](/sicp-js-evaluating-operator-combinations)
+        - [NEXT ➡ | The Substitution Model for Function Application ](/sicp-js-substitution-model-function-application)
+
+## Summary Questions
+
