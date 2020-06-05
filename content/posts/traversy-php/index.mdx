@@ -1,0 +1,1017 @@
+---
+title: PHP Front to Back | Traversy
+date: 2020-03-10
+slug: traversy-php
+tags:
+  - PHP
+  - Apache
+  - MySQL
+---
+
+### Contents 
+- Basic principles of PHP 
+- PHP7 / Apache / MySQL Setup 
+- Code Syntax (vars, arrays, loops, conditionals, functions, etc)
+- Procedural & OOP 
+- Dynamic Pages 
+- Form Submission / Superglobals 
+- Working with Databases 
+- Mini Projects (Contact Form, User Login System, etc)
+
+Need a server to run. Going to be using XAMP but you can use LAMP stack. 
+
+### What is PHP?
+- PHP: Hypertext Preprocessor (Recusive Acronym)
+- Server Side Programming / Scripting Language 
+    - All code must be hosted on a server, Apache is the most common server for it to be run. 
+    - LAMP stack is Linux, Apache, MySQL, PHP. Really popular stack to work with.
+- Can be embedded direcdtly within HTML (<?php?>) (one of the huge advantages of PHP)
+- Files use a ".php" file extension 
+
+### How Does PHP Work? 
+- Client makes a request 
+- Server runs PHP (via an interpreter) / extensions 
+    - while being processeed it has the ability to work with a database 
+- Query database if needed 
+- Load other files if needed 
+- Result is sent back to client 
+    - doesn't work like an HTML page, where it sends the HTML down to the client
+    - PHP simply sends the result of its code back, usually it is HTML, but it can also be plaintext, XML, JSON, PDF, etc.
+
+### Why Use PHP?
+- easy to learn 
+    - untyped Language
+- free and open source 
+- great support 
+- cross platform
+- freedom (can get some devs into trouble)
+- frameworks 
+- Database compatibility
+
+### What Can PHP Do? 
+- Create dynamic page content 
+- intertact with files on teh server 
+- collectc and process forms 
+- send / receive cookies 
+- interact with databases 
+- access control 
+- encrypt data 
+- almost anything else 
+
+### What can you build with php?
+- basic websites 
+- blog types websites 
+- shopping carts 
+- social networks 
+- content management systems 
+- memebership websites 
+- search engines 
+- backend APIs 
+
+### Installation 
+When we first install PHP, we need run .exe as admin, to allow us to run modules as service like Apache, and MySQL in the background.
+
+Now once enabled, we can navigate to localhost in a browswer and it will redirect us to the dashboard that sets it up for us. 
+
+
+Loads this `index.php` like an html file, we can just change the php contents of this file to have it echo 'Hello, World' if we like. 
+
+- When XAMPP running, you can navigate to localhost/phpmyadmin to go to the php myadmin database. 
+- The first thing we want to do is add a password because, as you can see its freely accessible, and we want to be more secure.
+    - User accounts > root localhost > Edit Privileges > Change Password 
+    - change password, hit go, if we navigate back towaards databases we will get a bunch of errors 
+    - we have to edit our config file to add the password, in config.inc.php within the phphmyadmin directory.
+    - Now when we use mySQL in our script we'll have to use this password.
+
+## Variables, Constants & Data Types 
+We will create a phpsandbox folder in our htdocs folder to store our coures code examples.  
+
+Create a new file called `variables.php` type in 'hello' and save, we can access this filein the browswer by navigating to `http://localhost/phpsandbox/variables.php` and we will see hello in the browswer. HTML would get parsed as well, but if we want to use php we have to wrap php code in php tags: `<?php ?>`
+
+- Some developers will leave out the ending `?>` tag, and so long as you don't have html within the php tag it shouldn't cause a problem, but it's your preference to keep the closing php tag. 
+
+```php 
+<?php 
+    echo 'Hello World';
+?>
+```
+- `echo` will just echo the text, we could even wrap the echo in `h1` tags or html, so long as we have the closing php tag if we are using html inside. 
+
+```php 
+<h1><?php 
+    echo 'Hello World';
+?></h1>
+``` 
+- `print` would do the same, but the difference between `echo` and `print` is that `print` will actually return the value and can be used with expressions where `echo` doesn't and therefore is a bit faster. 
+
+### Comments
+Three ways to do it in PHP, 
+```php 
+    // Single line comment 
+    # Single line comment 
+    /*
+        Multiline comment 
+    */
+```
+
+### Variables 
+```php 
+    // Single line comment 
+    # Single line comment 
+    /*
+        Multiline comment 
+    */
+    $output = 'Hello World!';
+    echo $output;
+```
+Rules for variables in PHP:
+
+- Prefix $ 
+- start with a letter or an underscore (underscore is the only character allowed besides numbers and letters, you can start with an underscore but can't start with a number)
+- Only letters, numbers, and underscores 
+- case sensitive 
+
+### Data Types 
+- String
+- Integers 
+- floats 
+- Booleans 
+- Arrays 
+- Objects 
+- NULL 
+- Resource (can be a reference to a function, not an actual datatype)
+
+```php 
+#DATA TYPES 
+/*
+    String
+    Integer
+    Float
+    Boolean
+    Array 
+    Object
+    NULL 
+    Resource
+*/
+    $output = 'Hello World!';
+    $num1 = 4;
+    $num2 = 10;
+    
+    $float1 = 4.4;
+    $bool1 = true;
+    echo $output
+```
+- String concatenation is different in PHP in that it uses `.` instead of `+`, e.g. `$string1 + $string2` would work in JS, but not in PHP, instead it would need to be `$string . $string`, if we wanted a aspace we could do, `$string1 .' '. $string2`. 
+
+The different between double quotes and single quotes is that double quotes actually parse varibles, so instead of the above we could simply do `$greeting = "$string1 $string2!";`
+
+### Escape sequences 
+
+```php 
+    $string3 = 'They\'re Here'; 
+```
+For things like aspostrophes, we can escape it by prefixing with backslash, `\`. You only need to escape it if the surrounding quotes are interupted.
+
+### Constants 
+You should only use constants if you know for sure the value associated with it isn't going to change. 
+To create constants you have to use the `define()` function. The convention is to keep the name all uppercase.
+```php 
+define('GREETING', 'Hello Everyone', true);
+```
+Constants are case sensitive by default, if you want them to be case insensitive, you can add a third parameter to the `define` function, by passing it `true`...
+
+## Arrays 
+- Arrays are variables that holds multiple values
+- Basically three types 
+    - Indexed 
+    - Associative 
+    - Multi-dimensional 
+
+
+### Indexed Arrays  
+```php 
+    // Indexed 
+    $people = array('Kevin', 'Jeremy', 'Sara');
+    echo $people[1];
+    // --> Jeremy 
+
+    # Second way for arrays 
+    $cars = ['Honda', 'Toyota', 'Ford'];
+```
+- Adding to arrays is easy, `$cars[3] = 'Chevy'`.
+- ⭐In some cases, you can may not know the length of the array, so you could simply say: `$cars[] = 'Chevy'` 
+
+A bunch of different array functions in PHP. `count()` for instance... `echo count($cars)` will echo out the count of 
+
+- `print_r($cars)` will print out all things in the array, helpful for arrays 
+- `var_dump($cars)` will show us the whole array and the data type and the number of characters. Pretty helpful, not just for arrays, but also for any data type. 
+
+### Associative Arays 
+Allows you to define a key and an index. We can assign a key to whatever we want and to whatever data type we want...
+```php
+<?php
+$people = array('Brad' => 35, 'Jose' => 32, 'William' => 37);
+echo $people['Brad'];
+$ids = [22 => 'Brad', 44 => 'Jose', 63 => 'William'];
+echo $ids[22];
+
+$people['Jill'] = 42;
+print_r($people)
+```
+- Kind of similar to JS Objects
+- Adding to arrays is easy, we can just add specify a key and a value. 
+
+### Mulidimensional
+Array within an array 
+```php 
+<?php
+$cars = array(
+    array('Honda', 20, 10);
+    array('Toyota', 30, 20);
+    array('Ford', 23, 12);
+);
+echo $cars[1][0];
+```
+- The first index is where in the first array, the next would be the index within the subarray.
+
+## Loops 
+- Four different types of loops in PHP: `for`, `while`, `do...while`, `foreach`
+```php 
+<?php
+# For loop
+# @params - init, condition, increment 
+for ($i = 0; $i < 10; i++) {
+    echo $i;
+}
+```
+- Usually `for` loop used if you know number of times it will be executed
+
+### while loop 
+```php 
+<?php
+# While loop
+# @params - condition 
+
+$i = 0;
+while ($i <10) {
+    echo $i;
+    echo '<br>';
+    $i++;
+}
+```
+- variable increment defined outside of the loop 
+- used over a `for` loop if you don't know the set condition 
+
+### do... while
+- brad rarely uses them
+```php 
+<?php
+# Do... While loop
+# @params - condition 
+$i = 0;
+do {
+    echo $i;
+    echo '<br>';
+    $i++;
+}
+
+
+while($i <10);
+
+```
+- Always going to run at least once no matter what 
+
+### `foreach` loop 
+- `foreach` is used for arrays 
+```php 
+<?php
+# foreach loop - for arrays 
+$people = array('brad', 'jose', 'william');
+for($people as $person) {
+    echo $person;
+    echo '<br>';
+}
+
+# foreach for associative arrays 
+
+$people = array('brad' => 'brad@mail.com', 'jose' => 'jose@mail.com', 'william' => 'will@mail.com');
+foreach$people as $person => $email) {
+    echo $person.': '.$email;
+    echo '<br>';
+}
+```
+- you want to use a variable for whatever the singular form of the array name is 
+- the format for looping through associative arrays is you provide variables names for both the keys and the values similar to declaring keys/values with associative arrays, with the `=>` fat arrow syntax.
+
+## Functions 
+A review of naming conventions: camelCase, lower_case, PascalCase. In PHP camel case is usually used, Pascal case usually used for objects. (Similar to JS), different frameworks use different styles of this, Codeigniter uses lower_case style. 
+- camelCase : myFunction() 
+- lower_case: my_function();
+- Pascal_case: MyFunction();
+```php
+<?php 
+    # FUNCTION - block of code that can be repeatedly called
+
+    // Create Simple function 
+    function simpleFunction() {
+        echo 'Hello World';
+    }
+    // Run simple function 
+    simpleFunction();
+
+    // Function with Param 
+    function sayHello($name = 'World') {
+        echo "Hello $name<br>";
+    }
+
+    sayHello('Joe');
+    sayHello('Bob');
+
+    function addNumbers($num1, $num2) {
+        return $num1 + $num2;
+    }
+
+    echo addNumbers(2,3);
+?>
+```
+- Function syntax very similar to JS, 
+- You can include parameters/arguments 
+- You can provide default argument values like you would in js; `$name = 'World'` 
+- You can also return values from functions, which is typically what you want to do 
+
+### Passing arguments by reference 
+Normally if we have a variable like `$myNum = 10` it will pass it in by value, `10`, if we want to pass it in by reference...
+```php 
+<?php 
+function addFive($num) {
+    $num += 5;
+}
+
+function addTen(&$num) {
+    $num += 10;
+}
+
+addFive($muNum);
+
+echo "Value: $myNum<br>";
+
+addTen($myNum);
+
+echo "Value: $muNum<br>"
+```
+- By placing an `&` ampersand in front of the variable name we are passing it in by reference instead of value, that means we are mutating that specific variable reference.  
+- Brad doesn't use pass by reference very much in his own code 
+
+## Conditionals & Comparison
+Useful for comparing values, conditions, etc.
+```php 
+<?php 
+
+    # CONDITIONALS
+
+    /*
+        ==
+        ===
+        <
+        >
+        <=
+        >=
+        != 
+        !== 
+    */
+    $num = 6;
+
+    if($num === 5) {
+        echo '5 passed';
+    } elseif($num == 6) {
+        echo '6 passed';
+    } else {
+        echo 'did not pass';
+    }
+
+    # NESTING IF 
+    $num = 5; 
+    if($num < 5) {
+        if($num > 10) {
+            echo "$num passed";
+        } 
+    }
+
+    /* 
+        LOGICAL OPERATORS 
+        AND &&
+        OR ||
+        xor 
+    */
+
+    if ($num > 4 XOR $num <10) {
+        echo "$num passed";
+    }
+
+``` 
+- You can also nest if statements 
+- Better to use logical operators over nested if statements if possible 
+- xor is 'exclusive or', one of them has to be true but not both.
+- Logical operators in PHP, you can use `AND` or `&&`. `OR` or `||` 
+
+### Switches 
+```php 
+<?php 
+
+    # SWITCH 
+    $favColor = 'red';
+
+    switch($favColor) {
+        case 'red': 
+            echo 'Your favorite color is red';
+            break;
+        case 'blue': 
+            echo 'Your favorite color is blue';
+            break;
+        case 'green': 
+            echo 'Your favorite color is green';
+            break;
+        default: 
+            echo 'Your favorite color is something else';
+    }
+```
+- add `break` after whatever case you want.
+
+## Dates & Timestamps 
+```php 
+<?php 
+
+echo date('d'); // Will give us the number of the day
+echo date('m'); // Month 
+echo date('Y'); // Year 
+
+echo date('l'); // Day of the week 
+
+echo date('Y/m/d');
+echo date('m-d-y');
+echo date('h'); // Hour 
+echo date('i'); // Minute 
+echo date('s'); // SEconds 
+echo date('a'); // AM/PM
+
+echo date('h:i:sa');
+
+// Set timezone
+date_default_timezone_set('America/Los_Angeles');
+```
+- ⭐ For year you need to give an uppercase `Y`.
+- lowercase `l` will give us day of the week 
+- You can combine them which is what you want to do.
+- `h` for hour (might be wrong )
+- `i` for minutes 
+- `a` for AM/PM 
+- Can also combine time things together. 
+
+If your clock is off, you might need to set the timezone for your environemtn or XAMPP setup. 
+You can do that with `date_default_timezone_set()`
+
+### Making time/timestamps 
+```php 
+<?php 
+// Hours, minutes, seconds, month, day, year 
+$timestamp = mktime(10, 14, 54, 9, 10, 1981);
+echo $timestamp; // Will give a string of numbers -> 368978294 
+
+echo date('m/d/Y h:i:sa', $timestamp);
+```
+- You can use the function `mktime` to make a timestamp 
+- a unix timestamp is just an integer containing the number of seconds between the unix epoch and the time specified; 
+- So the `date` function can also take another argument, a timestamp to be converted into a readable date. 
+
+### `strtotime` 
+```php 
+<?php 
+    $timestamp2 = strtotime('7:00pm March 22 2016');
+    echo $timestamp2;
+    echo date('m/d/Y h:i:sa', $timestamp2)
+
+    $timestamp3 = strtotime('tomorrow');
+    echo date('m/d/Y h:i:sa', $timestamp3);
+
+    $timestamp4 = strtotime('next Sunday');
+    echo date('m/d/Y h:i:sa', $timestamp4);
+
+``` 
+- the string we pass in is very specific but can be vague if we want it to be like `$timestamp3` and `$timestamp4`
+- We can also do two months from now with `+2 Months`
+- If you want to learn more you can go to the PHP docs, php.net data.php 
+
+## include and require statements 
+These allow us to insert PHP code/markup/text into another PHP file and saves a ton of time writing out a bunch of code 
+```php 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <ul>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="about.php">About</a></li>
+        <li><a href="contact.php">Contact</a></li>
+    </ul>
+
+    <h1>Contact</h1>
+
+    <footer>
+        <p>Mywebsite &copy; 2020</p>
+    </footer>
+</body>
+</html>
+```
+- So we can copy this code for the other files, contact and about, and we have all this repeated code with only one thing changing, the h1. We can save a lot of time by using includes/requires 
+- `inc` folder within a php project is common that just stands for includes, create a `header.php` within the includes 
+- In the `index.php` file you can cut everything above the `h1` and put in `header.php` file, then take everything below the h1 and put it in the footer file. Then, over in your `index.php` file which will only have the h1 you can do something like this ...
+
+```php:tile=index.php
+<?php include 'inc/header.php'; ?>
+    <h1>Home</h1>
+<?php include 'inc/footer.php'; ?>
+```
+- You can then do the same thing for the About/Contact pages.
+- If we included a file that isn't there 
+
+### The difference between `include` and `require`
+The difference between the two is if `require` won't continue the script if the file is not found, `include` will continue.
+If you want to halt the rest of the files from loading use `require`, if you want it to keep going regardless use `include` 
+
+- `require_once` will check to see if its already been required, if it has it won't again. 
+- You can also use the function format: `include('inc/header.php') ?>`
+
+## $_SERVER Superglobal 
+Superglobals are bulit in variables that are always available in all scopes, can be accessed from anywhere. Basically system variables. 
+
+We will start with $_SERVER which will address client info/browser info, and anything related to the server. 
+
+The `$_SERVER` superglobal is an associative array and we can access things on it like we would a normal array.
+
+```php 
+ <?php 
+    # $_SERVER SUPERGLOBAL 
+    // Create Server Array 
+    $server = [
+        'Host Server Name' => $_SERVER['SERVER_NAME'],
+        'Host Header' => $_SERVER['HTTP_HOST'],
+        'Server Software' => $_SERVER['SERVER_SOFTWARE'],
+        'Document Root' => $_SERVER['DOCUMENT_ROOT'],
+        'Current Page' => $_SERVER['PHP_SELF'],
+        'Script Name' => $_SERVER['SCRIPT_NAME'],
+        'Absolute Path' => $_SERVER['SCRIPT_FILENAME']
+    ];
+    echo $server['Host Server Name'];
+    // -> localhost 
+    echo $server['Host Header'];
+    // -> localhost 
+    echo $server['Server Software'];
+
+    print_r($server);
+ ?>
+```
+- ⭐ Something we might use often is `$_SERVER['DOCUMENT_ROOT'];`
+- ⭐ Another useful property can be useful (especially for form submissions is `PHP_SELF`), for submitting to same page you are on, 
+- Some of these could be the same like current page and script name, 
+- you can grab absolute path with `SCRIPT_FILENAME`
+- The code above is most of these server properties, you can check out more in the PHP docs 
+
+### Client Array 
+```php 
+ <?php 
+    # Create Client Array 
+    $client = [
+        'Client System Info' => $_SERVER['HTTP_USER_AGENT'],
+        'Client IP' => $_SERVER['REMOTE_ADDR'],
+        'Remote Port' => $_SERVER['REMOTE_PORT']
+    ];
+
+    print_r($client);
+ ?>
+```
+
+### PHP Shorthand syntax 
+- There is a PHP shorthand syntax for if/loops/etc if you're using php within html that ends with a colon, and ends the php closing tag...
+
+```php 
+<?php if($server): ?>
+    <ul class="list-group">
+        <?php foreach($server as $key => $value): ?>
+            <li class="list-group-item">
+                <strong><?php echo $key; ?>: </strong>
+                <?php echo $value; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+```
+We also want to do the same for the client stuff, 
+
+### Build our Page
+```php 
+<?php include 'server-info.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <h1>Client Info</h1>
+        <?php if($server): ?>
+            <ul class="list-group">
+                <?php foreach($server as $key => $value): ?>
+                    <li class="list-group-item">
+                        <strong><?php echo $key; ?>: </strong>
+                        <?php echo $value; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <br>
+
+        <h1>Client Info</h1>
+        <?php if($client): ?>
+            <ul class="list-group">
+                <?php foreach($client as $key => $value): ?>
+                    <li class="list-group-item">
+                        <strong><?php echo $key; ?>: </strong>
+                        <?php echo $value; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+    </div>
+</body>
+</html>
+```  
+
+## GET & POST 
+When you submit a form to a server/php page you can send data using the GET or POST method. 
+- The GET method you are actually sending the data through the URL, you can do so with query strings but its insecure because you are sending 
+- Sending data with a POST request is safer because it does through the HTTP headers, safer. 
+```php:title=get_post.php
+<?php
+    if(isset($_GET['name'])) {
+        print_r($_GET);
+    }
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+
+    <form method="GET" action="get_post.php">
+        <div>
+            <label for="">Name</label>
+            <input type="text" name="name">
+        </div>
+        <div>
+            <label for="Email">Email</label>
+            <input type="text" name="email">
+        </div>
+        <input type="submit" value="submit">
+    </form>
+</head>
+<body>
+    
+</body>
+</html>
+```
+- The `name` attribute on our form is really important because its that attribute that we can hook onto from the ,server, to get that data submitted, 
+- In order for us to process our form we need to add two things:
+    - `method="GET"` 
+    - `action="page-to-submit-to.php" `
+- If we run this as is, we will get an error because we haven't submitted the form yet, so we need to check to see if its exists first. 
+    - we can't just run a normal if, we have to wrap if in a PHP function called `isset` which will check to see if a value is set. 
+- When working with any kind of user data you have security issues, one of them  with PHP is XSS attacks, inserting scripts in forms. 
+
+### XSS 
+- Cross site scripting attacks 
+- If you insert a script tag within the form, you could auto-insert an html/js script, inserted into our form if we are trying to echo to the page. To prevent this from working we can use a function called html entitites, that takes the power out of html tags, take the power out of the opening and closing angled brackets...
+
+```php 
+    echo htmlentities($_GET['name']);
+```
+
+### POST 
+If you don't want to have data be visible through the url like with `GET` than you'll want to use `POST` 
+```php:title=get_post.php
+<?php
+    if(isset($_GET['name'])) {
+        echo $_GET['name'];
+    }
+
+    if(isset($_POST['name'])){
+        $name = htmlentities($_POST['name']);
+        echo $name; 
+    }
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+
+    <form method="POST" action="get_post.php">
+        <div>
+            <label for="">Name</label>
+            <input type="text" name="name">
+        </div>
+        <div>
+            <label for="Email">Email</label>
+            <input type="text" name="email">
+        </div>
+        <input type="submit" value="submit">
+    </form>
+</head>
+<body>
+    
+</body>
+</html>
+```
+- Now if you check the URL, the data will have been sent through the headers and not through the URL. 
+
+### Third way of getting data 
+There is a third way of getting data and that is through a request.
+```php:title=get_post.php
+<?php
+    // if(isset($_GET['name'])) {
+    //     echo $_GET['name'];
+    // }
+
+    // if(isset($_POST['name'])){
+    //     $name = htmlentities($_POST['name']);
+    //     echo $name; 
+    // }
+
+    if(isset($_REQUEST['name'])){
+        $name = htmlentities($_REQUEST ['name']);
+        echo $name; 
+    }
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+
+    <form method="POST" action="get_post.php">
+        <div>
+            <label for="">Name</label>
+            <input type="text" name="name">
+        </div>
+        <div>
+            <label for="Email">Email</label>
+            <input type="text" name="email">
+        </div>
+        <input type="submit" value="submit">
+    </form>
+</head>
+<body>
+    
+</body>
+</html>
+```
+- `REQUEST` is going to work if the form method is either `POST` or `GET`. 
+- `REQUEST` isn't used too much so you should stick with either GET or POST 
+
+### `QUERY_STRING` 
+There is another super global which is the QUERY_STRING value.  
+`echo $_SERVER['QUERY_STRING']`
+
+### Sending query strings without forms 
+You can send query strings without using a form. 
+```php:title=get_post.php
+<?php
+    if(isset($_GET['name'])) {
+        $name = htmlentitiets($_GET['name']);
+        echo $name;
+    }
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+
+    <form method="GET" action="get_post.php">
+        <div>
+            <label for="">Name</label>
+            <input type="text" name="name">
+        </div>
+        <div>
+            <label for="Email">Email</label>
+            <input type="text" name="email">
+        </div>
+        <input type="submit" value="submit">
+    </form>
+    <ul>
+        <li>
+            <a href="get_post.php?name=Brad">Brad</a>
+        </li>
+           <li>
+            <a href="get_post.php?name=Brad">Brad</a>
+        </li>
+    </ul>
+</head>
+<body>
+    
+</body>
+</html>
+```
+
+## Common String Functions 
+- `substr` will return a portion of a string 
+```php 
+<?php 
+    # substr() 
+    # Returns a portion of a string 
+    $output = substr('Hello', -2);
+    echo $output;
+    // -> lo 
+
+    # strlen()
+    # Returns the length of a string 
+    $output = strlen('Hello World');
+    echo $output;
+    // -> 11 
+
+    #strpos()
+    # Finds the position of the first occurence of a substring 
+    $output = strpos('Hello World', 'o');
+    echo $output;
+    // -> 4
+
+    # strrpos()
+    # Finds the position of the last occurence of a substring 
+    $output = strrpos('Hello World', 'o');
+    echo $output;
+    // -> 7
+
+    # trim() 
+    # Strips whitespace 
+    $text = 'Hello World                ';
+    var_dump($text);
+    // -> string(25) "Hello World"
+    // Counting all the spaces after Hello World
+
+    $trimmed = trim($text);
+    var_dump($trimmed);
+
+    # strtoupper() 
+    # Makes everything uppercase 
+    $output = strtoupper('Hello World');
+    echo $output;
+
+    # strtolower() 
+    # Makes everything lowercase 
+    $output = strtolower('Hello World');
+    
+    # ucwords()
+    # Caps first letter of each word
+    $output = ucwords('hello world ');
+    echo $output; 
+    //-> Hello World 
+
+    # str_replace()
+    # Replace all occurences of a search string with a replacement 
+    $text = 'Hello World';
+    $output = str_replace('World', 'Everyone', $text);
+    echo $ouput;
+    // -> Hello Everyone 
+
+    # is_string()
+    # Check if string 
+    $val = 'Hello';
+    $ouput = is_string($val);
+    echo output;
+    // -> 1
+
+    $values = array(true, false, null, 'abc', 33, '33', 22.4, '22.4', '', ' ', 0, '0');
+    foreach($values as $value){
+        if (is_string($value)){
+            echo "{$value} is a string<br>"
+        }
+    }
+    
+    #gzcompress() 
+    # Compress a string 
+    $string = "lorem ipsum very long string..."
+
+    $compressed = gzcompress($string);
+    echo $compressed;
+    // -> unreadable compressed text 
+    // useful for compression
+
+    // to uncompress 
+    $original = gzuncompress($compressed);
+```
+- In our substring we pass the string we want to make a substring of as the first arg, we pass a second arg specifying start position, the 3rd is where to end, th
+- Using negative numbers will start from the back of the string.
+- `strpos` versus `strrpos`, the two rs, the latter finds the last occurence.
+- use `trim()` typically with form inputs to trim any user inputed whitespace 
+-  `str_replace()` takes 3 parameters: the 1st is the string to be replaced, the 2nd is the str to replace with, the 3rd parameter is the string to search.
+- for `is_string` we get a `1` as a return value for true, we get nothing when its false, its ignored.
+    - why isn't this a 0 or false? 
+
+## Ternary & Shorthand Syntax 
+```php 
+<?php 
+    # Normal if statement  
+    $loggedIn = true;
+
+    if($loggedIn) {
+        echo 'You are logged in';   
+    } else {
+        echo 'You are not logged in';
+    }
+```
+We can save ourselves a few lines by putting the above one a single line ...
+```php
+<?php 
+    # shorthands 
+    echo ($loggedIn) ? 'You are logged in' : 'You are not logged in';
+```
+- Ternary works very similar to JS 
+- You can also assign variables based on conditions
+
+```php
+<?php 
+    # shorthands 
+    $isRegistered = ($loggedIn == true) ? true : false;
+    echo $isRegistered;
+```
+- We can also nest these statements 
+
+```php
+<?php 
+    # shorthands 
+    $isRegistered = ($loggedIn == true) ? true : false;
+    echo $isRegistered;
+
+    $age = 20;
+    $score = 15;
+
+    echo 'Your score is: '.($score > 10 ? ($age > 10 ? 'Average': 'Exceptional'):($age > 10 ? 'Horrible': 'Average'));
+```
+
+## Alternative Syntax 
+Usually used when embedding statements inside of html 
+
+Here is the regular way first...
+```php
+<?php 
+    <div>
+    <?php if($loggedIn) { ?>
+        <h1>Welcome User</h1>
+    <?php ? ?>
+    </div>
+```
+
+
+## Filters & Validation 
+## PHP - Contact Form 
+## Sessions 
+## Cookies 
+## PHP & AJAX 
+## File System Functions 
+## OOP 
+## Fetching Data with MySQLi 
+## MySQLi - Insert, Update, and Delete  
+
+## Key Insights
+- Interesting how the pass by reference option with the & helped me clarify the pass by reference/value in other langs more clearly. It
+
+- `print_r` and `var_dump` helpful for debugging
+
+### Shorthand syntax for conditionals/loops within markdown 
+> ⭐ You can use the syntax `<?php if(condition): ?>` /* markdown */ `<?php endif; ?>` to wrap html within a php condition, you can do the same with things like foreach...
+
+### isset 
+- `isset` is a function that can wraps the condition value of an `if` statement to check if a value has been set, it is a required PHP function if you are checking to see if something from a form has been set: `if(isset($_GET['name']))`
+
+### XSS 
+- `htmlentitites()` super important function when dealing with security in PHP and dealing with content a user can submit to the server.   
+
+
+## Summary Questions 
